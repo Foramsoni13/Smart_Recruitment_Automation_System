@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}
+Assign Candidates - {{ exam.title }} | Smart Recruitment
+{% endblock %}
+
+{% block css %}
+<style>
+    body { background-color: #f8fafc; }
+    .card-custom {
+        background: #ffffff;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">Assign Candidates to "{{ exam.title }}"</h3>
+            <p class="text-muted mb-0">Select individual candidates or assign by Job / Upload batch.</p>
+        </div>
+        <a href="{{ url_for('hr_exams_list') }}" class="btn btn-secondary btn-sm">
+            <i class="fa-solid fa-arrow-left me-1"></i> Back to Exams
+        </a>
+    </div>
+
+    <!-- BULK ASSIGN BY JOB / UPLOAD CARD -->
+    <div class="card-custom mb-4">
+        <h5 class="fw-bold text-primary mb-3"><i class="fa-solid fa-layer-group me-2"></i>Bulk Assign by Job / Upload Batch</h5>
+
+        <form action="{{ url_for('hr_assign_exam_batch', exam_id=exam.id) }}" method="POST" class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label class="form-label fw-semibold">Select Job / Upload Batch</label>
+                <select name="job_upload_key" class="form-select" required>
+                    <option value="">-- Choose Job / Batch --</option>
+                    {% for job in automation_jobs %}
+                        <option value="job_{{ job.job_code }}">Job: {{ job.job_name }} ({{ job.job_code }}) - {{ job.total_candidates }} candidates</option>
+                    {% endfor %}
+                    {% for uf in uploaded_files %}
+                        <option value="upload_{{ uf.upload_id }}">Upload Batch: {{ uf.filename }} (ID: {{ uf.upload_id }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary fw-bold">
+                    <i class="fa-solid fa-users-gear me-1"></i> Assign Whole Batch
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- INDIVIDUAL CANDIDATES TABLE -->
+    <div class="card-custom">
+        <form action="{{ url_for('hr_assign_exam', exam_id=exam.id) }}" method="POST">
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                <h5 class="fw-bold mb-0">Candidate Selection ({{ candidates|length if candidates else 0 }})</h5>
+                <button type="submit" class="btn btn-primary fw-bold">
+                    <i class="fa-solid fa-floppy-disk me-1"></i> Save Selected Assignments
+                </button>
+            </div>
+
+            {% if candidates and candidates|length > 0 %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 40px;">
+                                    <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)" style="cursor: pointer;">
+                                </th>
+                                <th>Candidate Name</th>
+                                <th>Email Address</th>
+                                <th>Position / Job ID</th>
+                                <th>Assignment Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in candidates %}
+                            <tr>
+                                <td>
+                                    <input type="checkbox" name="candidate_ids" value="{{ c.id }}" class="cand-checkbox" {% if c.id in assigned_cand_ids %}checked{% endif %} style="cursor: pointer;">
+                                </td>
+                                <td><strong>{{ c.name }}</strong></td>
+                                <td>{{ c.email }}</td>
+                                <td>{{ c.position }} <small class="text-muted">({{ c.job_id or 'General' }})</small></td>
+                                <td>
+                                    {% if c.id in assigned_cand_ids %}
+                                        <span class="badge bg-success"><i class="fa-solid fa-check me-1"></i> Assigned</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Not Assigned</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-4 text-muted">
+                    No candidates found in the database.
+                </div>
+            {% endif %}
+
+        </form>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+    function toggleSelectAll(master) {
+        const checkboxes = document.querySelectorAll('.cand-checkbox');
+        checkboxes.forEach(cb => cb.checked = master.checked);
+    }
+</script>
+{% endblock %}

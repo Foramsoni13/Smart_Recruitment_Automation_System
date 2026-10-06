@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block title %}
+Attempt Audit & Security Detail #{{ attempt.id }} | Smart Recruitment
+{% endblock %}
+
+{% block css %}
+<style>
+    body { background-color: #f8fafc; }
+    .card-custom {
+        background: #ffffff;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .timeline-item {
+        border-left: 2px solid #cbd5e1;
+        padding-left: 15px;
+        position: relative;
+        padding-bottom: 15px;
+    }
+    .timeline-item:last-child {
+        padding-bottom: 0;
+    }
+    .timeline-dot {
+        position: absolute;
+        left: -6px;
+        top: 0;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #ef4444;
+    }
+    .q-audit-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 12px;
+    }
+    .badge-correct { background: #dcfce7; color: #166534; font-weight: 700; }
+    .badge-wrong { background: #fee2e2; color: #991b1b; font-weight: 700; }
+    .badge-unanswered { background: #f1f5f9; color: #64748b; font-weight: 600; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">Candidate Attempt Audit #{{ attempt.id }}</h3>
+            <p class="text-muted mb-0">Detailed proctoring security timeline and question response analysis.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="/api/hr/exam/{{ exam.id }}/export" class="btn btn-outline-success btn-sm">
+                <i class="fa-solid fa-file-excel me-1"></i> Export Results CSV
+            </a>
+            <a href="{{ url_for('hr_exam_monitor', exam_id=exam.id) }}" class="btn btn-secondary btn-sm">
+                <i class="fa-solid fa-arrow-left me-1"></i> Back to Monitor
+            </a>
+        </div>
+    </div>
+
+    <!-- SUMMARY ROW -->
+    <div class="row g-3 mb-4">
+
+        <!-- CANDIDATE DETAILS -->
+        <div class="col-md-3">
+            <div class="card-custom h-100">
+                <h6 class="fw-bold text-primary mb-3"><i class="fa-solid fa-user me-2"></i>Candidate Profile</h6>
+                <p class="mb-1"><strong>Name:</strong> {{ candidate.name }}</p>
+                <p class="mb-1"><strong>Email:</strong> {{ candidate.email }}</p>
+                <p class="mb-1"><strong>Phone:</strong> {{ candidate.phone or 'N/A' }}</p>
+                <p class="mb-1"><strong>Candidate ID:</strong> #{{ candidate.id }}</p>
+                <p class="mb-0"><strong>Job / Batch:</strong> {{ attempt.job_id or 'General' }}</p>
+            </div>
+        </div>
+
+        <!-- EXAM DETAILS -->
+        <div class="col-md-3">
+            <div class="card-custom h-100">
+                <h6 class="fw-bold text-primary mb-3"><i class="fa-solid fa-file-signature me-2"></i>Exam Overview</h6>
+                <p class="mb-1"><strong>Exam Title:</strong> {{ exam.title }}</p>
+                <p class="mb-1"><strong>Attempt ID:</strong> #{{ attempt.id }}</p>
+                <p class="mb-1"><strong>Started At:</strong> {{ attempt.started_at or 'N/A' }}</p>
+                <p class="mb-1"><strong>Submitted At:</strong> {{ attempt.submitted_at or 'N/A' }}</p>
+                <p class="mb-0"><strong>Final Status:</strong> <span class="badge bg-primary">{{ attempt.status }}</span></p>
+            </div>
+        </div>
+
+        <!-- RESULT SCORE -->
+        <div class="col-md-3">
+            <div class="card-custom h-100">
+                <h6 class="fw-bold text-primary mb-3"><i class="fa-solid fa-trophy me-2"></i>Result Performance</h6>
+                <p class="mb-1"><strong>Score:</strong> {{ "%.1f"|format(attempt.score) }} / {{ "%.0f"|format(exam.total_marks) }}</p>
+                <p class="mb-1"><strong>Percentage:</strong> {{ "%.1f"|format(attempt.percentage) }}%</p>
+                <p class="mb-1"><strong>Result:</strong>
+                    {% if attempt.passed %}
+                        <span class="badge bg-success">PASSED</span>
+                    {% else %}
+                        <span class="badge bg-danger">FAILED / DISQUALIFIED</span>
+                    {% endif %}
+                </p>
+                <p class="mb-0"><strong>Correct / Wrong:</strong> {{ correct_count }} / {{ wrong_count }} ({{ unanswered_count }} unans)</p>
+            </div>
+        </div>
+
+        <!-- SECURITY SUMMARY -->
+        <div class="col-md-3">
+            <div class="card-custom h-100">
+                <h6 class="fw-bold text-danger mb-3"><i class="fa-solid fa-shield-halved me-2"></i>Proctoring Security</h6>
+                <p class="mb-1"><strong>Total Warnings:</strong> <span class="badge bg-danger">{{ attempt.warning_count }}</span></p>
+                <p class="mb-1"><strong>Tab Switches:</strong> {{ tab_switch_count }}</p>
+                <p class="mb-1"><strong>Fullscreen Exits:</strong> {{ fs_exit_count }}</p>
+                <p class="mb-0"><strong>Auto Submit:</strong> {{ 'Yes' if attempt.status in ['AUTO_SUBMITTED','DISQUALIFIED','TIME_EXPIRED'] else 'No' }}</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SECURITY ACTIVITY TIMELINE & QUESTION AUDIT -->
+    <div class="row g-3">
+
+        <!-- TIMELINE LOG -->
+        <div class="col-md-4">
+            <div class="card-custom h-100">
+                <h5 class="fw-bold mb-3"><i class="fa-solid fa-clock-rotate-left me-2 text-danger"></i>Security Event History</h5>
+
+                {% if security_events and security_events|length > 0 %}
+                    <div>
+                        {% for ev in security_events %}
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <small class="text-muted d-block">{{ ev.timestamp }}</small>
+                            <strong class="text-danger">{{ ev.violation_type }}</strong>
+                            <div class="small text-dark">Warning #{{ ev.warning_number }}: {{ ev.details or 'Security rule violated' }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4 text-muted">
+                        <i class="fa-solid fa-shield-check fa-2x mb-2 text-success"></i>
+                        <p class="mb-0">No security violations recorded for this attempt.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- QUESTION BY QUESTION ANALYSIS -->
+        <div class="col-md-8">
+            <div class="card-custom">
+                <h5 class="fw-bold mb-3"><i class="fa-solid fa-list-check me-2 text-primary"></i>Question Response Audit</h5>
+
+                {% if question_analysis and question_analysis|length > 0 %}
+                    {% for q in question_analysis %}
+                    <div class="q-audit-card">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <span class="badge bg-secondary me-2">Q{{ loop.index }}</span>
+                                <strong>{{ q.question_text }}</strong>
+                            </div>
+                            <div>
+                                {% if q.is_correct %}
+                                    <span class="badge badge-correct"><i class="fa-solid fa-check me-1"></i> +{{ "%.1f"|format(q.marks_awarded) }}</span>
+                                {% elif q.selected_option %}
+                                    <span class="badge badge-wrong"><i class="fa-solid fa-xmark me-1"></i> {{ "%.2f"|format(q.marks_awarded) }}</span>
+                                {% else %}
+                                    <span class="badge badge-unanswered">0.00 (Unanswered)</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="small text-muted">
+                            Candidate Selected: <strong>Option {{ q.selected_option or 'None' }}</strong> | Correct Answer: <strong class="text-success">Option {{ q.correct_answer }}</strong>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">No responses recorded.</p>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

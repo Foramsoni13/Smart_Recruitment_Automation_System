@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}
+Exam Result - {{ exam.title }} | Smart Recruitment
+{% endblock %}
+
+{% block css %}
+<style>
+    .result-container-inner {
+        max-width: 840px;
+        margin: 0 auto;
+    }
+
+    .result-status-icon {
+        width: 84px;
+        height: 84px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px auto;
+        font-size: 2.3rem;
+    }
+
+    .icon-passed {
+        background: #eff6ff;
+        color: #2563eb;
+        border: 2px solid #bfdbfe;
+        box-shadow: 0 4px 16px rgba(37, 99, 235, 0.15);
+    }
+
+    .icon-failed {
+        background: #f8fafc;
+        color: #475569;
+        border: 2px solid #cbd5e1;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+    }
+
+    .icon-submitted {
+        background: #eff6ff;
+        color: #2563eb;
+        border: 2px solid #bfdbfe;
+        box-shadow: 0 4px 16px rgba(37, 99, 235, 0.15);
+    }
+
+    .score-summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+        margin: 28px 0;
+    }
+
+    .score-card-item {
+        background: #f8fafc;
+        border: 1.5px solid #cbd5e1 !important;
+        border-radius: var(--radius-lg);
+        padding: 20px 16px;
+    }
+
+    .score-label {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+    }
+
+    .score-value {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #000000;
+    }
+
+    .breakdown-row {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        background: #f8fafc;
+        border: 1.5px solid #cbd5e1 !important;
+        border-radius: var(--radius-lg);
+        padding: 20px;
+        margin-bottom: 28px;
+    }
+
+    .breakdown-item {
+        text-align: center;
+    }
+
+    .breakdown-num {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #000000;
+    }
+
+    .breakdown-lbl {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: var(--text-muted);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="app-container">
+    <div class="result-container-inner">
+        <div class="app-card p-4 p-md-5 text-center">
+
+            {% if is_visible %}
+
+                {% if attempt.passed %}
+                    <div class="result-status-icon icon-passed">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                {% else %}
+                    <div class="result-status-icon icon-failed">
+                        <i class="fa-solid fa-circle-xmark"></i>
+                    </div>
+                {% endif %}
+
+                <div class="result-header">
+                    <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-1 mb-2 text-uppercase" style="font-size: 0.8rem;">
+                        EXAM SUBMITTED
+                    </span>
+                    <h1 class="h2 fw-extrabold text-dark mt-1">{{ exam.title }}</h1>
+                </div>
+
+                <!-- MAIN STATS -->
+                <div class="score-summary-grid">
+                    <div class="score-card-item">
+                        <div class="score-label">Score</div>
+                        <div class="score-value">{{ "%.1f"|format(attempt.score) }} / {{ "%.0f"|format(exam.total_marks) }}</div>
+                    </div>
+
+                    <div class="score-card-item">
+                        <div class="score-label">Percentage</div>
+                        <div class="score-value">{{ "%.1f"|format(attempt.percentage) }}%</div>
+                    </div>
+
+                    <div class="score-card-item">
+                        <div class="score-label">Result</div>
+                        <div class="score-value">
+                            {% if attempt.status == 'DISQUALIFIED' %}
+                                <span class="text-dark">DISQUALIFIED</span>
+                            {% elif attempt.passed %}
+                                <span class="text-primary">PASSED</span>
+                            {% else %}
+                                <span class="text-muted">FAILED</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BREAKDOWN -->
+                <div class="breakdown-row">
+                    <div class="breakdown-item">
+                        <div class="breakdown-num text-primary">{{ correct_count }}</div>
+                        <div class="breakdown-lbl">Correct</div>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="breakdown-num text-muted">{{ wrong_count }}</div>
+                        <div class="breakdown-lbl">Wrong</div>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="breakdown-num text-dark">{{ unanswered_count }}</div>
+                        <div class="breakdown-lbl">Unanswered</div>
+                    </div>
+                </div>
+
+            {% else %}
+
+                <div class="result-status-icon icon-submitted">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+
+                <div class="result-header">
+                    <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-1 mb-2 text-uppercase" style="font-size: 0.8rem;">
+                        SUBMITTED SUCCESSFULLY
+                    </span>
+                    <h1 class="h2 fw-extrabold text-dark mt-1">{{ exam.title }}</h1>
+                </div>
+
+                <div class="alert alert-primary border-0 my-4 p-3 rounded-3" style="background: #eff6ff; border: 1.5px solid #bfdbfe !important; color: #1d4ed8; font-weight: 600;">
+                    <i class="fa-solid fa-circle-info me-2"></i>
+                    Your responses have been recorded securely. Exam results will be declared by the recruiter according to schedule.
+                </div>
+
+            {% endif %}
+
+            <div class="text-muted mb-4" style="font-size: 0.88rem; font-weight: 600;">
+                <i class="fa-solid fa-clock me-1 text-primary"></i> Submitted At: {{ attempt.submitted_at or 'Recently' }}
+            </div>
+
+            <div>
+                <a href="{{ url_for('candidate_dashboard') }}" class="btn btn-primary px-4 py-2 fw-bold">
+                    <i class="fa-solid fa-house me-2"></i> Return to Candidate Dashboard
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

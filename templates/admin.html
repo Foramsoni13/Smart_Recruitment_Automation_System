@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+
+{% block title %}
+Admin Dashboard - HR Management | Smart Recruitment
+{% endblock %}
+
+{% block content %}
+<div class="app-container">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header-box">
+        <div>
+            <h2><i class="fa-solid fa-user-shield text-indigo me-2" style="color: #4f46e5;"></i>Administrator Dashboard</h2>
+            <p>Manage system HR users, system roles, and account security specifications.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-indigo-subtle text-indigo px-3 py-2" style="background: rgba(79, 70, 229, 0.1); color: #4f46e5; font-size: 0.85rem; font-weight: 600;">
+                <i class="fa-solid fa-shield-halved me-1"></i> Admin Privileges Active
+            </span>
+        </div>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="stat-card-grid">
+        <div class="stat-card">
+            <div class="stat-icon-box" style="background: #eff6ff; color: #2563eb; border: 1.5px solid #bfdbfe !important;">
+                <i class="fa-solid fa-users-gear"></i>
+            </div>
+            <div>
+                <div class="stat-val">{{ hr_users|length if hr_users else 0 }}</div>
+                <div class="stat-label">Registered HR Accounts</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon-box" style="background: #eff6ff; color: #2563eb; border: 1.5px solid #bfdbfe !important;">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div>
+                <div class="stat-val">Active</div>
+                <div class="stat-label">System Health & Services</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon-box" style="background: #eff6ff; color: #2563eb; border: 1.5px solid #bfdbfe !important;">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <div>
+                <div class="stat-val">Secured</div>
+                <div class="stat-label">TOTP / 2FA Verification</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HR USERS MANAGEMENT CARD -->
+    <div class="app-card">
+        <div class="app-card-header">
+            <div>
+                <h3 class="app-card-title">
+                    <i class="fa-solid fa-id-card-clip text-primary me-1"></i> HR Accounts Management
+                </h3>
+                <small class="text-muted">Review, search, and manage registered recruitment managers.</small>
+            </div>
+            <div>
+                <div class="input-group" style="width: 260px;">
+                    <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                    <input type="text" id="hrSearchInput" class="form-control border-start-0 ps-0" placeholder="Search HR user...">
+                </div>
+            </div>
+        </div>
+
+        <!-- TABLE -->
+        <div class="table-responsive-wrapper">
+            <table class="table-app" id="hrTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Full Name</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if hr_users and hr_users|length > 0 %}
+                        {% for user in hr_users %}
+                        <tr id="hr-row-{{ user.id }}">
+                            <td><strong>#{{ user.id }}</strong></td>
+                            <td>
+                                <div class="fw-bold text-dark">{{ user.fullname or 'HR User' }}</div>
+                            </td>
+                            <td><code>{{ user.username }}</code></td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.phone or '-' }}</td>
+                            <td>
+                                <span class="badge bg-success-subtle text-success px-2.5 py-1 rounded-pill" style="font-size: 0.78rem; font-weight: 600;">
+                                    <i class="fa-solid fa-circle-check me-1"></i> Active
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <button type="button" class="btn btn-outline-danger btn-sm rounded-2 px-3 fw-semibold" onclick="confirmDeleteHr({{ user.id }}, '{{ user.fullname|replace("'", "\\'") }}', '{{ user.email }}')">
+                                    <i class="fa-solid fa-trash me-1"></i> Delete HR
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5">
+                                <div class="empty-state-card border-0 my-0 py-3">
+                                    <div class="empty-state-icon mb-2" style="width: 50px; height: 50px; font-size: 1.4rem;">
+                                        <i class="fa-solid fa-user-group"></i>
+                                    </div>
+                                    <h6 class="empty-state-title">No HR Accounts Found</h6>
+                                    <p class="empty-state-desc mb-0">No HR accounts have been registered yet.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- DELETE HR CONFIRMATION MODAL -->
+<div class="modal fade" id="deleteHrModal" tabindex="-1" aria-labelledby="deleteHrModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header bg-danger text-white border-0 py-3">
+                <h5 class="modal-title font-weight-bold" id="deleteHrModalLabel">
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i> Confirm HR Account Deletion
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="mb-2 text-dark font-weight-medium">Are you sure you want to delete this HR user account?</p>
+                <div class="alert alert-warning border-0 my-3 rounded-3">
+                    <div class="fw-bold text-dark" id="modalHrName">HR User</div>
+                    <small class="text-muted" id="modalHrEmail">hr@company.com</small>
+                </div>
+                <p class="text-muted small mb-0">
+                    <i class="fa-solid fa-shield-halved me-1 text-danger"></i>
+                    This action will revoke system access for this HR user. Candidate profiles will remain preserved.
+                </p>
+            </div>
+            <div class="modal-footer border-0 bg-light py-3">
+                <button type="button" class="btn btn-secondary-custom btn-sm px-3" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger btn-sm px-4 fw-bold" id="confirmDeleteHrBtn">
+                    <i class="fa-solid fa-trash me-1"></i> Delete HR Account
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+    let selectedHrId = null;
+
+    function confirmDeleteHr(id, name, email) {
+        selectedHrId = id;
+        document.getElementById("modalHrName").textContent = name || "HR User #" + id;
+        document.getElementById("modalHrEmail").textContent = email || "";
+        const modal = new bootstrap.Modal(document.getElementById("deleteHrModal"));
+        modal.show();
+    }
+
+    document.getElementById("confirmDeleteHrBtn").addEventListener("click", function() {
+        if (!selectedHrId) return;
+
+        const deleteBtn = this;
+        deleteBtn.disabled = true;
+        deleteBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i> Deleting...`;
+
+        fetch(`/admin/hr/${selectedHrId}`, {
+            method: "DELETE",
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+                "Content-Type": "application/json"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            deleteBtn.disabled = false;
+            deleteBtn.innerHTML = `<i class="fa-solid fa-trash me-1"></i> Delete HR Account`;
+
+            const modalEl = document.getElementById("deleteHrModal");
+            const modalInstance = bootstrap.Modal.getInstance(modalEl);
+            if (modalInstance) modalInstance.hide();
+
+            if (data.success || data.status === "success") {
+                const row = document.getElementById(`hr-row-${selectedHrId}`);
+                if (row) row.remove();
+                if (typeof showWebsiteToast === 'function') {
+                    showWebsiteToast("HR user deleted successfully.", "success");
+                } else {
+                    alert("HR user deleted successfully.");
+                }
+            } else {
+                const errMsg = "Deletion failed: " + (data.message || "Unauthorized action");
+                if (typeof showWebsiteAlert === 'function') {
+                    showWebsiteAlert("Action Failed", errMsg, "error");
+                } else {
+                    alert(errMsg);
+                }
+            }
+        })
+        .catch(err => {
+            deleteBtn.disabled = false;
+            deleteBtn.innerHTML = `<i class="fa-solid fa-trash me-1"></i> Delete HR Account`;
+            const errMsg = "Error communicating with server: " + err.message;
+            if (typeof showWebsiteAlert === 'function') {
+                showWebsiteAlert("Server Communication Error", errMsg, "error");
+            } else {
+                alert(errMsg);
+            }
+        });
+    });
+
+    // Client-side search filter for HR users
+    const hrSearchInput = document.getElementById("hrSearchInput");
+    if (hrSearchInput) {
+        hrSearchInput.addEventListener("input", function() {
+            const filter = this.value.toLowerCase().trim();
+            const rows = document.querySelectorAll("#hrTable tbody tr");
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(filter) ? "" : "none";
+            });
+        });
+    }
+</script>
+{% endblock %}

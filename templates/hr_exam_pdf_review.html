@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+
+{% block title %}
+Review Extracted Questions | Smart Recruitment
+{% endblock %}
+
+{% block css %}
+<style>
+    body { background-color: #f8fafc; }
+    .review-summary-card {
+        background: #ffffff;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        padding: 1.5rem 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    }
+    .question-card {
+        background: #ffffff;
+        border-radius: 14px;
+        border: 1px solid #cbd5e1;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+    }
+    .question-card.warning-card {
+        border-left: 5px solid #3b82f6;
+        background: #eff6ff;
+    }
+    .badge-warning-item {
+        background-color: #e0f2fe;
+        color: #0369a1;
+        font-size: 0.82rem;
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- SUMMARY HEADER -->
+    <div class="review-summary-card d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h4 class="fw-bold mb-1"><i class="fa-solid fa-list-check me-2 text-indigo"></i>PDF Question Extraction Review</h4>
+            <p class="text-muted mb-0">Verify extracted questions, correct any missing options/answers, and finalize the exam for publication.</p>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <span class="badge bg-primary fs-6 px-3 py-2">Total: {{ total_count }}</span>
+            <span class="badge bg-success fs-6 px-3 py-2">Valid: {{ valid_count }}</span>
+            <span class="badge bg-warning text-dark fs-6 px-3 py-2">Review Required: {{ review_count }}</span>
+        </div>
+    </div>
+
+    <!-- PUBLISH FORM -->
+    <form action="{{ url_for('hr_publish_pdf_exam') }}" method="POST" id="publishForm">
+        
+        <!-- Hidden Metadata Fields -->
+        <input type="hidden" name="title" value="{{ exam_config.title }}">
+        <input type="hidden" name="description" value="{{ exam_config.description }}">
+        <input type="hidden" name="duration_minutes" value="{{ exam_config.duration_minutes }}">
+        <input type="hidden" name="total_marks" value="{{ exam_config.total_marks }}">
+        <input type="hidden" name="passing_marks" value="{{ exam_config.passing_marks }}">
+        <input type="hidden" name="negative_marking" value="{{ exam_config.negative_marking }}">
+        <input type="hidden" name="randomize_questions" value="{{ exam_config.randomize_questions }}">
+        <input type="hidden" name="randomize_options" value="{{ exam_config.randomize_options }}">
+        <input type="hidden" name="total_questions_to_show" value="{{ exam_config.total_questions_to_show or '' }}">
+        <input type="hidden" name="allowed_warnings" value="{{ exam_config.allowed_warnings }}">
+        <input type="hidden" name="auto_submit_on_violation" value="{{ exam_config.auto_submit_on_violation }}">
+        <input type="hidden" name="camera_required" value="{{ exam_config.camera_required }}">
+        <input type="hidden" name="fullscreen_required" value="{{ exam_config.fullscreen_required }}">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0">Extracted Questions ({{ questions|length }})</h5>
+            <button type="button" class="btn btn-outline-primary btn-sm" onclick="addNewQuestionCard()">
+                <i class="fa-solid fa-plus me-1"></i> Add Question Manually
+            </button>
+        </div>
+
+        <div id="questionsContainer">
+            {% for q in questions %}
+            <div class="question-card {% if q.requires_review %}warning-card{% endif %}" id="qCard_{{ loop.index }}">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="fw-bold text-dark fs-6">Question #<span class="q-num">{{ loop.index }}</span></span>
+                    <div>
+                        {% if q.warnings %}
+                            {% for w in q.warnings %}
+                                <span class="badge-warning-item me-1"><i class="fa-solid fa-triangle-exclamation me-1"></i>{{ w }}</span>
+                            {% endfor %}
+                        {% endif %}
+                        <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="removeQuestionCard({{ loop.index }})">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Question Text *</label>
+                        <textarea name="q_text_{{ loop.index }}" class="form-control" rows="2" required>{{ q.question_text }}</textarea>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold text-primary">Option A *</label>
+                        <input type="text" name="q_opt_a_{{ loop.index }}" class="form-control" value="{{ q.option_a }}" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold text-primary">Option B *</label>
+                        <input type="text" name="q_opt_b_{{ loop.index }}" class="form-control" value="{{ q.option_b }}" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold text-primary">Option C *</label>
+                        <input type="text" name="q_opt_c_{{ loop.index }}" class="form-control" value="{{ q.option_c }}" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold text-primary">Option D *</label>
+                        <input type="text" name="q_opt_d_{{ loop.index }}" class="form-control" value="{{ q.option_d }}" required>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold text-success">Correct Answer *</label>
+                        <select name="q_ans_{{ loop.index }}" class="form-select fw-bold" required>
+                            <option value="">-- Select --</option>
+                            <option value="A" {% if q.correct_answer == 'A' %}selected{% endif %}>Option A</option>
+                            <option value="B" {% if q.correct_answer == 'B' %}selected{% endif %}>Option B</option>
+                            <option value="C" {% if q.correct_answer == 'C' %}selected{% endif %}>Option C</option>
+                            <option value="D" {% if q.correct_answer == 'D' %}selected{% endif %}>Option D</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Marks</label>
+                        <input type="number" step="0.5" name="q_marks_{{ loop.index }}" class="form-control" value="{{ q.marks or 1.0 }}">
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Negative Marks</label>
+                        <input type="number" step="0.05" name="q_neg_{{ loop.index }}" class="form-control" value="{{ q.negative_marks or 0.0 }}">
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Difficulty</label>
+                        <select name="q_diff_{{ loop.index }}" class="form-select">
+                            <option value="Easy" {% if q.difficulty == 'Easy' %}selected{% endif %}>Easy</option>
+                            <option value="Medium" {% if q.difficulty == 'Medium' %}selected{% endif %}>Medium</option>
+                            <option value="Hard" {% if q.difficulty == 'Hard' %}selected{% endif %}>Hard</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <input type="hidden" name="question_count" id="qCountInput" value="{{ questions|length }}">
+
+        <!-- ACTION BUTTONS -->
+        <div class="card p-3 shadow-sm d-flex flex-row justify-content-between align-items-center mt-4">
+            <a href="{{ url_for('hr_upload_exam_pdf_page') }}" class="btn btn-secondary">
+                <i class="fa-solid fa-arrow-left me-1"></i> Re-upload PDF
+            </a>
+            <button type="submit" class="btn btn-primary btn-lg px-4 fw-bold">
+                <i class="fa-solid fa-circle-check me-2"></i> Publish Exam Now
+            </button>
+        </div>
+
+    </form>
+
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+    let qCounter = {{ questions|length }};
+
+    function removeQuestionCard(id) {
+        const card = document.getElementById('qCard_' + id);
+        if (card) {
+            card.remove();
+            reindexQuestions();
+        }
+    }
+
+    function reindexQuestions() {
+        const cards = document.querySelectorAll('.question-card');
+        document.getElementById('qCountInput').value = cards.length;
+        cards.forEach((c, idx) => {
+            const numSpan = c.querySelector('.q-num');
+            if (numSpan) numSpan.innerText = idx + 1;
+        });
+    }
+
+    function addNewQuestionCard() {
+        qCounter++;
+        const container = document.getElementById('questionsContainer');
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = 'qCard_' + qCounter;
+        card.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-bold text-dark fs-6">Question #<span class="q-num">${qCounter}</span></span>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeQuestionCard(${qCounter})">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+            <div class="row g-3">
+                <div class="col-12">
+                    <label class="form-label fw-semibold">Question Text *</label>
+                    <textarea name="q_text_${qCounter}" class="form-control" rows="2" required placeholder="Enter question text..."></textarea>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold text-primary">Option A *</label>
+                    <input type="text" name="q_opt_a_${qCounter}" class="form-control" required placeholder="Option A">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold text-primary">Option B *</label>
+                    <input type="text" name="q_opt_b_${qCounter}" class="form-control" required placeholder="Option B">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold text-primary">Option C *</label>
+                    <input type="text" name="q_opt_c_${qCounter}" class="form-control" required placeholder="Option C">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold text-primary">Option D *</label>
+                    <input type="text" name="q_opt_d_${qCounter}" class="form-control" required placeholder="Option D">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold text-success">Correct Answer *</label>
+                    <select name="q_ans_${qCounter}" class="form-select fw-bold" required>
+                        <option value="">-- Select --</option>
+                        <option value="A">Option A</option>
+                        <option value="B">Option B</option>
+                        <option value="C">Option C</option>
+                        <option value="D">Option D</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Marks</label>
+                    <input type="number" step="0.5" name="q_marks_${qCounter}" class="form-control" value="1.0">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Negative Marks</label>
+                    <input type="number" step="0.05" name="q_neg_${qCounter}" class="form-control" value="0.0">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Difficulty</label>
+                    <select name="q_diff_${qCounter}" class="form-select">
+                        <option value="Easy">Easy</option>
+                        <option value="Medium" selected>Medium</option>
+                        <option value="Hard">Hard</option>
+                    </select>
+                </div>
+            </div>
+        `;
+        container.appendChild(card);
+        reindexQuestions();
+    }
+</script>
+{% endblock %}

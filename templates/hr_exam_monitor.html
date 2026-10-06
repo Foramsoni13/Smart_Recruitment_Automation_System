@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}
+Live Exam Proctoring Monitor - {{ exam.title }} | Smart Recruitment
+{% endblock %}
+
+{% block css %}
+<style>
+    :root {
+        --dark-bg: #0f172a;
+        --card-bg: #ffffff;
+        --border: #e2e8f0;
+    }
+    body { background-color: #f8fafc; }
+    .monitor-stat-card {
+        background: #ffffff;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.25rem;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+    .stat-num {
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
+    .table-custom th {
+        background: #f1f5f9;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 0.85rem;
+    }
+    .table-custom td {
+        padding: 0.85rem;
+        vertical-align: middle;
+    }
+    .badge-in-progress { background: #eff6ff; color: #1d4ed8; font-weight: 700; border: 1.5px solid #bfdbfe; }
+    .badge-submitted { background: #eff6ff; color: #1d4ed8; font-weight: 700; border: 1.5px solid #bfdbfe; }
+    .badge-not-started { background: #f1f5f9; color: #475569; font-weight: 700; border: 1.5px solid #cbd5e1; }
+    .badge-disqualified { background: #fef2f2; color: #b91c1c; font-weight: 700; border: 1.5px solid #fecaca; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-danger px-2 py-1"><i class="fa-solid fa-signal me-1"></i> LIVE MONITOR</span>
+                <h3 class="fw-bold mb-0">{{ exam.title }}</h3>
+            </div>
+            <p class="text-muted mb-0">Real-time candidate tracking, camera connection telemetry, and proctoring security events.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="fetchLiveStatus()">
+                <i class="fa-solid fa-rotate me-1"></i> Refresh Grid
+            </button>
+            <a href="{{ url_for('hr_exams_list') }}" class="btn btn-secondary btn-sm">
+                <i class="fa-solid fa-arrow-left me-1"></i> Back to Exams
+            </a>
+        </div>
+    </div>
+
+    <!-- METRICS CARDS -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-2.4 col-6">
+            <div class="monitor-stat-card">
+                <small class="text-muted">Total Candidates</small>
+                <div class="stat-num text-dark" id="statTotal">0</div>
+            </div>
+        </div>
+        <div class="col-md-2.4 col-6">
+            <div class="monitor-stat-card">
+                <small class="text-muted">Not Started</small>
+                <div class="stat-num text-secondary" id="statNotStarted">0</div>
+            </div>
+        </div>
+        <div class="col-md-2.4 col-6">
+            <div class="monitor-stat-card">
+                <small class="text-muted">In Progress</small>
+                <div class="stat-num text-info" id="statInProgress">0</div>
+            </div>
+        </div>
+        <div class="col-md-2.4 col-6">
+            <div class="monitor-stat-card">
+                <small class="text-muted">Submitted</small>
+                <div class="stat-num text-success" id="statSubmitted">0</div>
+            </div>
+        </div>
+        <div class="col-md-2.4 col-6">
+            <div class="monitor-stat-card">
+                <small class="text-muted">Security Violations</small>
+                <div class="stat-num text-danger" id="statViolations">0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LIVE MONITOR TABLE -->
+    <div class="card border-0 shadow-sm rounded-4 p-3">
+        <div class="table-responsive">
+            <table class="table table-custom align-middle">
+                <thead>
+                    <tr>
+                        <th>Candidate</th>
+                        <th>Exam Status</th>
+                        <th>Time Remaining</th>
+                        <th>Progress</th>
+                        <th>Camera Status</th>
+                        <th>Full Screen</th>
+                        <th>Warnings</th>
+                        <th>Last Activity</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="monitorTableBody">
+                    <tr>
+                        <td colspan="9" class="text-center py-4 text-muted">
+                            <i class="fa-solid fa-spinner fa-spin me-2"></i> Loading live candidate telemetry...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+    const examId = {{ exam.id }};
+
+    async function fetchLiveStatus() {
+        try {
+            const resp = await fetch(`/api/hr/exam/${examId}/live-status`);
+            const data = await resp.json();
+
+            if (data.success) {
+                // Update stats
+                document.getElementById('statTotal').innerText = data.stats.total;
+                document.getElementById('statNotStarted').innerText = data.stats.not_started;
+                document.getElementById('statInProgress').innerText = data.stats.in_progress;
+                document.getElementById('statSubmitted').innerText = data.stats.submitted;
+                document.getElementById('statViolations').innerText = data.stats.violations;
+
+                // Update Table
+                const tbody = document.getElementById('monitorTableBody');
+                if (data.candidates.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-muted">No candidates assigned to this exam.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = data.candidates.map(c => {
+                    let statusBadge = `<span class="badge badge-not-started">Not Started</span>`;
+                    if (c.status === 'IN_PROGRESS') statusBadge = `<span class="badge badge-in-progress"><i class="fa-solid fa-spinner fa-spin me-1"></i> In Progress</span>`;
+                    else if (c.status === 'SUBMITTED' || c.status === 'AUTO_SUBMITTED' || c.status === 'TIME_EXPIRED') statusBadge = `<span class="badge badge-submitted"><i class="fa-solid fa-check me-1"></i> Submitted</span>`;
+                    else if (c.status === 'DISQUALIFIED') statusBadge = `<span class="badge badge-disqualified"><i class="fa-solid fa-xmark me-1"></i> Disqualified</span>`;
+
+                    const cameraBadge = (c.camera_status === 'Connected')
+                        ? `<span class="badge bg-success-subtle text-success border border-success"><i class="fa-solid fa-video me-1"></i> Connected</span>`
+                        : `<span class="badge bg-secondary-subtle text-secondary"><i class="fa-solid fa-video-slash me-1"></i> Disconnected</span>`;
+
+                    const fsBadge = (c.fullscreen_status === 'Active')
+                        ? `<span class="badge bg-info-subtle text-info border border-info">Active</span>`
+                        : `<span class="badge bg-danger-subtle text-danger">Exited</span>`;
+
+                    const warningBadge = (c.warnings > 0)
+                        ? `<span class="badge bg-danger text-white fw-bold">${c.warnings} Warning(s)</span>`
+                        : `<span class="badge bg-light text-dark border">0</span>`;
+
+                    return `
+                        <tr>
+                            <td>
+                                <strong>${c.name}</strong><br>
+                                <small class="text-muted">${c.email}</small>
+                            </td>
+                            <td>${statusBadge}</td>
+                            <td><strong class="font-monospace text-primary">${c.remaining_time || '--:--'}</strong></td>
+                            <td>${c.answered_count} / ${c.total_questions} answered</td>
+                            <td>${cameraBadge}</td>
+                            <td>${fsBadge}</td>
+                            <td>${warningBadge}</td>
+                            <td><small class="text-muted">${c.last_activity || 'N/A'}</small></td>
+                            <td class="text-end">
+                                ${c.attempt_id ? `<a href="/hr/exams/attempt/${c.attempt_id}" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-shield-halved me-1"></i> Audit</a>` : '<span class="text-muted small">--</span>'}
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+        } catch (err) {
+            console.error("Fetch live status error:", err);
+        }
+    }
+
+    // Auto-poll every 5 seconds
+    setInterval(fetchLiveStatus, 5000);
+    document.addEventListener('DOMContentLoaded', fetchLiveStatus);
+</script>
+{% endblock %}

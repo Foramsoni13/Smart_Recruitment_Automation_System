@@ -1,0 +1,19 @@
+# Environment variables
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+
+# Logs and temporary files
+*.log
+automation/logs/*
+!automation/logs/.gitkeep
+
+# macOS
+.DS_Store
+
+uploads/

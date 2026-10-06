@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+
+{% block title %}
+Resume Scanner | Smart Recruitment
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/resume_scanner.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="scanner-page">
+
+    <!-- =====================================================
+         BACKGROUND EFFECTS
+    ====================================================== -->
+    <div class="scanner-background">
+        <div class="scanner-orb orb-1"></div>
+        <div class="scanner-orb orb-2"></div>
+        <div class="scanner-orb orb-3"></div>
+        <div class="scanner-grid"></div>
+    </div>
+
+    <!-- =====================================================
+         HEADER & NAV
+    ====================================================== -->
+    <header class="scanner-header">
+
+        <div class="scanner-header-left">
+
+            <a href="{{ url_for('home') }}"
+               class="back-btn"
+               title="Back to Dashboard">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+
+            <div class="scanner-header-icon">
+                <i class="fa-solid fa-file-arrow-up"></i>
+            </div>
+
+            <div>
+                <span class="scanner-eyebrow">
+                    AUTOMATION MODULE
+                </span>
+                <h1>Resume Scanner</h1>
+            </div>
+
+        </div>
+
+        <div class="scanner-header-right">
+
+            <div class="live-indicator">
+                SCANNER READY
+            </div>
+
+            <a href="{{ url_for('candidates') }}" class="nav-shortcut-btn">
+                <i class="fa-solid fa-users"></i>
+                <span>Candidates</span>
+            </a>
+
+            <a href="{{ url_for('home') }}" class="nav-shortcut-btn">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         MAIN SCANNER CONTAINER
+    ====================================================== -->
+    <main class="scanner-main">
+
+        <!-- UPLOAD SECTION -->
+        <section class="upload-section" id="uploadSection">
+
+            <div class="upload-card">
+
+                <div class="upload-header">
+                    <h2>Upload Candidate Resume</h2>
+                </div>
+
+                <!-- DRAG AND DROP ZONE -->
+                <div class="drop-zone" id="dropZone">
+                    
+                    <div class="drop-zone-icon">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                    </div>
+
+                    <h3>Drag and drop resume here</h3>
+                    <p>or click browse to choose from your computer</p>
+
+                    <label for="resumeFileInput" class="btn-choose-file">
+                        <i class="fa-solid fa-folder-open"></i>
+                        <span>Upload Resume</span>
+                    </label>
+
+                    <input type="file"
+                           id="resumeFileInput"
+                           name="resume"
+                           accept=".pdf,.doc,.docx"
+                           hidden>
+
+                    <div class="supported-formats">
+                        <span class="format-tag"><i class="fa-solid fa-file-pdf"></i> PDF</span>
+                        <span class="format-tag"><i class="fa-solid fa-file-word"></i> DOC</span>
+                        <span class="format-tag"><i class="fa-solid fa-file-word"></i> DOCX</span>
+                    </div>
+
+                </div>
+
+                <!-- ERROR / NOTICE BANNER -->
+                <div class="scanner-alert alert-error hidden" id="scannerErrorBanner">
+                    <div class="alert-icon">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                    </div>
+                    <div class="alert-content">
+                        <strong id="errorTitle">Upload Error</strong>
+                        <span id="errorMessage">Unsupported resume format. Please upload PDF, DOC, or DOCX.</span>
+                    </div>
+                    <button type="button" class="alert-close" id="closeErrorBanner">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- SCANNING & PROCESSING PROGRESS -->
+        <section class="progress-section hidden" id="progressSection">
+
+            <div class="progress-card">
+
+                <div class="progress-spinner-box">
+                    <div class="pulse-ring"></div>
+                    <div class="spinner-core">
+                        <i class="fa-solid fa-file-waveform fa-bounce"></i>
+                    </div>
+                </div>
+
+                <h2 id="progressStatusTitle">Processing resume...</h2>
+                <p id="progressStatusSubtitle">Uploading and analyzing document text...</p>
+
+                <!-- PIPELINE STEPS -->
+                <div class="pipeline-tracker">
+
+                    <div class="tracker-step step-active" id="stepUpload">
+                        <div class="tracker-icon"><i class="fa-solid fa-check"></i></div>
+                        <span>Resume uploaded successfully</span>
+                    </div>
+
+                    <div class="tracker-line" id="line1"></div>
+
+                    <div class="tracker-step" id="stepProcess">
+                        <div class="tracker-icon"><i class="fa-solid fa-spinner fa-spin"></i></div>
+                        <span>Processing resume...</span>
+                    </div>
+
+                    <div class="tracker-line" id="line2"></div>
+
+                    <div class="tracker-step" id="stepExtract">
+                        <div class="tracker-icon"><i class="fa-solid fa-brain"></i></div>
+                        <span>Candidate information extracted successfully</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- RESULT SECTION: EXTRACTED CANDIDATE DATA -->
+        <section class="result-section hidden" id="resultSection">
+
+            <div class="result-card">
+
+                <div class="result-header">
+
+                    <div class="result-header-left">
+                        <div class="candidate-avatar">
+                            <i class="fa-solid fa-user-check"></i>
+                        </div>
+                        <div>
+                            <span class="result-eyebrow">
+                                <i class="fa-solid fa-circle-check"></i> PROCESSED SUCCESSFULLY
+                            </span>
+                            <h2 id="resCandidateName">Candidate Name</h2>
+                            <span class="candidate-role-pill" id="resCandidatePosition">Software Engineer</span>
+                        </div>
+                    </div>
+
+                    <div class="result-header-actions">
+                        <button type="button" class="btn-scan-again" id="scanAgainBtn">
+                            <i class="fa-solid fa-plus"></i> Scan Another
+                        </button>
+                        <a href="{{ url_for('candidates') }}" class="btn-view-candidates">
+                            <i class="fa-solid fa-users"></i> View in Candidates
+                        </a>
+                    </div>
+
+                </div>
+
+                <!-- EXTRACTION STATUS NOTICE -->
+                <div class="status-notice" id="statusNotice">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span id="statusNoticeText">Candidate record stored in database and available for recruitment automation.</span>
+                </div>
+
+                <!-- EXTRACTED DETAILS GRID -->
+                <div class="details-grid">
+
+                    <!-- EMAIL -->
+                    <div class="detail-card">
+                        <div class="detail-icon"><i class="fa-solid fa-envelope"></i></div>
+                        <div class="detail-content">
+                            <label>Email Address</label>
+                            <strong id="resCandidateEmail">-</strong>
+                        </div>
+                    </div>
+
+                    <!-- PHONE -->
+                    <div class="detail-card">
+                        <div class="detail-icon"><i class="fa-solid fa-phone"></i></div>
+                        <div class="detail-content">
+                            <label>Phone Number</label>
+                            <strong id="resCandidatePhone">-</strong>
+                        </div>
+                    </div>
+
+                    <!-- EXPERIENCE -->
+                    <div class="detail-card">
+                        <div class="detail-icon"><i class="fa-solid fa-briefcase"></i></div>
+                        <div class="detail-content">
+                            <label>Experience</label>
+                            <strong id="resCandidateExperience">-</strong>
+                        </div>
+                    </div>
+
+                    <!-- EDUCATION -->
+                    <div class="detail-card">
+                        <div class="detail-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                        <div class="detail-content">
+                            <label>Education</label>
+                            <strong id="resCandidateEducation">-</strong>
+                        </div>
+                    </div>
+
+                    <!-- RESUME FILE & LINK -->
+                    <div class="detail-card full-width">
+                        <div class="detail-icon"><i class="fa-solid fa-file-pdf"></i></div>
+                        <div class="detail-content">
+                            <label>Resume File</label>
+                            <div class="resume-file-row">
+                                <strong id="resCandidateFilename">resume.pdf</strong>
+                                <a href="#" id="resViewResumeBtn" class="btn-preview-resume" target="_blank">
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i> View Resume
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DETECTED SKILLS -->
+                    <div class="detail-card full-width">
+                        <div class="detail-icon"><i class="fa-solid fa-code"></i></div>
+                        <div class="detail-content">
+                            <label>Detected Skills & Tech Stack</label>
+                            <div class="skills-tags-container" id="resCandidateSkills">
+                                <span class="skill-pill">Python</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script src="{{ url_for('static', filename='js/resume_scanner.js') }}"></script>
+{% endblock %}

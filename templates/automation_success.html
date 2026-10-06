@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+
+{% block title %}
+Automation Completed | Smart Recruitment
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/automation_success.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="automation-success-page" id="automationSuccessPage" data-job-id="{{ job_id or '' }}">
+
+    <div class="success-container">
+
+        <!-- =====================================================
+             TOP NAVIGATION BAR
+        ====================================================== -->
+        <div class="top-nav-bar">
+            <a href="{{ url_for('candidates') }}" class="nav-btn btn-back">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Back to Candidates</span>
+            </a>
+
+            <div class="nav-right">
+                <a href="{{ url_for('home') }}" class="nav-btn btn-home">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+        </div>
+
+
+        <!-- =====================================================
+             HEADER SECTION
+        ====================================================== -->
+        <header class="success-header">
+            <div class="success-icon-box">
+                <div class="success-icon-pulse"></div>
+                <div class="success-icon-inner">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+            </div>
+
+            <div class="header-text">
+                <span class="header-eyebrow">
+                    <i class="fa-solid fa-robot"></i> ROBOT FRAMEWORK AUTOMATION
+                </span>
+                <h1>Automation Completed</h1>
+                <p class="header-subtitle">
+                    Successfully Registered Candidates
+                </p>
+                <div class="completion-pill">
+                    <span class="status-dot"></span>
+                    Candidate automation completed successfully.
+                </div>
+            </div>
+        </header>
+
+
+        <!-- =====================================================
+             SUMMARY STATS CARDS
+        ====================================================== -->
+        <section class="stats-grid">
+
+            <div class="stat-card stat-total">
+                <div class="stat-icon">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <div class="stat-details">
+                    <span class="stat-label">TOTAL PROCESSED</span>
+                    <strong class="stat-value" id="statTotal">0</strong>
+                </div>
+                <div class="stat-bg-glow"></div>
+            </div>
+
+            <div class="stat-card stat-registered">
+                <div class="stat-icon">
+                    <i class="fa-solid fa-user-check"></i>
+                </div>
+                <div class="stat-details">
+                    <span class="stat-label">SUCCESSFULLY REGISTERED</span>
+                    <strong class="stat-value" id="statRegistered">0</strong>
+                </div>
+                <div class="stat-bg-glow"></div>
+            </div>
+
+            <div class="stat-card stat-resumes">
+                <div class="stat-icon">
+                    <i class="fa-solid fa-file-arrow-up"></i>
+                </div>
+                <div class="stat-details">
+                    <span class="stat-label">RESUMES UPLOADED</span>
+                    <strong class="stat-value" id="statResumes">0</strong>
+                </div>
+                <div class="stat-bg-glow"></div>
+            </div>
+
+            <div class="stat-card stat-failed">
+                <div class="stat-icon">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div class="stat-details">
+                    <span class="stat-label">FAILED</span>
+                    <strong class="stat-value" id="statFailed">0</strong>
+                </div>
+                <div class="stat-bg-glow"></div>
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             TABLE CARD SECTION
+        ====================================================== -->
+        <section class="results-card">
+
+            <div class="results-card-header">
+                <div class="results-title">
+                    <div class="results-icon">
+                        <i class="fa-solid fa-list-check"></i>
+                    </div>
+                    <div>
+                        <h2>Processed Candidates</h2>
+                        <p>Candidate records and verified resume attachments</p>
+                    </div>
+                </div>
+
+                <div class="results-controls">
+                    <div class="search-input-wrapper">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="candidateSearchInput" placeholder="Search by name, email, role...">
+                    </div>
+
+                    <div class="filter-wrapper">
+                        <select id="resumeFilter">
+                            <option value="all">All Resumes</option>
+                            <option value="Uploaded">Uploaded</option>
+                            <option value="Not Uploaded">Not Uploaded</option>
+                            <option value="Upload Failed">Upload Failed</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- CANDIDATE TABLE -->
+            <div class="table-responsive">
+                <table class="success-table" id="successCandidatesTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Candidate</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Position</th>
+                            <th>Registration</th>
+                            <th>Resume</th>
+                            <th>Processed At</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="candidatesTableBody">
+                        <!-- Populated by JavaScript -->
+                        <tr class="loading-row">
+                            <td colspan="9">
+                                <div class="table-loader">
+                                    <i class="fa-solid fa-circle-notch fa-spin"></i>
+                                    <span>Loading automation results...</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+            <!-- EMPTY STATE -->
+            <div class="empty-state hidden" id="emptyState">
+                <div class="empty-icon">
+                    <i class="fa-solid fa-folder-open"></i>
+                </div>
+                <h3>No candidates found</h3>
+                <p>No candidates matched your search filter.</p>
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             FOOTER ACTIONS
+        ====================================================== -->
+        <div class="footer-actions">
+            <a href="{{ url_for('candidates') }}" class="action-btn btn-primary-glass">
+                <i class="fa-solid fa-play"></i>
+                <span>Run New Automation</span>
+            </a>
+
+            <a href="{{ url_for('home') }}" class="action-btn btn-secondary-glass">
+                <i class="fa-solid fa-house"></i>
+                <span>Go to Dashboard</span>
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     CANDIDATE DETAILS MODAL
+========================================================== -->
+<div class="modal-backdrop hidden" id="candidateModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <div class="modal-header-info">
+                <div class="modal-avatar" id="modalAvatar">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <div>
+                    <h3 id="modalName">Candidate Details</h3>
+                    <span id="modalPosition" class="modal-position-pill">Position</span>
+                </div>
+            </div>
+            <button type="button" class="modal-close-btn" id="modalCloseBtn" aria-label="Close modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <div class="modal-grid">
+                <div class="modal-item">
+                    <label><i class="fa-solid fa-id-badge"></i> Candidate ID</label>
+                    <strong id="modalCandidateId">-</strong>
+                </div>
+
+                <div class="modal-item">
+                    <label><i class="fa-solid fa-envelope"></i> Email Address</label>
+                    <strong id="modalEmail">-</strong>
+                </div>
+
+                <div class="modal-item">
+                    <label><i class="fa-solid fa-phone"></i> Phone Number</label>
+                    <strong id="modalPhone">-</strong>
+                </div>
+
+                <div class="modal-item">
+                    <label><i class="fa-solid fa-briefcase"></i> Applied Position</label>
+                    <strong id="modalAppliedPosition">-</strong>
+                </div>
+
+                <div class="modal-item">
+                    <label><i class="fa-solid fa-circle-check"></i> Registration Status</label>
+                    <div id="modalRegistrationStatus">-</div>
+                </div>
+
+                <div class="modal-item">
+                    <label><i class="fa-solid fa-file-shield"></i> Resume Status</label>
+                    <div id="modalResumeStatus">-</div>
+                </div>
+
+                <div class="modal-item full-width">
+                    <label><i class="fa-solid fa-file-signature"></i> Resume Filename</label>
+                    <strong id="modalResumeFilename">None</strong>
+                </div>
+
+                <div class="modal-item full-width">
+                    <label><i class="fa-solid fa-clock"></i> Processed Time</label>
+                    <strong id="modalProcessedTime">-</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <div id="modalResumeAction">
+                <!-- Injected by JS: View Resume button or Unavailable badge -->
+            </div>
+            <button type="button" class="btn-modal-close" id="modalFooterCloseBtn">Close</button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script src="{{ url_for('static', filename='js/automation_success.js') }}"></script>
+{% endblock %}

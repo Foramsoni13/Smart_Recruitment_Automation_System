@@ -1,0 +1,734 @@
+{% extends "base.html" %}
+
+{% block title %}
+Candidate Dashboard | Smart Recruitment
+{% endblock %}
+
+{% block css %}
+<style>
+    .page-header-card {
+        background: #ffffff;
+        border: 1.5px solid #cbd5e1 !important;
+        border-radius: var(--radius-xl);
+        padding: 1.5rem 1.75rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    }
+
+    .candidate-welcome-card {
+        background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);
+        border: 1.5px solid #bfdbfe !important;
+        border-radius: var(--radius-xl);
+        padding: 1.5rem 1.75rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 16px rgba(37, 99, 235, 0.06);
+    }
+
+    .candidate-welcome-card h2 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #000000;
+        margin-bottom: 6px;
+        letter-spacing: -0.4px;
+        line-height: 1.25;
+    }
+
+    .candidate-welcome-card p {
+        color: #475569;
+        font-size: 0.94rem;
+        margin-bottom: 0;
+        font-weight: 500;
+        line-height: 1.5;
+    }
+
+    .user-avatar-badge {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: #2563eb;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 1.4rem;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+        flex-shrink: 0;
+    }
+
+    .welcome-icon-box {
+        width: 52px;
+        height: 52px;
+        background: #eff6ff;
+        color: #2563eb;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        border: 1.5px solid #bfdbfe !important;
+        flex-shrink: 0;
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);
+    }
+
+    .app-card {
+        padding: 1.5rem;
+        margin-bottom: 0;
+    }
+
+    .app-card-header {
+        padding-bottom: 0.85rem;
+        margin-bottom: 1rem;
+        border-bottom: 1.5px solid #cbd5e1 !important;
+    }
+
+    .app-card-title {
+        font-size: 1.12rem;
+        font-weight: 800;
+        color: #000000;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .info-list-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 11px 0;
+        border-bottom: 1.5px solid #f1f5f9;
+    }
+
+    .info-list-row:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        font-size: 0.82rem;
+        font-weight: 800;
+        color: #475569;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .info-val {
+        font-size: 0.94rem;
+        font-weight: 700;
+        color: #000000;
+    }
+
+    .badge-status-pill {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border: 1.5px solid transparent;
+    }
+
+    .badge-status-blue {
+        background-color: #eff6ff;
+        color: #1d4ed8;
+        border-color: #bfdbfe;
+    }
+
+    .badge-status-neutral {
+        background-color: #f8fafc;
+        color: #475569;
+        border-color: #cbd5e1;
+    }
+
+    @media (max-width: 767.98px) {
+        .page-header-card, .candidate-welcome-card {
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .info-list-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            padding: 9px 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="app-container">
+
+    <!-- DASHBOARD CARDS GRID -->
+    <div class="row g-4 mb-4">
+
+        <!-- ACCOUNT PROFILE CARD -->
+        <div class="col-lg-4 col-md-6">
+            <div class="app-card h-100">
+                <div class="app-card-header">
+                    <h3 class="app-card-title">
+                        <i class="fa-solid fa-id-card text-primary me-2"></i> Account Profile
+                    </h3>
+                    <a href="{{ url_for('change_password') }}" class="btn btn-primary btn-sm">
+                        <i class="fa-solid fa-key me-1"></i> Password
+                    </a>
+                </div>
+
+                <div class="info-list-row">
+                    <span class="info-label">Full Name</span>
+                    <span class="info-val">{{ user.fullname or candidate.name or 'N/A' }}</span>
+                </div>
+
+                <div class="info-list-row">
+                    <span class="info-label">Username</span>
+                    <span class="info-val">{{ user.username or 'N/A' }}</span>
+                </div>
+
+                <div class="info-list-row">
+                    <span class="info-label">Email Address</span>
+                    <span class="info-val">{{ user.email or candidate.email or 'N/A' }}</span>
+                </div>
+
+                <div class="info-list-row">
+                    <span class="info-label">Phone</span>
+                    <span class="info-val">{{ candidate.phone or user.phone or 'Not Provided' }}</span>
+                </div>
+
+                <div class="info-list-row">
+                    <span class="info-label">Account Role</span>
+                    <span class="info-val">
+                        <span class="badge-status-pill badge-status-blue">
+                            <i class="fa-solid fa-user-check"></i> CANDIDATE
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- APPLICATION STATUS CARD -->
+        <div class="col-lg-4 col-md-6">
+            <div class="app-card h-100">
+                <div class="app-card-header">
+                    <h3 class="app-card-title">
+                        <i class="fa-solid fa-briefcase text-primary me-2"></i> Application Status
+                    </h3>
+                </div>
+
+                <div class="info-list-row">
+                    <span class="info-label">Applied Position</span>
+                    <span class="info-val">{{ candidate.position or 'Software Engineer' }}</span>
+                </div>
+
+                <div class="info-list-row">
+                    <span class="info-label">Job ID</span>
+                    <span class="info-val">{{ candidate.job_id or 'General Application' }}</span>
+                </div>
+
+                <div class="info-list-row">
+                    <span class="info-label">Registration</span>
+                    <span class="info-val">
+                        <span class="badge-status-pill badge-status-blue">
+                            <i class="fa-solid fa-circle-check"></i> {{ candidate.registration_status or 'Registered' }}
+                        </span>
+                    </span>
+                </div>
+
+                <div class="info-list-row">
+                    <span class="info-label">Recruitment Status</span>
+                    <span class="info-val">
+                        <span class="badge-status-pill badge-status-blue">
+                            <i class="fa-solid fa-clock"></i> {{ candidate.status or candidate.automation_status or 'Under Review' }}
+                        </span>
+                    </span>
+                </div>
+
+                <div class="info-list-row">
+                    <span class="info-label">Application Date</span>
+                    <span class="info-val">{{ candidate.created_at or 'Recently' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESUME FILE CARD -->
+        <div class="col-lg-4 col-md-12">
+            <div class="app-card h-100">
+                <div class="app-card-header">
+                    <h3 class="app-card-title">
+                        <i class="fa-solid fa-file-pdf text-primary me-2"></i> Resume Document
+                    </h3>
+                </div>
+
+                <div class="info-list-row">
+                    <span class="info-label">Resume Status</span>
+                    <span class="info-val">
+                        {% if candidate.resume_status == 'Uploaded' or candidate.resume %}
+                            <span class="badge-status-pill badge-status-blue">
+                                <i class="fa-solid fa-file-lines"></i> Uploaded
+                            </span>
+                        {% else %}
+                            <span class="badge-status-pill badge-status-neutral">
+                                <i class="fa-solid fa-file-excel"></i> Missing
+                            </span>
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="info-list-row">
+                    <span class="info-label">Filename</span>
+                    <span class="info-val text-truncate" style="max-width: 180px;">
+                        {{ candidate.resume_filename or candidate.resume or 'No file attached' }}
+                    </span>
+                </div>
+
+                {% if candidate and candidate.id %}
+                <div class="p-3 mt-3 bg-light rounded-3 border border-secondary-subtle">
+                    <form action="{{ url_for('upload_candidate_resume', candidate_id=candidate.id) }}" method="POST" enctype="multipart/form-data">
+                        <label class="form-label text-dark fw-bold small mb-2">Update Resume (.pdf, .doc, .docx):</label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="file" name="resume" class="form-control form-control-sm" style="border-radius: 8px !important;" accept=".pdf,.doc,.docx" required>
+                            <button type="submit" class="btn btn-primary btn-sm px-3 flex-shrink-0" style="border-radius: 8px !important;">
+                                <i class="fa-solid fa-upload me-1"></i> Upload
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ASSIGNED EXAMINATIONS SECTION CARD -->
+    <div class="app-card">
+        <div class="app-card-header">
+            <h3 class="app-card-title">
+                <i class="fa-solid fa-graduation-cap text-primary me-2"></i> Assigned Aptitude Examinations
+            </h3>
+        </div>
+
+        {% if assigned_exams and assigned_exams|length > 0 %}
+            <div class="alert alert-primary border-0 d-flex align-items-center mb-4 p-3 rounded-3" style="background: #eff6ff; border: 1.5px solid #bfdbfe !important; color: #1d4ed8;">
+                <i class="fa-solid fa-bell fa-lg me-3 text-primary"></i>
+                <div>
+                    <strong style="font-size: 0.98rem;" class="text-dark">Assigned Examinations Active</strong><br>
+                    <span style="font-size: 0.88rem;" class="text-muted">Please read examination instructions carefully before launching full-screen proctored assessment.</span>
+                </div>
+            </div>
+
+            <div class="table-responsive-wrapper">
+                <table class="table-app">
+                    <thead>
+                        <tr>
+                            <th>Exam Title</th>
+                            <th>Duration</th>
+                            <th>Marks</th>
+                            <th>Status</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ex in assigned_exams %}
+                        <tr>
+                            <td>
+                                <strong class="text-dark fs-6">{{ ex.title }}</strong><br>
+                                <span class="text-muted small">{{ ex.description or 'Aptitude Assessment' }}</span>
+                            </td>
+                            <td>
+                                <span class="fw-bold text-dark"><i class="fa-solid fa-clock text-primary me-1"></i> {{ ex.duration_minutes }} Mins</span>
+                            </td>
+                            <td>
+                                <span class="fw-bold text-dark">Total: {{ "%.0f"|format(ex.total_marks) }} | Pass: {{ "%.0f"|format(ex.passing_marks) }}</span>
+                            </td>
+                            <td>
+                                {% if ex.attempt_status in ['SUBMITTED', 'AUTO_SUBMITTED', 'TIME_EXPIRED', 'DISQUALIFIED'] %}
+                                    <span class="badge-status-pill badge-status-blue">
+                                        <i class="fa-solid fa-circle-check"></i> Submitted
+                                    </span>
+                                {% elif ex.attempt_status == 'IN_PROGRESS' %}
+                                    <span class="badge-status-pill badge-status-blue">
+                                        <i class="fa-solid fa-spinner fa-spin"></i> In Progress
+                                    </span>
+                                {% else %}
+                                    <span class="badge-status-pill badge-status-neutral">
+                                        <i class="fa-solid fa-hourglass-start"></i> Not Started
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                {% if ex.attempt_status in ['SUBMITTED', 'AUTO_SUBMITTED', 'TIME_EXPIRED', 'DISQUALIFIED'] %}
+                                    <a href="{{ url_for('candidate_exam_result', exam_id=ex.id) }}" class="btn btn-primary btn-sm px-3 fw-bold">
+                                        <i class="fa-solid fa-chart-simple me-1"></i> View Result
+                                    </a>
+                                {% elif ex.attempt_status == 'IN_PROGRESS' %}
+                                    <a href="{{ url_for('take_candidate_exam', exam_id=ex.id) }}" class="btn btn-primary btn-sm px-3 fw-bold">
+                                        <i class="fa-solid fa-play me-1"></i> Resume Exam
+                                    </a>
+                                {% else %}
+                                    <a href="{{ url_for('candidate_exam_instructions', exam_id=ex.id) }}" class="btn btn-primary btn-sm px-3 fw-bold">
+                                        <i class="fa-solid fa-arrow-right me-1"></i> Take Exam
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state-card border-0 py-5">
+                <div class="empty-state-icon">
+                    <i class="fa-solid fa-file-circle-check"></i>
+                </div>
+                <h4 class="empty-state-title">No Assigned Examinations</h4>
+                <p class="empty-state-desc">You currently have no pending aptitude examinations assigned. Check back later or contact your recruiter.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- MY SCHEDULED INTERVIEWS CARD -->
+    <div class="app-card mb-4">
+        <div class="app-card-header">
+            <div>
+                <h3 class="app-card-title"><i class="fa-solid fa-calendar-days text-primary me-2"></i>My Scheduled Interviews</h3>
+                <p class="text-muted small mb-0">View your scheduled recruitment interviews, join meeting links, and check status updates.</p>
+            </div>
+            <span class="badge bg-primary px-3 py-2 fs-6 fw-bold">{{ scheduled_interviews|length }} Scheduled</span>
+        </div>
+
+        {% if scheduled_interviews %}
+            <div class="row g-3">
+                {% for intv in scheduled_interviews %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card p-3.5 h-100 border-1.5 shadow-sm rounded-3 d-flex flex-column justify-content-between" style="border-color: #e2e8f0;">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-2.5">
+                                <span class="badge bg-light text-primary border fw-bold px-2.5 py-1.5" style="font-size: 0.76rem;">{{ intv.interview_type }}</span>
+                                {% if intv.status == 'Scheduled' %}
+                                    <span class="badge bg-primary px-2.5 py-1.5 fw-semibold" style="font-size: 0.74rem;">Scheduled</span>
+                                {% elif intv.status == 'Rescheduled' %}
+                                    <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle px-2.5 py-1.5 fw-semibold" style="font-size: 0.74rem;"><i class="fa-solid fa-arrows-rotate me-1"></i>Rescheduled</span>
+                                {% elif intv.status == 'Reschedule Requested' %}
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1.5 fw-bold" style="font-size: 0.74rem;"><i class="fa-solid fa-clock-rotate-left me-1"></i>Reschedule Requested</span>
+                                {% elif intv.status == 'Completed' %}
+                                    <span class="badge bg-success px-2.5 py-1.5 fw-semibold" style="font-size: 0.74rem;">Completed</span>
+                                {% elif intv.status == 'Cancelled' %}
+                                    <span class="badge bg-danger px-2.5 py-1.5 fw-semibold" style="font-size: 0.74rem;">Cancelled</span>
+                                {% else %}
+                                    <span class="badge bg-secondary px-2.5 py-1.5 fw-semibold" style="font-size: 0.74rem;">{{ intv.status }}</span>
+                                {% endif %}
+                            </div>
+
+                            <h5 class="fw-bold text-dark mb-2.5 fs-6">{{ intv.interview_type }} Interview</h5>
+                            
+                            <div class="p-2.5 rounded-2 bg-light border mb-3" style="border-color: #f1f5f9; font-size: 0.82rem;">
+                                <div class="mb-1.5"><i class="fa-regular fa-calendar text-primary me-2"></i><strong>Date:</strong> <span class="text-dark fw-bold ms-1">{{ intv.interview_date }}</span></div>
+                                <div class="mb-1.5"><i class="fa-regular fa-clock text-primary me-2"></i><strong>Time:</strong> <span class="text-dark fw-bold ms-1">{{ intv.start_time }} - {{ intv.end_time }}</span></div>
+                                <div><i class="fa-solid fa-user-tie text-primary me-2"></i><strong>Interviewer:</strong> <span class="text-secondary ms-1">{{ intv.interviewer_name }}</span></div>
+                            </div>
+
+                            {% if intv.status == 'Reschedule Requested' %}
+                                <!-- Pending Candidate Reschedule Box (Clean, Elegant Layout) -->
+                                <div class="p-3 mb-3 rounded-3 border shadow-none" style="background: #f8fafc; border-color: #cbd5e1 !important; border-left: 4px solid #2563eb !important; font-size: 0.82rem;">
+                                    <div class="fw-bold text-dark d-flex align-items-center justify-content-between mb-2">
+                                        <span class="d-flex align-items-center gap-1.5"><i class="fa-solid fa-clock-rotate-left text-primary"></i> Reschedule Request Pending</span>
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-semibold" style="font-size: 0.68rem;">Under HR Review</span>
+                                    </div>
+                                    <div class="text-secondary mb-1"><strong>Reason:</strong> <span class="text-dark">{{ intv.candidate_reschedule_reason or 'Schedule Conflict' }}</span></div>
+                                    {% if intv.candidate_preferred_date %}
+                                        <div class="text-secondary mb-1"><strong>Preferred:</strong> <span class="text-dark fw-semibold">📅 {{ intv.candidate_preferred_date }}</span> <span class="text-muted">({{ intv.candidate_preferred_time or 'Flexible' }})</span></div>
+                                    {% endif %}
+                                    {% if intv.candidate_reschedule_message %}
+                                        <div class="mt-2 p-2.5 bg-white rounded border text-dark fst-italic" style="font-size: 0.78rem; line-height: 1.4; border-color: #e2e8f0 !important;">
+                                            <i class="fa-solid fa-quote-left small me-1 text-primary opacity-50"></i>{{ intv.candidate_reschedule_message }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="text-muted opacity-75 mt-2 small" style="font-size: 0.7rem;"><i class="fa-regular fa-clock me-1"></i>Submitted: {{ intv.reschedule_requested_at_formatted or 'Recently' }}</div>
+                                </div>
+                            {% elif intv.reschedule_reason and intv.status == 'Rescheduled' %}
+                                <!-- HR Rescheduled Notice -->
+                                <div class="p-2.5 mb-3 rounded-3 bg-light border" style="font-size: 0.78rem;">
+                                    <div class="text-dark fw-semibold mb-1"><i class="fa-solid fa-circle-info text-primary me-1"></i> Rescheduled by HR</div>
+                                    <div class="text-muted mb-1"><strong>Reason:</strong> {{ intv.reschedule_reason }}</div>
+                                    {% if intv.previous_schedule %}
+                                        <div class="text-muted small"><strong>Previous:</strong> <span class="text-decoration-line-through">{{ intv.previous_schedule }}</span></div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+
+                            {% if intv.location_link %}
+                                <div class="mb-2">
+                                    {% if intv.location_link.startswith('http') %}
+                                        <a href="{{ intv.location_link }}" target="_blank" class="btn btn-sm btn-outline-primary w-100 fw-bold">
+                                            <i class="fa-solid fa-video me-1"></i> Join Video Meeting
+                                        </a>
+                                    {% else %}
+                                        <div class="small bg-light p-2 rounded border"><i class="fa-solid fa-location-dot me-1 text-danger"></i> {{ intv.location_link }}</div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+
+                            {% if intv.notes %}
+                                <div class="small text-muted p-2 bg-light rounded border mb-2">
+                                    <strong>Instructions:</strong> {{ intv.notes }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            {% if intv.status in ['Scheduled', 'Rescheduled'] %}
+                                <div class="mt-2 pt-2 border-top">
+                                    <button type="button" class="btn btn-sm btn-outline-primary fw-bold w-100 py-1.5" 
+                                            onclick="openCandidateRescheduleModal({{ intv.id }}, '{{ intv.interview_type|escape }}', '{{ intv.interview_date }}', '{{ intv.start_time }}', '{{ intv.end_time }}', '{{ intv.interviewer_name|escape }}')">
+                                        <i class="fa-solid fa-calendar-rotate-left me-1.5"></i> Request Reschedule
+                                    </button>
+                                </div>
+                            {% endif %}
+
+                            <div class="text-end text-muted opacity-75 mt-2" style="font-size: 0.72rem;">
+                                Updated: {{ intv.updated_at_formatted }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state-card border-0 py-4">
+                <div class="empty-state-icon" style="width: 48px; height: 48px; font-size: 1.3rem;">
+                    <i class="fa-solid fa-calendar-xmark"></i>
+                </div>
+                <h5 class="empty-state-title">No Scheduled Interviews</h5>
+                <p class="empty-state-desc mb-0">You currently have no scheduled interviews. When HR schedules or reschedules an interview for you, details will appear here.</p>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- =========================================================================
+     MODAL: CANDIDATE REQUEST RESCHEDULE
+     ========================================================================= -->
+<div class="modal fade" id="candidateRescheduleModal" tabindex="-1" aria-labelledby="candidateRescheduleModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+            <div class="modal-header border-bottom px-4 py-3" style="background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="d-flex align-items-center justify-content-center rounded-circle" style="width: 42px; height: 42px; background: #dbeafe; color: #2563eb; font-size: 1.2rem;">
+                        <i class="fa-solid fa-calendar-rotate-left"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold text-dark mb-0" id="candidateRescheduleModalLabel">Request Interview Reschedule</h5>
+                        <p class="text-muted small mb-0">Submit your reason and preferred availability to HR.</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form id="candidateRescheduleForm" onsubmit="submitCandidateReschedule(event)">
+                <input type="hidden" id="candReqInterviewId" value="">
+
+                <div class="modal-body p-4">
+                    <!-- Current Interview Summary Card -->
+                    <div class="p-3 mb-3 rounded-3 border" style="background: #f8fafc; border-color: #e2e8f0;">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="badge bg-primary" id="candReqTypeBadge">Technical</span>
+                            <span class="small text-muted" id="candReqInterviewerName">-</span>
+                        </div>
+                        <div class="fw-bold text-dark fs-6" id="candReqCurrentDateTime">-</div>
+                    </div>
+
+                    <!-- 1. Reason Selection -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark small">
+                            <i class="fa-solid fa-circle-question text-primary me-1"></i> Rescheduling Reason <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select form-select-sm" id="candReqReasonSelect" required onchange="handleCandReasonChange()">
+                            <option value="" disabled selected>-- Select a reason --</option>
+                            <option value="Medical Emergency / Health Issue">Medical Emergency / Health Issue</option>
+                            <option value="Academic Exam / Class Schedule Conflict">Academic Exam / Class Schedule Conflict</option>
+                            <option value="Prior Work / Professional Commitment">Prior Work / Professional Commitment</option>
+                            <option value="Technical or Internet Connectivity Issues">Technical or Internet Connectivity Issues</option>
+                            <option value="Personal / Family Emergency">Personal / Family Emergency</option>
+                            <option value="Other">Other (Specify below)</option>
+                        </select>
+                    </div>
+
+                    <!-- Custom reason text box if 'Other' -->
+                    <div class="mb-3 d-none" id="candCustomReasonBox">
+                        <label class="form-label fw-bold text-dark small">Please Specify Reason <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control form-control-sm" id="candCustomReasonInput" placeholder="Briefly describe your reason...">
+                    </div>
+
+                    <!-- 2. When / Preferred Date & Time Window -->
+                    <div class="row g-2 mb-3">
+                        <div class="col-sm-6">
+                            <label class="form-label fw-bold text-dark small">
+                                <i class="fa-regular fa-calendar text-primary me-1"></i> Preferred New Date <span class="text-danger">*</span>
+                            </label>
+                            <input type="date" class="form-control form-control-sm" id="candReqPreferredDate" required>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label fw-bold text-dark small">
+                                <i class="fa-regular fa-clock text-primary me-1"></i> Preferred Time Window <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select form-select-sm" id="candReqPreferredTime" required>
+                                <option value="Morning (09:00 AM - 12:00 PM)">Morning (09:00 AM - 12:00 PM)</option>
+                                <option value="Afternoon (12:00 PM - 04:00 PM)">Afternoon (12:00 PM - 04:00 PM)</option>
+                                <option value="Evening (04:00 PM - 07:00 PM)">Evening (04:00 PM - 07:00 PM)</option>
+                                <option value="Any Available Slot on this Date">Any Available Slot on this Date</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 3. Additional Message / Explanation -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark small">
+                            <i class="fa-solid fa-message text-primary me-1"></i> Message for HR / Recruiter (Optional)
+                        </label>
+                        <textarea class="form-control form-control-sm" id="candReqMessage" rows="3" placeholder="Please provide any additional details, preferred specific hours, or constraints..."></textarea>
+                    </div>
+
+                    <div class="alert alert-info py-2 px-3 small mb-0 rounded-3 border-0" style="background: #eff6ff; color: #1e40af;">
+                        <i class="fa-solid fa-info-circle me-1"></i> HR will review your availability and confirm an updated schedule. You will receive an in-app notification once processed.
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-light border-top px-4 py-3 d-flex justify-content-between">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm px-4 fw-bold" id="candReqSubmitBtn">
+                        <span id="candReqBtnSpinner" class="spinner-border spinner-border-sm me-1 d-none" role="status"></span>
+                        <i class="fa-solid fa-paper-plane me-1"></i> Send Reschedule Request
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function openCandidateRescheduleModal(interviewId, type, date, startTime, endTime, interviewer) {
+    document.getElementById('candidateRescheduleForm').reset();
+    document.getElementById('candReqInterviewId').value = interviewId;
+    document.getElementById('candReqTypeBadge').textContent = type || 'Interview';
+    document.getElementById('candReqInterviewerName').textContent = 'Interviewer: ' + (interviewer || 'HR Team');
+    document.getElementById('candReqCurrentDateTime').textContent = '📅 ' + date + ' (' + startTime + ' - ' + endTime + ')';
+    
+    // Set min date to tomorrow
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const minDateStr = tomorrow.toISOString().split('T')[0];
+    const dateInput = document.getElementById('candReqPreferredDate');
+    dateInput.min = minDateStr;
+    dateInput.value = minDateStr;
+
+    document.getElementById('candCustomReasonBox').classList.add('d-none');
+    document.getElementById('candCustomReasonInput').required = false;
+
+    const modalEl = document.getElementById('candidateRescheduleModal');
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+}
+
+function handleCandReasonChange() {
+    const select = document.getElementById('candReqReasonSelect');
+    const customBox = document.getElementById('candCustomReasonBox');
+    const customInput = document.getElementById('candCustomReasonInput');
+
+    if (select.value === 'Other') {
+        customBox.classList.remove('d-none');
+        customInput.required = true;
+        customInput.focus();
+    } else {
+        customBox.classList.add('d-none');
+        customInput.required = false;
+    }
+}
+
+function submitCandidateReschedule(event) {
+    event.preventDefault();
+
+    const interviewId = document.getElementById('candReqInterviewId').value;
+    const reason = document.getElementById('candReqReasonSelect').value;
+    const customReason = document.getElementById('candCustomReasonInput').value.trim();
+    const preferredDate = document.getElementById('candReqPreferredDate').value;
+    const preferredTime = document.getElementById('candReqPreferredTime').value;
+    const message = document.getElementById('candReqMessage').value.trim();
+
+    if (!interviewId || !reason || !preferredDate) {
+        if (typeof showWebsiteToast === 'function') {
+            showWebsiteToast("Please fill in all required fields.", "warning");
+        } else {
+            alert("Please fill in all required fields.");
+        }
+        return;
+    }
+
+    if (reason === 'Other' && !customReason) {
+        if (typeof showWebsiteToast === 'function') {
+            showWebsiteToast("Please describe your custom reason.", "warning");
+        } else {
+            alert("Please describe your custom reason.");
+        }
+        document.getElementById('candCustomReasonInput').focus();
+        return;
+    }
+
+    const submitBtn = document.getElementById('candReqSubmitBtn');
+    const spinner = document.getElementById('candReqBtnSpinner');
+    submitBtn.disabled = true;
+    spinner.classList.remove('d-none');
+
+    fetch('/api/candidate/interview/request-reschedule', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            interview_id: interviewId,
+            reason: reason,
+            custom_reason: customReason,
+            preferred_date: preferredDate,
+            preferred_time: preferredTime,
+            message: message
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        submitBtn.disabled = false;
+        spinner.classList.add('d-none');
+
+        if (data.success) {
+            const modalEl = document.getElementById('candidateRescheduleModal');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) modal.hide();
+
+            if (typeof showWebsiteToast === 'function') {
+                showWebsiteToast(data.message || "Reschedule request submitted to HR!", "success", 4000);
+            }
+
+            // Refresh global notifications if available
+            if (typeof window.loadGlobalNotifications === 'function') {
+                window.loadGlobalNotifications();
+            }
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 1200);
+        } else {
+            if (typeof showWebsiteToast === 'function') {
+                showWebsiteToast(data.message || "Failed to submit reschedule request.", "error");
+            } else {
+                alert(data.message || "Failed to submit request.");
+            }
+        }
+    })
+    .catch(err => {
+        submitBtn.disabled = false;
+        spinner.classList.add('d-none');
+        console.error("Reschedule request error:", err);
+        if (typeof showWebsiteToast === 'function') {
+            showWebsiteToast("An unexpected network error occurred.", "error");
+        }
+    });
+}
+</script>
+{% endblock %}

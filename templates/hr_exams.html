@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block title %}
+Exam Management | Smart Recruitment
+{% endblock %}
+
+{% block css %}
+<style>
+    .page-header-card {
+        transition: border-color 0.25s ease;
+    }
+    .page-header-card:hover {
+        border-color: #1d4ed8 !important;
+    }
+
+    .app-card {
+        transition: border-color 0.25s ease;
+    }
+    .app-card:hover {
+        border-color: #1d4ed8 !important;
+    }
+
+    /* EXPLICIT BUTTON SPACING FOR EXAM ACTION BAR */
+    .exam-action-bar {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        gap: 12px !important;
+        flex-wrap: nowrap !important;
+        white-space: nowrap !important;
+    }
+
+    .exam-action-bar > a,
+    .exam-action-bar > form {
+        margin-left: 4px !important;
+        margin-right: 4px !important;
+    }
+
+    .exam-action-btn {
+        background-color: #2563eb !important;
+        color: #ffffff !important;
+        border: 1.5px solid #1d4ed8 !important;
+        border-radius: 10px !important;
+        padding: 0.55rem 1rem !important;
+        font-size: 0.85rem !important;
+        font-weight: 700 !important;
+        text-decoration: none !important;
+        box-shadow: 0 3px 8px rgba(37, 99, 235, 0.25) !important;
+        transition: all 0.2s ease !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        cursor: pointer !important;
+    }
+
+    .exam-action-btn *, .exam-action-btn i {
+        color: #ffffff !important;
+    }
+
+    .exam-action-btn:hover {
+        background-color: #1d4ed8 !important;
+        border-color: #1d4ed8 !important;
+        color: #ffffff !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 5px 14px rgba(29, 78, 216, 0.35) !important;
+    }
+
+    .exam-action-btn-icon {
+        padding: 0.55rem 0.85rem !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="app-container">
+
+    <!-- PAGE HEADER CARD -->
+    <header class="page-header-card d-flex align-items-center justify-content-between p-4 mb-4 bg-white border border-2 rounded-4 shadow-sm" style="border-color: #cbd5e1 !important;">
+        <div class="d-flex align-items-center gap-3">
+            <div class="header-icon-box d-flex align-items-center justify-content-center rounded-4" style="width: 54px; height: 54px; background-color: #eff6ff; color: #2563eb; border: 1.5px solid #bfdbfe; font-size: 1.55rem;">
+                <i class="fa-solid fa-file-signature" style="color: #2563eb !important;"></i>
+            </div>
+            <div>
+                <span class="eyebrow-text fw-bold text-uppercase" style="font-size: 0.75rem; color: #2563eb; letter-spacing: 1.2px; display: block; margin-bottom: 2px;">EXAMINATION MODULE</span>
+                <h1 class="h3 fw-extrabold m-0 text-dark" style="font-weight: 800; color: #000000 !important; letter-spacing: -0.5px;">Exam Management</h1>
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+            <a href="{{ url_for('hr_question_bank') }}" class="exam-action-btn">
+                <i class="fa-solid fa-database"></i> Question Bank
+            </a>
+            <div class="dropdown">
+                <button class="exam-action-btn dropdown-toggle" type="button" id="addExamDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa-solid fa-plus"></i> Add Exam
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm rounded-3 p-2" aria-labelledby="addExamDropdown">
+                    <li>
+                        <a class="dropdown-item py-2 fw-semibold rounded-2" href="{{ url_for('hr_create_exam') }}">
+                            <i class="fa-solid fa-pen-to-square me-2 text-primary"></i> Create Exam Manually
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item py-2 fw-semibold rounded-2" href="{{ url_for('hr_upload_exam_pdf_page') }}">
+                            <i class="fa-solid fa-file-pdf me-2 text-primary"></i> Upload Questions PDF
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <a href="{{ url_for('home') }}" class="exam-action-btn">
+                <i class="fa-solid fa-arrow-left"></i> Dashboard
+            </a>
+        </div>
+    </header>
+
+    <!-- EXAMS TABLE CARD -->
+    <div class="app-card bg-white p-4 border border-2 rounded-4 shadow-sm" style="border-color: #cbd5e1 !important;">
+        <div class="d-flex align-items-center justify-content-between pb-3 mb-4 border-bottom" style="border-color: #cbd5e1 !important;">
+            <div>
+                <span class="eyebrow-text fw-bold text-uppercase" style="font-size: 0.75rem; color: #2563eb; letter-spacing: 1px; display: block; margin-bottom: 2px;">EXAM DATABASE</span>
+                <h2 class="h4 fw-bold m-0 text-dark" style="font-weight: 800; color: #000000 !important;">All Examination Modules</h2>
+            </div>
+            <div class="badge px-3.5 py-2 rounded-pill fw-bold" style="background-color: #eff6ff; color: #2563eb; border: 1.5px solid #bfdbfe; font-size: 0.88rem;">
+                {{ exams|length if exams else 0 }} Exams
+            </div>
+        </div>
+
+        {% if exams and exams|length > 0 %}
+            <div class="table-responsive-wrapper" style="overflow-x: auto;">
+                <table class="table align-middle m-0" style="width: 100%;">
+                    <thead>
+                        <tr style="background-color: #f8fafc; border-bottom: 1.5px solid #cbd5e1;">
+                            <th style="padding: 1.1rem 1.25rem; font-size: 0.78rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Exam Title</th>
+                            <th style="padding: 1.1rem 1.25rem; font-size: 0.78rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Duration</th>
+                            <th style="padding: 1.1rem 1.25rem; font-size: 0.78rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Marks</th>
+                            <th style="padding: 1.1rem 1.25rem; font-size: 0.78rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Questions</th>
+                            <th style="padding: 1.1rem 1.25rem; font-size: 0.78rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Status</th>
+                            <th style="padding: 1.1rem 1.25rem; font-size: 0.78rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Created</th>
+                            <th class="text-end" style="padding: 1.1rem 1.5rem; font-size: 0.78rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ex in exams %}
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 1.25rem 1.25rem;">
+                                <strong style="font-weight: 800; color: #0f172a; font-size: 0.96rem;">{{ ex.title }}</strong><br>
+                                <small class="text-muted" style="font-weight: 600; font-size: 0.82rem;">{{ ex.description or 'No description provided' }}</small>
+                            </td>
+                            <td style="padding: 1.25rem 1.25rem; font-weight: 700; color: #000000;"><i class="fa-solid fa-clock me-1.5" style="color: #2563eb;"></i>{{ ex.duration_minutes }} Mins</td>
+                            <td style="padding: 1.25rem 1.25rem; font-weight: 700; color: #000000;">Total: {{ "%.0f"|format(ex.total_marks) }} | Pass: {{ "%.0f"|format(ex.passing_marks) }}</td>
+                            <td style="padding: 1.25rem 1.25rem;"><span class="badge px-3 py-1.5" style="background-color: #eff6ff; color: #2563eb; border: 1.5px solid #bfdbfe; font-weight: 700; font-size: 0.8rem;">{{ ex.question_count or 0 }} MCQs</span></td>
+                            <td style="padding: 1.25rem 1.25rem;">
+                                {% if ex.is_published %}
+                                    <span class="badge px-3 py-1.5" style="background-color: #eff6ff; color: #1d4ed8; border: 1.5px solid #bfdbfe; font-size: 0.8rem; font-weight: 800;">
+                                        <i class="fa-solid fa-circle-check me-1.5"></i> Published
+                                    </span>
+                                {% else %}
+                                    <span class="badge px-3 py-1.5" style="background-color: #f1f5f9; color: #475569; border: 1.5px solid #cbd5e1; font-size: 0.8rem; font-weight: 800;">
+                                        <i class="fa-solid fa-pen-ruler me-1.5"></i> Draft
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td style="padding: 1.25rem 1.25rem;"><small class="text-muted" style="font-weight: 600; font-size: 0.82rem;">{{ ex.created_at or 'N/A' }}</small></td>
+                            <td class="text-end" style="padding: 1.25rem 1.5rem;">
+                                <div class="exam-action-bar">
+                                    <a href="{{ url_for('hr_exam_questions', exam_id=ex.id) }}" class="exam-action-btn" title="Manage Questions">
+                                        <i class="fa-solid fa-question"></i> MCQs
+                                    </a>
+                                    <a href="{{ url_for('hr_assign_exam', exam_id=ex.id) }}" class="exam-action-btn" title="Assign Candidates">
+                                        <i class="fa-solid fa-user-plus"></i> Assign
+                                    </a>
+                                    <a href="{{ url_for('hr_exam_monitor', exam_id=ex.id) }}" class="exam-action-btn" title="Live Monitor">
+                                        <i class="fa-solid fa-desktop"></i> Monitor
+                                    </a>
+                                    <a href="{{ url_for('hr_exam_results_list', exam_id=ex.id) }}" class="exam-action-btn" title="View Results">
+                                        <i class="fa-solid fa-square-poll-vertical"></i> Results
+                                    </a>
+                                    <a href="{{ url_for('hr_edit_exam', exam_id=ex.id) }}" class="exam-action-btn exam-action-btn-icon" title="Edit Configuration">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </a>
+                                     <form action="{{ url_for('hr_toggle_publish_exam', exam_id=ex.id) }}" method="POST" class="d-inline">
+                                        <button type="submit" class="exam-action-btn exam-action-btn-icon" title="Toggle Publish">
+                                            <i class="fa-solid {% if ex.is_published %}fa-eye-slash{% else %}fa-eye{% endif %}"></i>
+                                        </button>
+                                    </form>
+                                    <form action="{{ url_for('hr_delete_exam', exam_id=ex.id) }}" method="POST" class="d-inline" data-confirm="Are you sure you want to permanently delete the exam '{{ ex.title }}'? All candidate results and question links will also be removed." data-confirm-title="Delete Exam" data-confirm-type="danger">
+                                        <button type="submit" class="exam-action-btn exam-action-btn-icon" title="Delete Exam">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state-card text-center p-5 bg-white border border-2 rounded-4" style="border-color: #cbd5e1 !important;">
+                <div class="empty-state-icon mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle" style="width: 64px; height: 64px; background-color: #eff6ff; color: #2563eb; font-size: 1.8rem; border: 1.5px solid #bfdbfe;">
+                    <i class="fa-solid fa-file-circle-xmark"></i>
+                </div>
+                <h4 class="empty-state-title fw-bold text-dark" style="font-weight: 800;">No Exams Created Yet</h4>
+                <p class="empty-state-desc text-muted mb-4">Click below to create your first Aptitude Assessment Examination.</p>
+                <a href="{{ url_for('hr_create_exam') }}" class="exam-action-btn" style="padding: 0.75rem 1.5rem !important; font-size: 0.95rem !important;">
+                    <i class="fa-solid fa-plus"></i> Create Exam Now
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

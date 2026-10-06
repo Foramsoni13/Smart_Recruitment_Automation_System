@@ -1,0 +1,353 @@
+{% extends "base.html" %}
+
+{% block title %}
+Upload Exam PDF | Smart Recruitment
+{% endblock %}
+
+{% block css %}
+<style>
+    .page-header-card, .form-section-card {
+        transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .page-header-card:hover, .form-section-card:hover, .form-section-card:focus-within {
+        border-color: #1d4ed8 !important;
+        box-shadow: 0 4px 16px rgba(29, 78, 216, 0.08) !important;
+    }
+
+    .form-section-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding-bottom: 0.75rem;
+        margin-bottom: 1.25rem;
+        border-bottom: 1.5px solid #e2e8f0;
+    }
+
+    .form-section-header i {
+        font-size: 1.25rem;
+        color: #2563eb !important;
+    }
+
+    .form-section-header h3 {
+        font-size: 1.15rem;
+        font-weight: 800 !important;
+        color: #000000 !important;
+        margin: 0;
+    }
+
+    .form-label {
+        font-size: 0.88rem;
+        font-weight: 700 !important;
+        color: #000000 !important;
+        margin-bottom: 6px;
+    }
+
+    .form-control, .form-select {
+        border-radius: 10px !important;
+        border: 1.5px solid #cbd5e1 !important;
+        padding: 0.65rem 1rem !important;
+        font-size: 0.92rem !important;
+        color: #000000 !important;
+        background-color: #ffffff !important;
+        font-weight: 600 !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #1d4ed8 !important;
+        box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.15) !important;
+        outline: none !important;
+    }
+
+    .file-dropzone {
+        border: 2px dashed #cbd5e1;
+        border-radius: 14px;
+        padding: 3rem 1.5rem;
+        text-align: center;
+        background-color: #f8fafc;
+        cursor: pointer;
+        transition: all 0.25s ease;
+    }
+
+    .file-dropzone:hover {
+        border-color: #2563eb;
+        background-color: #eff6ff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+    }
+
+    .btn-form-action {
+        background-color: #2563eb !important;
+        color: #ffffff !important;
+        border: 1.5px solid #1d4ed8 !important;
+        border-radius: 12px !important;
+        padding: 0.7rem 1.6rem !important;
+        font-size: 0.92rem !important;
+        font-weight: 800 !important;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25) !important;
+        transition: all 0.2s ease !important;
+        text-decoration: none !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        cursor: pointer !important;
+    }
+
+    .btn-form-action *, .btn-form-action i {
+        color: #ffffff !important;
+    }
+
+    .btn-form-action:hover {
+        background-color: #1d4ed8 !important;
+        color: #ffffff !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 6px 16px rgba(29, 78, 216, 0.35) !important;
+    }
+
+    .btn-form-secondary {
+        background-color: #eff6ff !important;
+        color: #2563eb !important;
+        border: 1.5px solid #bfdbfe !important;
+        border-radius: 12px !important;
+        padding: 0.7rem 1.6rem !important;
+        font-size: 0.92rem !important;
+        font-weight: 800 !important;
+        transition: all 0.2s ease !important;
+        text-decoration: none !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        cursor: pointer !important;
+    }
+
+    .btn-form-secondary:hover {
+        background-color: #2563eb !important;
+        color: #ffffff !important;
+        border-color: #1d4ed8 !important;
+    }
+
+    .btn-form-secondary:hover * {
+        color: #ffffff !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="app-container">
+
+    <!-- PAGE HEADER CARD -->
+    <header class="page-header-card d-flex align-items-center justify-content-between p-4 mb-4 bg-white border border-2 rounded-4 shadow-sm" style="border-color: #cbd5e1 !important;">
+        <div class="d-flex align-items-center gap-3">
+            <div class="header-icon-box d-flex align-items-center justify-content-center rounded-4" style="width: 54px; height: 54px; background-color: #eff6ff; color: #2563eb; border: 1.5px solid #bfdbfe; font-size: 1.55rem;">
+                <i class="fa-solid fa-file-pdf" style="color: #2563eb !important;"></i>
+            </div>
+            <div>
+                <span class="eyebrow-text fw-bold text-uppercase" style="font-size: 0.75rem; color: #2563eb; letter-spacing: 1.2px; display: block; margin-bottom: 2px;">PDF AUTOMATION IMPORT</span>
+                <h1 class="h3 fw-extrabold m-0 text-dark" style="font-weight: 800; color: #000000 !important; letter-spacing: -0.5px;">
+                    Upload Question PDF
+                </h1>
+            </div>
+        </div>
+
+        <div>
+            <a href="{{ url_for('hr_exams_list') }}" class="btn-form-action">
+                <i class="fa-solid fa-arrow-left"></i> Back to Exams
+            </a>
+        </div>
+    </header>
+
+    <!-- WORKFLOW PROCESS INDICATOR STEPS -->
+    <div class="row g-3 mb-4 text-center">
+        <div class="col-md-3">
+            <div class="p-3 rounded-4 fw-bold shadow-sm" style="background-color: #2563eb; color: #ffffff !important; border: 1.5px solid #1d4ed8; font-size: 0.9rem;">
+                <i class="fa-solid fa-cloud-arrow-up me-2" style="color: #ffffff !important;"></i> 1. Select PDF File
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="p-3 rounded-4 text-secondary fw-semibold bg-white shadow-sm" style="border: 1.5px solid #cbd5e1; font-size: 0.9rem;">
+                <i class="fa-solid fa-wand-magic-sparkles me-2" style="color: #64748b;"></i> 2. Extract Questions
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="p-3 rounded-4 text-secondary fw-semibold bg-white shadow-sm" style="border: 1.5px solid #cbd5e1; font-size: 0.9rem;">
+                <i class="fa-solid fa-list-check me-2" style="color: #64748b;"></i> 3. Review Extraction
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="p-3 rounded-4 text-secondary fw-semibold bg-white shadow-sm" style="border: 1.5px solid #cbd5e1; font-size: 0.9rem;">
+                <i class="fa-solid fa-database me-2" style="color: #64748b;"></i> 4. Save to Question Bank
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN FORM -->
+    <form action="{{ url_for('hr_upload_exam_pdf') }}" method="POST" enctype="multipart/form-data" onsubmit="return handleFormSubmit(this)">
+
+        <!-- 1. FILE UPLOAD DROPZONE CARD -->
+        <div class="form-section-card bg-white p-4 mb-4 border border-2 rounded-4 shadow-sm" style="border-color: #cbd5e1 !important;">
+            <div class="form-section-header">
+                <i class="fa-solid fa-file-arrow-up"></i>
+                <h3>Select Exam PDF Document</h3>
+            </div>
+
+            <div class="file-dropzone" onclick="document.getElementById('pdfInput').click()">
+                <i class="fa-solid fa-cloud-arrow-up fa-3x mb-3" style="color: #2563eb;"></i>
+                <h5 class="fw-bold text-dark mb-1" style="color: #000000 !important;">Click or drag & drop Aptitude Exam PDF here</h5>
+                <p class="text-muted mb-0 small">Only .pdf files containing multiple-choice questions are supported</p>
+                <input type="file" name="pdf_file" id="pdfInput" accept=".pdf,.PDF" class="d-none" required onchange="updateFileName(this)">
+                <div id="fileSelectedName" class="mt-3 py-2 px-3 rounded-3 d-none" style="display: inline-block; font-size: 0.9rem; font-weight: 700; background-color: #eff6ff; color: #1d4ed8; border: 1.5px solid #bfdbfe;"></div>
+            </div>
+        </div>
+
+        <!-- 2. EXAM OVERVIEW CONFIGURATION CARD -->
+        <div class="form-section-card bg-white p-4 mb-4 border border-2 rounded-4 shadow-sm" style="border-color: #cbd5e1 !important;">
+            <div class="form-section-header">
+                <i class="fa-solid fa-pen-to-square"></i>
+                <h3>Exam Overview Configuration</h3>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-12">
+                    <label class="form-label">Exam Title *</label>
+                    <input type="text" name="title" class="form-control" placeholder="e.g. Aptitude Assessment 2026 (PDF Import)" required>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">Exam Description</label>
+                    <textarea name="description" class="form-control" rows="3" placeholder="Brief overview or candidate instructions..."></textarea>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Duration (Minutes) *</label>
+                    <input type="number" name="duration_minutes" class="form-control" min="1" max="360" value="30" required>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Total Marks *</label>
+                    <input type="number" step="0.5" name="total_marks" class="form-control" min="1" value="30" required>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Passing Marks *</label>
+                    <input type="number" step="0.5" name="passing_marks" class="form-control" min="1" value="18" required>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Negative Marking</label>
+                    <select name="negative_marking" class="form-select">
+                        <option value="0">Disabled (0.00)</option>
+                        <option value="1">Enabled (-0.25 / wrong)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. QUESTION SELECTION & RANDOMIZATION CARD -->
+        <div class="form-section-card bg-white p-4 mb-4 border border-2 rounded-4 shadow-sm" style="border-color: #cbd5e1 !important;">
+            <div class="form-section-header">
+                <i class="fa-solid fa-shuffle"></i>
+                <h3>Question Selection & Randomization</h3>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Randomize Questions</label>
+                    <select name="randomize_questions" class="form-select">
+                        <option value="1">Enabled (Different order per candidate)</option>
+                        <option value="0">Disabled (Sequential PDF order)</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Randomize Options</label>
+                    <select name="randomize_options" class="form-select">
+                        <option value="1">Enabled (Shuffle A, B, C, D)</option>
+                        <option value="0">Disabled (Fixed option order)</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Questions Per Candidate</label>
+                    <input type="number" name="total_questions_to_show" class="form-control" placeholder="30 (Default)">
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. PROCTORING & SECURITY RULES CARD -->
+        <div class="form-section-card bg-white p-4 mb-4 border border-2 rounded-4 shadow-sm" style="border-color: #cbd5e1 !important;">
+            <div class="form-section-header">
+                <i class="fa-solid fa-shield-halved"></i>
+                <h3>Proctoring & Security Rules</h3>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Maximum Warnings *</label>
+                    <input type="number" name="allowed_warnings" class="form-control" min="1" max="10" value="3" required>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Auto-Submit on Violation</label>
+                    <select name="auto_submit_on_violation" class="form-select">
+                        <option value="1">Yes (Auto-submit when limit reached)</option>
+                        <option value="0">No (Warn only)</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Camera Required</label>
+                    <select name="camera_required" class="form-select">
+                        <option value="1">Required (WebRTC camera check)</option>
+                        <option value="0">Optional</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Full Screen Required</label>
+                    <select name="fullscreen_required" class="form-select">
+                        <option value="1">Required (Full-screen focus)</option>
+                        <option value="0">Optional</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="d-flex align-items-center justify-content-end gap-3 pt-2 mb-5">
+            <a href="{{ url_for('hr_exams_list') }}" class="btn-form-secondary">
+                <i class="fa-solid fa-xmark"></i> Cancel
+            </a>
+            <button type="submit" class="btn-form-action" id="btnSubmitPdf">
+                <i class="fa-solid fa-gear"></i> Process PDF & Extract Questions
+            </button>
+        </div>
+
+    </form>
+
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+    function updateFileName(input) {
+        const display = document.getElementById('fileSelectedName');
+        if (input.files && input.files[0]) {
+            display.innerHTML = '<i class="fa-solid fa-file-pdf me-2" style="color: #2563eb;"></i>Selected File: <strong>' + input.files[0].name + '</strong>';
+            display.classList.remove('d-none');
+        } else {
+            display.classList.add('d-none');
+        }
+    }
+
+    function handleFormSubmit(form) {
+        const btn = document.getElementById('btnSubmitPdf');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Processing PDF & Extracting Questions...';
+        }
+        return true;
+    }
+</script>
+{% endblock %}
+

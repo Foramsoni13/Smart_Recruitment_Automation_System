@@ -1,0 +1,18 @@
+/* ==========================================================================
+   SMARTRECRUITMENT - REGISTER STYLESHEET
+   ========================================================================== */
+
+@import url('auth_common.css');
+
+.register-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+@media (max-width: 576px) {
+    .register-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+}

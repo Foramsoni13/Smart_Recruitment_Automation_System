@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+
+{% block title %}
+Set up Google Authenticator | SmartRecruitment
+{% endblock %}
+
+{% block css %}
+<style>
+    .login-full-wrapper {
+        min-height: 92vh;
+        width: 100%;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2.5rem 1rem;
+        background: url("{{ url_for('static', filename='images/clean_laptop_left_bg.gif') }}") no-repeat center center / cover;
+        border-radius: 28px;
+        box-shadow: 0 20px 50px rgba(59, 130, 246, 0.15);
+        perspective: 1200px;
+        overflow: hidden;
+    }
+
+    .login-full-wrapper::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(240, 247, 255, 0.35) 0%, rgba(224, 242, 254, 0.35) 50%, rgba(248, 250, 252, 0.35) 100%);
+        pointer-events: none;
+    }
+
+    .login-card-3d {
+        max-width: 440px;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.52);
+        backdrop-filter: blur(28px) saturate(220%);
+        -webkit-backdrop-filter: blur(28px) saturate(220%);
+        border: 1px solid rgba(255, 255, 255, 0.85);
+        border-radius: 28px;
+        padding: 2.25rem 2.25rem;
+        box-shadow: 0 25px 60px -10px rgba(59, 130, 246, 0.22), 0 10px 25px -5px rgba(15, 23, 42, 0.05);
+        z-index: 10;
+        position: relative;
+        overflow: hidden;
+        transform-style: preserve-3d;
+        animation: loginCardAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards, floatLogin3D 6.5s ease-in-out infinite alternate 0.8s;
+        transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, background 0.3s ease;
+    }
+
+    .login-card-3d::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+            60deg,
+            transparent 40%,
+            rgba(255, 255, 255, 0.45) 50%,
+            transparent 60%
+        );
+        pointer-events: none;
+        animation: shimmerLight3D 7s ease-in-out infinite;
+    }
+
+    .login-card-3d:hover {
+        box-shadow: 0 35px 80px -10px rgba(59, 130, 246, 0.28), 0 15px 35px -5px rgba(15, 23, 42, 0.08);
+    }
+
+    @keyframes loginCardAppear {
+        from { opacity: 0; transform: translateY(35px) rotateX(4deg) scale(0.96); }
+        to { opacity: 1; transform: translateY(0) rotateX(0deg) scale(1); }
+    }
+
+    @keyframes floatLogin3D {
+        0%, 100% { transform: translateY(0px) rotateX(0deg) rotateY(0deg); }
+        50% { transform: translateY(-8px) rotateX(1.2deg) rotateY(-1.2deg); }
+    }
+
+    .login-brand-box {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        font-size: 1.65rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        color: #0f172a;
+        margin-bottom: 1.25rem;
+    }
+
+    .login-brand-icon {
+        width: 38px;
+        height: 38px;
+        background: linear-gradient(135deg, #2563eb, #3b82f6);
+        color: #ffffff;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        box-shadow: 0 8px 18px rgba(59, 130, 246, 0.3);
+    }
+
+    .login-brand-box .brand-blue {
+        color: #3b82f6;
+    }
+
+    .login-title {
+        font-size: 1.55rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 4px;
+        letter-spacing: -0.4px;
+        text-align: center;
+    }
+
+    .login-subtitle {
+        font-size: 0.86rem;
+        color: #64748b;
+        font-weight: 500;
+        margin-bottom: 1.25rem;
+        text-align: center;
+    }
+
+    .qr-card-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 14px;
+        background: #ffffff;
+        border: 2px solid #e2eefd;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.15);
+        margin: 0.75rem auto 1.25rem auto;
+        width: fit-content;
+    }
+
+    .qr-card-image {
+        width: 170px;
+        height: 170px;
+        display: block;
+        border-radius: 12px;
+    }
+
+    .qr-steps-list {
+        text-align: left;
+        font-size: 0.82rem;
+        color: #334155;
+        background: rgba(255, 255, 255, 0.75);
+        border: 1px solid #e2eefd;
+        border-radius: 14px;
+        padding: 10px 14px 10px 28px;
+        margin-bottom: 1.15rem;
+        line-height: 1.5;
+    }
+
+    .qr-steps-list li {
+        margin-bottom: 4px;
+    }
+
+    .qr-steps-list li:last-child {
+        margin-bottom: 0;
+    }
+
+    .btn-login-submit {
+        width: 100%;
+        padding: 12px 20px;
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: #ffffff;
+        border: none;
+        border-radius: 14px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 10px 25px rgba(59, 130, 246, 0.35);
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+    .btn-login-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 30px rgba(59, 130, 246, 0.45);
+        color: #ffffff;
+    }
+
+    .login-card-footer {
+        text-align: center;
+        margin-top: 1.25rem;
+        font-size: 0.86rem;
+        color: #64748b;
+    }
+
+    .login-card-footer a {
+        color: #3b82f6;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .login-card-footer a:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-full-wrapper">
+    <!-- 3D FLOATING ANIMATED OVERLAY ELEMENTS -->
+    <div class="bg-3d-floating-layer">
+        <div class="bg-blob bg-blob-1"></div>
+        <div class="bg-blob bg-blob-2"></div>
+        <div class="bg-arch-ring-1"></div>
+        <div class="bg-arch-ring-2"></div>
+        <div class="bg-sphere-3d bg-sphere-3d-1"></div>
+        <div class="bg-sphere-3d bg-sphere-3d-2"></div>
+        <div class="bg-sphere-3d bg-sphere-3d-3"></div>
+        <div class="float-3d-avatar-1"></div>
+        <div class="float-3d-avatar-2"></div>
+        <div class="float-3d-magnifier-animator"></div>
+    </div>
+
+    <!-- MAIN FLOATING LOGIN CARD -->
+    <div class="login-card-3d">
+
+        <!-- TOP LOGO BRANDING -->
+        <div class="login-brand-box">
+            <div class="login-brand-icon">
+                <i class="fa-solid fa-qrcode"></i>
+            </div>
+            <div>
+                Smart<span class="brand-blue">Recruitment</span>
+            </div>
+        </div>
+
+        <!-- HEADLINE & SUBTITLE -->
+        <h1 class="login-title">Google Authenticator</h1>
+        <p class="login-subtitle">Scan to set up two-factor security on your account</p>
+
+        <!-- Steps Box -->
+        <ol class="qr-steps-list">
+            <li>Open <strong>Google Authenticator</strong> on your phone</li>
+            <li>Tap <strong>+</strong> &rarr; <strong>Scan a QR code</strong></li>
+            <li>Scan the QR code below and save it to your device</li>
+        </ol>
+
+        <!-- QR Code Container -->
+        <div class="qr-card-container">
+            <img
+                src="{{ url_for('static', filename='qrcodes/' + qr_image) }}"
+                alt="Google Authenticator QR Code"
+                class="qr-card-image"
+            >
+        </div>
+
+        <!-- Continue Button -->
+        <a href="{{ url_for('login') }}" class="btn-login-submit">
+            <span>Done, Proceed to Sign In &nbsp;<i class="fa-solid fa-arrow-right"></i></span>
+        </a>
+
+        <!-- Footer -->
+        <div class="login-card-footer">
+            <a href="{{ url_for('login') }}"><i class="fa-solid fa-arrow-left me-1"></i> Back to Sign In</a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script src="{{ url_for('static', filename='js/hero_3d_engine.js') }}"></script>
+{% endblock %}

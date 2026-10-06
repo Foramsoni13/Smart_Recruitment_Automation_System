@@ -1,0 +1,1040 @@
+{% extends "base.html" %}
+
+{% block title %}
+Interview Management & Calendar | Smart Recruitment
+{% endblock %}
+
+{% block css %}
+<style>
+    .calendar-card {
+        background: #ffffff;
+        border: 1.5px solid #cbd5e1 !important;
+        border-radius: var(--radius-xl);
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
+        margin-bottom: 1.5rem;
+    }
+
+    .calendar-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+        padding-bottom: 1rem;
+        border-bottom: 1.5px solid #e2e8f0;
+    }
+
+    .view-btn-group .btn {
+        font-weight: 600;
+        font-size: 0.85rem;
+        padding: 6px 14px;
+        border-color: #cbd5e1;
+    }
+
+    .view-btn-group .btn.active {
+        background: #2563eb;
+        color: #ffffff;
+        border-color: #2563eb;
+    }
+
+    /* Month Calendar Grid */
+    .calendar-month-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 8px;
+    }
+
+    .calendar-header-day {
+        text-align: center;
+        font-weight: 700;
+        font-size: 0.8rem;
+        color: #475569;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 8px 0;
+        background: #f8fafc;
+        border-radius: var(--radius-md);
+        border: 1px solid #e2e8f0;
+    }
+
+    .calendar-day-cell {
+        min-height: 110px;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: var(--radius-md);
+        padding: 6px;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.2s ease;
+        position: relative;
+    }
+
+    .calendar-day-cell:hover {
+        border-color: #3b82f6;
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);
+    }
+
+    .calendar-day-cell.other-month {
+        background: #f8fafc;
+        opacity: 0.5;
+    }
+
+    .calendar-day-cell.today-cell {
+        background: #eff6ff;
+        border-color: #93c5fd;
+    }
+
+    .day-number {
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: #1e293b;
+        margin-bottom: 4px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .today-badge {
+        font-size: 0.65rem;
+        background: #2563eb;
+        color: #ffffff;
+        padding: 2px 6px;
+        border-radius: 10px;
+        font-weight: 600;
+    }
+
+    .interview-chip {
+        font-size: 0.72rem;
+        padding: 4px 6px;
+        border-radius: 6px;
+        margin-bottom: 4px;
+        font-weight: 600;
+        cursor: pointer;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: transform 0.15s ease;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .interview-chip:hover {
+        transform: translateY(-1px);
+        filter: brightness(0.95);
+    }
+
+    /* Status Colors for Chips & Badges */
+    .status-scheduled { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    .status-rescheduled { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+    .status-reschedule-requested { background: #fff7ed; color: #c2410c; border: 1.5px solid #fed7aa; }
+    .status-completed { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+    .status-cancelled { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+    .status-pending { background: #f8fafc; color: #475569; border: 1px solid #cbd5e1; }
+
+    /* Day & Week View Schedules */
+    .time-slot-row {
+        display: flex;
+        border-bottom: 1px solid #f1f5f9;
+        min-height: 54px;
+        align-items: stretch;
+    }
+
+    .time-label {
+        width: 80px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #64748b;
+        padding: 8px;
+        border-right: 1.5px solid #e2e8f0;
+        background: #f8fafc;
+        flex-shrink: 0;
+    }
+
+    .time-slot-content {
+        flex-grow: 1;
+        padding: 6px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    /* Searchable Select Dropdowns (Enhanced) */
+    .searchable-select-box {
+        cursor: pointer;
+        background: #ffffff;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 10px;
+        padding: 9px 14px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+    .searchable-select-box:hover, .searchable-select-box:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+    }
+
+    .custom-dropdown-panel {
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        right: 0;
+        background: #ffffff;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 12px;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.15);
+        z-index: 1070;
+        overflow: hidden;
+    }
+
+    .dropdown-items-scroll {
+        max-height: 240px;
+        overflow-y: auto;
+    }
+
+    .search-dropdown-item {
+        padding: 10px 14px;
+        cursor: pointer;
+        border-bottom: 1px solid #f1f5f9;
+        transition: background 0.15s ease;
+    }
+
+    .search-dropdown-item:hover, .search-dropdown-item.active, .search-dropdown-item.active-focus {
+        background: #eff6ff;
+        border-left: 3.5px solid #2563eb;
+    }
+
+    .search-dropdown-item:last-child {
+        border-bottom: none;
+    }
+
+    .candidate-avatar-badge {
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: #ffffff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.78rem;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    /* Conflict card */
+    .conflict-card {
+        background: #fef2f2;
+        border: 1.5px solid #fca5a5 !important;
+        border-radius: var(--radius-lg);
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+
+    /* In-page Toast System */
+    .toast-container-custom {
+        position: fixed;
+        top: 24px;
+        right: 24px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        pointer-events: none;
+    }
+
+    .custom-toast {
+        pointer-events: auto;
+        min-width: 320px;
+        max-width: 420px;
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 12px 16px;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.18);
+        border: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        animation: toastSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        transition: all 0.25s ease;
+    }
+
+    .custom-toast.toast-success { border-left: 5px solid #16a34a; }
+    .custom-toast.toast-error { border-left: 5px solid #ef4444; }
+    .custom-toast.toast-warning { border-left: 5px solid #f59e0b; }
+    .custom-toast.toast-info { border-left: 5px solid #3b82f6; }
+
+    @keyframes toastSlideIn {
+        from { opacity: 0; transform: translateX(50px) scale(0.95); }
+        to { opacity: 1; transform: translateX(0) scale(1); }
+    }
+
+    @keyframes toastSlideOut {
+        from { opacity: 1; transform: translateX(0) scale(1); }
+        to { opacity: 0; transform: translateX(50px) scale(0.95); }
+    }
+
+    @media (max-width: 768px) {
+        .calendar-month-grid {
+            gap: 4px;
+        }
+        .calendar-day-cell {
+            min-height: 80px;
+            padding: 4px;
+        }
+        .time-label {
+            width: 60px;
+            font-size: 0.7rem;
+        }
+        .toast-container-custom {
+            top: 12px;
+            right: 12px;
+            left: 12px;
+        }
+        .custom-toast {
+            min-width: unset;
+            max-width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid app-container px-3 px-md-4 py-4">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header-box mb-4">
+        <div>
+            <h2><i class="fa-solid fa-calendar-days text-primary me-2"></i>Interview Management & Calendar</h2>
+            <p class="text-muted">Schedule, reschedule, track candidate interviews, and manage interviewer schedules without conflict.</p>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+            <button class="btn btn-primary btn-form-action" data-bs-toggle="modal" data-bs-target="#scheduleModal" onclick="openScheduleModal()">
+                <i class="fa-solid fa-calendar-plus me-1"></i> Schedule Interview
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN CALENDAR CARD -->
+    <div class="calendar-card">
+        
+        <!-- TOOLBAR & FILTERS -->
+        <div class="calendar-toolbar">
+            <!-- Left: Date Navigator -->
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn btn-sm btn-outline-secondary" onclick="navigateDate(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+                <h4 id="currentCalendarTitle" class="fw-bold mb-0 text-dark fs-5 min-w-160">September 2026</h4>
+                <button class="btn btn-sm btn-outline-secondary" onclick="navigateDate(1)"><i class="fa-solid fa-chevron-right"></i></button>
+                <button class="btn btn-sm btn-outline-primary ms-1 fw-semibold" onclick="goToToday()">Today</button>
+            </div>
+
+            <!-- Center: Search & Status Filter -->
+            <div class="d-flex gap-2 flex-wrap align-items-center">
+                <div class="input-group input-group-sm" style="width: 220px;">
+                    <span class="input-group-text bg-light"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                    <input type="text" id="interviewSearchInput" class="form-control" placeholder="Search candidate/interviewer..." onkeyup="filterInterviews()">
+                </div>
+                <select id="statusFilterSelect" class="form-select form-select-sm" style="width: 175px;" onchange="filterInterviews()">
+                    <option value="ALL">All Statuses</option>
+                    <option value="Reschedule Requested">⚠️ Reschedule Requested</option>
+                    <option value="Scheduled">Scheduled</option>
+                    <option value="Rescheduled">Rescheduled</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Cancelled">Cancelled</option>
+                    <option value="Pending">Pending</option>
+                </select>
+            </div>
+
+            <!-- Right: View Switcher -->
+            <div class="btn-group view-btn-group" role="group">
+                <button type="button" class="btn btn-outline-secondary active" id="viewBtnMonth" onclick="switchView('month')">Month</button>
+                <button type="button" class="btn btn-outline-secondary" id="viewBtnWeek" onclick="switchView('week')">Week</button>
+                <button type="button" class="btn btn-outline-secondary" id="viewBtnDay" onclick="switchView('day')">Day</button>
+                <button type="button" class="btn btn-outline-secondary" id="viewBtnList" onclick="switchView('list')">List</button>
+            </div>
+        </div>
+
+        <!-- MONTH VIEW CONTAINER -->
+        <div id="monthViewContainer">
+            <div class="calendar-month-grid mb-2">
+                <div class="calendar-header-day">Sun</div>
+                <div class="calendar-header-day">Mon</div>
+                <div class="calendar-header-day">Tue</div>
+                <div class="calendar-header-day">Wed</div>
+                <div class="calendar-header-day">Thu</div>
+                <div class="calendar-header-day">Fri</div>
+                <div class="calendar-header-day">Sat</div>
+            </div>
+            <div id="monthGridDays" class="calendar-month-grid">
+                <!-- Days populated dynamically by JS -->
+            </div>
+        </div>
+
+        <!-- WEEK VIEW CONTAINER -->
+        <div id="weekViewContainer" class="d-none">
+            <div class="table-responsive-wrapper">
+                <div id="weekViewGrid" class="border rounded-3">
+                    <!-- Week grid populated dynamically by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- DAY VIEW CONTAINER -->
+        <div id="dayViewContainer" class="d-none">
+            <div id="dayViewTimeline" class="border rounded-3 bg-white">
+                <!-- Day timeline populated dynamically by JS -->
+            </div>
+        </div>
+
+        <!-- LIST VIEW CONTAINER -->
+        <div id="listViewContainer" class="d-none">
+            <div class="table-responsive-wrapper">
+                <table class="table table-hover align-middle table-app mb-0">
+                    <thead>
+                        <tr>
+                            <th>Candidate</th>
+                            <th>Interview Date & Time</th>
+                            <th>Type</th>
+                            <th>Interviewer</th>
+                            <th>Location / Meeting Link</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="interviewTableBody">
+                        <!-- Table rows populated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- =========================================================================
+     MODAL: SCHEDULE / EDIT INTERVIEW
+     ========================================================================= -->
+<div class="modal fade" id="scheduleModal" tabindex="-1" aria-labelledby="scheduleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+            <div class="modal-header bg-light border-bottom px-4 py-3">
+                <h5 class="modal-title fw-bold text-dark" id="scheduleModalLabel">
+                    <i class="fa-solid fa-calendar-plus text-primary me-2"></i><span id="modalHeaderTitle">Schedule Interview</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="scheduleInterviewForm" onsubmit="handleInterviewFormSubmit(event)">
+                <input type="hidden" id="formInterviewId" value="">
+                <div class="modal-body p-4">
+                    
+                    <div class="row g-3 mb-3">
+                        <!-- Searchable Candidate Selection (Enhanced with Dropdown & Search) -->
+                        <div class="col-md-6 position-relative">
+                            <label class="form-label fw-semibold text-dark">Candidate <span class="text-danger">*</span></label>
+                            <input type="hidden" id="formCandidateId" required>
+                            
+                            <!-- Searchable Dropdown Button Trigger -->
+                            <div class="searchable-select-box d-flex justify-content-between align-items-center" id="candidateSelectBtn" onclick="toggleCandidateDropdown()">
+                                <div class="d-flex align-items-center gap-2 overflow-hidden">
+                                    <i class="fa-solid fa-user text-primary small"></i>
+                                    <span id="candidateSelectBtnText" class="text-truncate text-muted">-- Choose Candidate or Search --</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-1">
+                                    <i class="fa-solid fa-xmark text-muted p-1 hover-danger d-none" id="clearCandBtnIcon" onclick="event.stopPropagation(); clearCandidateSelection();"></i>
+                                    <i class="fa-solid fa-chevron-down text-muted small ms-1"></i>
+                                </div>
+                            </div>
+
+                            <!-- Floating Search Dropdown Panel -->
+                            <div id="candidateDropdownMenu" class="custom-dropdown-panel d-none">
+                                <div class="p-2 border-bottom bg-light">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text bg-white"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                                        <input type="text" id="candidateSearchInput" class="form-control" placeholder="Search by name, email, ID..." autocomplete="off" oninput="filterCandidateDropdown()">
+                                        <button type="button" class="btn btn-outline-secondary" onclick="clearCandidateSearch()"><i class="fa-solid fa-xmark"></i></button>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mt-1 px-1">
+                                        <small id="candidateMatchCount" class="text-muted" style="font-size: 0.72rem;">Loading candidates...</small>
+                                        <small class="text-primary fw-semibold" style="font-size: 0.72rem; cursor: pointer;" onclick="clearCandidateSelection()">Reset</small>
+                                    </div>
+                                </div>
+                                <div id="candidateDropdownList" class="dropdown-items-scroll">
+                                    <!-- Populated dynamically by JS -->
+                                </div>
+                            </div>
+
+                            <!-- Selected Candidate Details Card -->
+                            <div id="selectedCandidateBadge" class="mt-2 d-none">
+                                <div class="badge bg-light text-dark border p-2 text-start w-100 fw-normal d-flex justify-content-between align-items-center" style="border-radius: 10px;">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="candidate-avatar-badge" id="candAvatarInitials">CS</div>
+                                        <div>
+                                            <strong id="selectedCandNameText" class="text-primary fs-6 d-block">-</strong>
+                                            <small id="selectedCandEmailText" class="text-muted d-block">-</small>
+                                            <small id="selectedCandPositionText" class="badge bg-white text-secondary border mt-1">-</small>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="clearCandidateSelection()" title="Clear Selection">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Interview Type -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold text-dark">Interview Type <span class="text-danger">*</span></label>
+                            <select id="formInterviewType" class="form-select" style="padding: 9px 14px; border-radius: 10px;" required>
+                                <option value="Technical">Technical Interview</option>
+                                <option value="HR Screening">HR Screening</option>
+                                <option value="Managerial">Managerial Round</option>
+                                <option value="Final Round">Final Executive Round</option>
+                                <option value="Coding Challenge">Coding & System Design</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <!-- Searchable Interviewer Selection -->
+                        <div class="col-md-6 position-relative">
+                            <label class="form-label fw-semibold text-dark">Interviewer Name <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fa-solid fa-user-tie text-muted"></i></span>
+                                <input type="text" id="formInterviewerName" class="form-control" style="padding: 9px 14px;" placeholder="Type interviewer name or email..." required autocomplete="off" onfocus="showInterviewerDropdown()" oninput="filterInterviewerDropdown()" onchange="checkLiveConflict()">
+                                <button type="button" class="btn btn-outline-secondary" onclick="toggleInterviewerDropdown()"><i class="fa-solid fa-chevron-down small"></i></button>
+                            </div>
+                            <!-- Interviewer Search Results Dropdown -->
+                            <div id="interviewerDropdownMenu" class="custom-dropdown-panel d-none">
+                                <div id="interviewerDropdownList" class="dropdown-items-scroll">
+                                    <!-- Populated dynamically by JS -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Interviewer Email -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold text-dark">Interviewer Email</label>
+                            <input type="email" id="formInterviewerEmail" class="form-control" style="padding: 9px 14px; border-radius: 10px;" placeholder="interviewer@company.com">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <!-- Date -->
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold text-dark">Interview Date <span class="text-danger">*</span></label>
+                            <input type="date" id="formInterviewDate" class="form-control" style="padding: 9px 14px; border-radius: 10px;" required onchange="checkLiveConflict()">
+                        </div>
+
+                        <!-- Start Time -->
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold text-dark">Start Time <span class="text-danger">*</span></label>
+                            <input type="time" id="formStartTime" class="form-control" style="padding: 9px 14px; border-radius: 10px;" required onchange="checkLiveConflict()">
+                        </div>
+
+                        <!-- End Time -->
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold text-dark">End Time <span class="text-danger">*</span></label>
+                            <input type="time" id="formEndTime" class="form-control" style="padding: 9px 14px; border-radius: 10px;" required onchange="checkLiveConflict()">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <!-- Location or Meeting Link -->
+                        <div class="col-md-8">
+                            <label class="form-label fw-semibold text-dark">Location or Video Meeting Link</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fa-solid fa-link text-muted"></i></span>
+                                <input type="text" id="formLocationLink" class="form-control" style="padding: 9px 14px;" placeholder="https://meet.google.com/abc-defg-hij or Room 4B">
+                            </div>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold text-dark">Status</label>
+                            <select id="formStatus" class="form-select" style="padding: 9px 14px; border-radius: 10px;">
+                                <option value="Scheduled">Scheduled</option>
+                                <option value="Rescheduled">Rescheduled</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Cancelled">Cancelled</option>
+                                <option value="Pending">Pending</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-dark">Interview Instructions / Notes</label>
+                        <textarea id="formNotes" class="form-control" rows="3" style="border-radius: 10px;" placeholder="Provide instructions for candidate or preparation details for interviewer..."></textarea>
+                    </div>
+
+                    <!-- Live Conflict Notice Box -->
+                    <div id="liveConflictNotice" class="alert alert-danger border-danger shadow-sm d-none align-items-center gap-2 mb-0" style="border-radius: 12px;">
+                        <i class="fa-solid fa-triangle-exclamation fs-4 text-danger"></i>
+                        <div>
+                            <strong class="d-block text-dark">Warning: Interviewer Conflict Detected!</strong>
+                            <span id="liveConflictText" class="small text-muted">The interviewer has an overlapping schedule.</span>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer bg-light border-top px-4 py-3">
+                    <button type="button" class="btn btn-secondary px-3" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" id="submitScheduleBtn" class="btn btn-primary px-4 fw-bold">
+                        <i class="fa-solid fa-floppy-disk me-1"></i> Save Interview
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- =========================================================================
+     MODAL: INTERVIEW CONFLICT ALERT
+     ========================================================================= -->
+<div class="modal fade" id="conflictWarningModal" tabindex="-1" aria-labelledby="conflictWarningModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-danger shadow-lg" style="border-radius: 20px; overflow: hidden;">
+            <div class="modal-header bg-danger text-white px-4 py-3">
+                <h5 class="modal-title fw-bold" id="conflictWarningModalLabel">
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i>Interview Conflict Detected
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="fw-semibold text-dark mb-2">The selected interviewer already has another interview scheduled during this time period.</p>
+                <p class="text-muted small mb-3">To prevent double-booking, please choose a different time slot or assign another interviewer.</p>
+                
+                <div class="conflict-card">
+                    <h6 class="fw-bold text-danger mb-2"><i class="fa-solid fa-circle-exclamation me-1"></i> Conflicting Booking Details:</h6>
+                    <div class="small text-dark">
+                        <div><strong>Candidate:</strong> <span id="conflictCandidateName">-</span></div>
+                        <div><strong>Date:</strong> <span id="conflictDate">-</span></div>
+                        <div><strong>Time Slot:</strong> <span id="conflictTimeSlot" class="badge bg-danger text-white">-</span></div>
+                        <div><strong>Interviewer:</strong> <span id="conflictInterviewerName">-</span></div>
+                        <div><strong>Status:</strong> <span id="conflictStatus" class="badge bg-secondary">-</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer bg-light px-4 py-3">
+                <button type="button" class="btn btn-danger fw-bold" data-bs-dismiss="modal">
+                    <i class="fa-solid fa-pen-to-square me-1"></i> Modify Time or Interviewer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =========================================================================
+     MODAL: VIEW INTERVIEW DETAILS
+     ========================================================================= -->
+<div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+            <div class="modal-header bg-light border-bottom px-4 py-3">
+                <h5 class="modal-title fw-bold text-dark" id="detailModalLabel">
+                    <i class="fa-solid fa-calendar-check text-primary me-2"></i>Interview Details
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span id="detailTypeBadge" class="badge bg-primary fs-6">Technical</span>
+                    <span id="detailStatusBadge" class="badge status-scheduled fs-6">Scheduled</span>
+                </div>
+                
+                <h4 id="detailCandidateName" class="fw-bold text-dark mb-1">Candidate Name</h4>
+                <p id="detailCandidateEmail" class="text-muted small mb-3">candidate@example.com</p>
+
+                <!-- Candidate Reschedule Request Card (Clean, Structured, Full Message View) -->
+                <div id="detailCandRescheduleAlert" class="p-3.5 mb-3 rounded-3 border d-none" style="background: #f8fafc; border-color: #cbd5e1 !important; border-left: 4px solid #2563eb !important;">
+                    <div class="d-flex align-items-center justify-content-between mb-2.5">
+                        <div class="fw-bold text-dark fs-6 d-flex align-items-center gap-2">
+                            <span class="d-flex align-items-center justify-content-center rounded-circle" style="width: 30px; height: 30px; background: #dbeafe; color: #2563eb; font-size: 0.85rem;">
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                            </span>
+                            <span>Candidate Reschedule Request</span>
+                        </div>
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-bold" style="font-size: 0.72rem;">Action Required</span>
+                    </div>
+
+                    <div class="p-2.5 rounded-2 bg-white border mb-2.5" style="border-color: #e2e8f0 !important;">
+                        <div class="row g-2 small">
+                            <div class="col-sm-6">
+                                <strong class="text-muted d-block" style="font-size: 0.72rem; text-transform: uppercase;">Candidate's Reason:</strong>
+                                <span id="detailCandReqReason" class="text-dark fw-bold">-</span>
+                            </div>
+                            <div class="col-sm-6">
+                                <strong class="text-muted d-block" style="font-size: 0.72rem; text-transform: uppercase;">Preferred Timing:</strong>
+                                <span id="detailCandReqPreferred" class="text-primary fw-bold">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-2.5">
+                        <strong class="text-muted d-block mb-1" style="font-size: 0.72rem; text-transform: uppercase;"><i class="fa-solid fa-message me-1 text-primary"></i> Full Candidate Message:</strong>
+                        <div id="detailCandReqMessage" class="p-3 bg-white rounded-2 border text-dark" style="font-size: 0.85rem; line-height: 1.5; white-space: pre-wrap; min-height: 52px; border-color: #e2e8f0 !important;">-</div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                        <div class="text-muted small" style="font-size: 0.72rem;">
+                            <i class="fa-regular fa-clock me-1"></i>Requested: <span id="detailCandReqTime">-</span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="openDeclineRescheduleModalFromDetail()">
+                                <i class="fa-solid fa-xmark me-1"></i> Decline
+                            </button>
+                            <button type="button" class="btn btn-sm btn-primary fw-bold px-3" onclick="openRescheduleModalFromDetail()">
+                                <i class="fa-solid fa-calendar-check me-1"></i> Set New Schedule
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-light rounded-3 border mb-3">
+                    <div class="row g-2 text-dark small">
+                        <div class="col-6">
+                            <i class="fa-solid fa-calendar text-primary me-1"></i> <strong>Date:</strong><br/>
+                            <span id="detailDateText" class="ms-3 text-secondary">-</span>
+                        </div>
+                        <div class="col-6">
+                            <i class="fa-solid fa-clock text-primary me-1"></i> <strong>Time:</strong><br/>
+                            <span id="detailTimeText" class="ms-3 text-secondary">-</span>
+                        </div>
+                        <div class="col-12 mt-2">
+                            <i class="fa-solid fa-user-tie text-primary me-1"></i> <strong>Interviewer:</strong><br/>
+                            <span id="detailInterviewerText" class="ms-3 text-secondary">-</span>
+                        </div>
+                        <div class="col-12 mt-2">
+                            <i class="fa-solid fa-location-dot text-primary me-1"></i> <strong>Location / Meeting Link:</strong><br/>
+                            <span id="detailLocationText" class="ms-3 text-secondary">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <strong class="text-dark small d-block mb-1"><i class="fa-solid fa-clipboard text-muted me-1"></i> Notes & Instructions:</strong>
+                    <div id="detailNotesText" class="p-2 bg-white border rounded small text-muted min-h-60">No additional notes provided.</div>
+                </div>
+
+                <div class="text-end text-muted small">
+                    Last Updated: <span id="detailUpdatedAt">-</span>
+                </div>
+            </div>
+            <div class="modal-footer bg-light border-top px-4 py-3 d-flex justify-content-between align-items-center">
+                <button type="button" class="btn btn-outline-danger" onclick="cancelCurrentInterview()">
+                    <i class="fa-solid fa-ban me-1"></i> Cancel Interview
+                </button>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-secondary" onclick="openEditModalFromDetail()">
+                        <i class="fa-solid fa-pen me-1"></i> Edit Details
+                    </button>
+                    <button type="button" class="btn btn-primary fw-bold px-3" onclick="openRescheduleModalFromDetail()">
+                        <i class="fa-solid fa-calendar-rotate-left me-1"></i> Reschedule Interview
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =========================================================================
+     MODAL: DECLINE CANDIDATE RESCHEDULE REQUEST
+     ========================================================================= -->
+<div class="modal fade" id="declineRescheduleModal" tabindex="-1" aria-labelledby="declineRescheduleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+            <div class="modal-header bg-light border-bottom px-4 py-3">
+                <h5 class="modal-title fw-bold text-danger" id="declineRescheduleModalLabel">
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i>Decline Candidate Reschedule Request
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="text-dark small mb-3">
+                    Are you sure you want to decline the reschedule request for <strong id="declineCandName">-</strong>? The interview status will remain confirmed for the original scheduled slot.
+                </p>
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-dark small">Reason for Declining (Sent in notification to candidate)</label>
+                    <textarea class="form-control form-control-sm" id="declineReasonText" rows="3" placeholder="e.g., Interview panel is fully booked for requested dates. Please attend the original slot or reach out to HR."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer bg-light border-top px-4 py-3 d-flex justify-content-between">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Keep Reviewing</button>
+                <button type="button" class="btn btn-danger btn-sm px-3 fw-bold" id="confirmDeclineBtn" onclick="confirmDeclineCandidateReschedule()">
+                    <span id="confirmDeclineSpinner" class="spinner-border spinner-border-sm me-1 d-none" role="status"></span>
+                    <i class="fa-solid fa-ban me-1"></i> Confirm Decline
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =========================================================================
+     MODAL: RESCHEDULE INTERVIEW (Dedicated Rescheduling Experience)
+     ========================================================================= -->
+<div class="modal fade" id="rescheduleModal" tabindex="-1" aria-labelledby="rescheduleModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+            
+            <!-- Modal Header (Sleek Modern Indigo/Blue Palette) -->
+            <div class="modal-header border-bottom px-4 py-3" style="background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="d-flex align-items-center justify-content-center rounded-circle" style="width: 44px; height: 44px; background: #dbeafe; color: #2563eb; font-size: 1.25rem; border: 1.5px solid #bfdbfe;">
+                        <i class="fa-solid fa-calendar-rotate-left"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold text-dark mb-0" id="rescheduleModalLabel">Set New Interview Schedule</h5>
+                        <p class="text-muted small mb-0">Select an updated date, check for interviewer conflicts, and notify the candidate.</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form id="rescheduleInterviewForm" onsubmit="handleRescheduleFormSubmit(event)">
+                <input type="hidden" id="rescheduleInterviewId" value="">
+                <input type="hidden" id="rescheduleCandidateEmail" value="">
+                <input type="hidden" id="rescheduleCandidateName" value="">
+                <input type="hidden" id="rescheduleInterviewerName" value="">
+                <input type="hidden" id="rescheduleInterviewType" value="">
+                <input type="hidden" id="rescheduleOldScheduleStr" value="">
+
+                <div class="modal-body p-4" style="max-height: calc(85vh - 120px); overflow-y: auto;">
+
+                    <!-- Candidate Requested Notice Prompt -->
+                    <div id="rescheduleCandidatePromptBanner" class="p-3 mb-3 rounded-3 border d-none" style="background: #f8fafc; border-color: #cbd5e1 !important; border-left: 4px solid #2563eb !important;">
+                        <div class="fw-bold text-dark d-flex align-items-center mb-1.5">
+                            <i class="fa-solid fa-user-clock text-primary me-2"></i> Candidate's Requested Reschedule Availability
+                        </div>
+                        <div id="rescheduleCandidatePromptDetails" class="small text-dark"></div>
+                    </div>
+                    
+                    <!-- 1. Current Schedule Overview Card -->
+                    <div class="p-3 mb-4 rounded-3 border" style="background: #f8fafc; border-color: #e2e8f0 !important;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-secondary fw-semibold" style="font-size: 0.75rem;">CURRENT INTERVIEW SCHEDULE</span>
+                            <span class="badge bg-primary" id="rescheduleTypePill">Technical Round</span>
+                        </div>
+                        <div class="row g-2 text-dark small">
+                            <div class="col-md-6">
+                                <strong class="text-secondary"><i class="fa-solid fa-user text-primary me-1"></i> Candidate:</strong>
+                                <div class="fw-bold text-dark fs-6" id="rescheduleCurrentCandText">-</div>
+                            </div>
+                            <div class="col-md-6">
+                                <strong class="text-secondary"><i class="fa-solid fa-user-tie text-primary me-1"></i> Interviewer:</strong>
+                                <div class="fw-bold text-dark fs-6" id="rescheduleCurrentInterviewerText">-</div>
+                            </div>
+                            <div class="col-12 mt-2 pt-2 border-top">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="text-muted fw-semibold">Current Time:</span>
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 fw-bold fs-6" id="rescheduleCurrentDateText">
+                                        <i class="fa-regular fa-calendar-xmark me-1"></i> -
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Rescheduling Reason -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-dark d-flex align-items-center gap-1">
+                            <i class="fa-solid fa-clipboard-question text-warning"></i> Reason for Rescheduling <span class="text-danger">*</span>
+                        </label>
+                        <select id="rescheduleReasonSelect" class="form-select form-select-md" style="padding: 10px 14px; border-radius: 10px;" required onchange="handleRescheduleReasonChange()">
+                            <option value="Interviewer unavailable">Interviewer unavailable</option>
+                            <option value="Candidate requested a change">Candidate requested a change</option>
+                            <option value="Scheduling conflict">Scheduling conflict</option>
+                            <option value="HR / team availability">HR / team availability</option>
+                            <option value="Technical issue">Technical issue</option>
+                            <option value="Emergency">Emergency</option>
+                            <option value="Other">Other (Specify below)</option>
+                        </select>
+
+                        <!-- Custom Reason Textarea (shown when "Other" is chosen) -->
+                        <div id="customReasonContainer" class="mt-2 d-none">
+                            <textarea id="rescheduleCustomReason" class="form-control" rows="2" placeholder="Please provide specific details for the rescheduling reason..." style="border-radius: 10px;" oninput="updateLiveEmailPreview()"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- 3. New Schedule Date & Time -->
+                    <div class="mb-4 p-3 rounded-3 border" style="background: #ffffff; border-color: #bfdbfe !important; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.05);">
+                        <label class="form-label fw-bold text-dark d-flex justify-content-between align-items-center mb-2">
+                            <span><i class="fa-solid fa-calendar-days text-primary me-1"></i> Select New Interview Date & Time <span class="text-danger">*</span></span>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle">Updated Slot</span>
+                        </label>
+
+                        <!-- Quick Date Presets -->
+                        <div class="d-flex gap-2 mb-3 flex-wrap align-items-center">
+                            <small class="text-muted fw-semibold me-1">Quick Presets:</small>
+                            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1" onclick="setRescheduleDatePreset(1)">Tomorrow</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1" onclick="setRescheduleDatePreset(2)">In 2 Days</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1" onclick="setRescheduleDatePreset(7)">Next Week (+7d)</button>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label small fw-semibold text-muted">New Date</label>
+                                <input type="date" id="rescheduleNewDate" class="form-control" style="border-radius: 10px;" required onchange="onRescheduleScheduleChange()">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-semibold text-muted">Start Time</label>
+                                <input type="time" id="rescheduleNewStartTime" class="form-control" style="border-radius: 10px;" required onchange="onRescheduleScheduleChange()">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-semibold text-muted">End Time</label>
+                                <input type="time" id="rescheduleNewEndTime" class="form-control" style="border-radius: 10px;" required onchange="onRescheduleScheduleChange()">
+                            </div>
+                        </div>
+
+                        <!-- Popular Slot Shortcuts -->
+                        <div class="d-flex gap-1 mt-2 flex-wrap align-items-center">
+                            <small class="text-muted" style="font-size: 0.72rem;">Suggested Slots:</small>
+                            <button type="button" class="badge bg-light text-dark border p-1 px-2 btn text-decoration-none" onclick="setRescheduleTimeSlot('10:00', '11:00')">10:00 - 11:00</button>
+                            <button type="button" class="badge bg-light text-dark border p-1 px-2 btn text-decoration-none" onclick="setRescheduleTimeSlot('11:00', '12:00')">11:00 - 12:00</button>
+                            <button type="button" class="badge bg-light text-dark border p-1 px-2 btn text-decoration-none" onclick="setRescheduleTimeSlot('14:00', '15:00')">14:00 - 15:00</button>
+                            <button type="button" class="badge bg-light text-dark border p-1 px-2 btn text-decoration-none" onclick="setRescheduleTimeSlot('15:00', '16:00')">15:00 - 16:00</button>
+                            <button type="button" class="badge bg-light text-dark border p-1 px-2 btn text-decoration-none" onclick="setRescheduleTimeSlot('16:00', '17:00')">16:00 - 17:00</button>
+                        </div>
+
+                        <!-- Conflict Alert Box -->
+                        <div id="rescheduleConflictAlert" class="mt-3 p-3 rounded-3 d-none" style="background: #fef2f2; border: 1.5px solid #fca5a5;">
+                            <div class="d-flex align-items-center gap-2 text-danger fw-bold small">
+                                <i class="fa-solid fa-triangle-exclamation fs-5"></i>
+                                <span id="rescheduleConflictText">Conflict detected for this interviewer.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Location / Video Meeting Link & Notes -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-dark small"><i class="fa-solid fa-link text-primary me-1"></i> Meeting Link or Location</label>
+                            <input type="text" id="rescheduleLocationLink" class="form-control" style="border-radius: 10px;" placeholder="https://meet.google.com/... or Room 402" oninput="updateLiveEmailPreview()">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-dark small"><i class="fa-solid fa-note-sticky text-primary me-1"></i> Additional Instructions / Notes</label>
+                            <input type="text" id="rescheduleNotes" class="form-control" style="border-radius: 10px;" placeholder="e.g. Please bring updated portfolio link" oninput="updateLiveEmailPreview()">
+                        </div>
+                    </div>
+
+                    <!-- 5. Email Notification Toggle & Live Preview -->
+                    <div class="card border rounded-3 p-3 mb-3 bg-white" style="border-color: #cbd5e1 !important;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" id="rescheduleSendEmail" checked onchange="toggleEmailPreviewVisibility()">
+                                <label class="form-check-label fw-bold text-dark" for="rescheduleSendEmail">
+                                    <i class="fa-solid fa-envelope text-primary me-1"></i> Send Reschedule Email Notification to Candidate
+                                </label>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="toggleEmailPreviewAccordion()">
+                                <i class="fa-solid fa-eye me-1"></i> <span id="emailPreviewToggleText">Preview Email</span>
+                            </button>
+                        </div>
+                        <small class="text-muted d-block">Candidate will receive full schedule details, reasons, meeting links, and preparation instructions.</small>
+
+                        <!-- Collapsible Live Email Preview -->
+                        <div id="emailPreviewBox" class="mt-3 pt-3 border-top d-none">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <strong class="small text-secondary"><i class="fa-solid fa-file-invoice text-primary me-1"></i> Candidate Email Live Preview:</strong>
+                                <span class="badge bg-light text-secondary border small" id="emailPreviewRecipient">-</span>
+                            </div>
+                            <div class="border rounded-3 p-3 bg-light" id="renderedEmailPreviewContainer" style="max-height: 280px; overflow-y: auto; font-family: inherit;">
+                                <!-- Live Email HTML Preview rendered dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 6. Visual Schedule Summary Diff -->
+                    <div class="p-3 rounded-3 border" style="background: #eff6ff; border-color: #bfdbfe !important;">
+                        <div class="fw-bold text-dark small mb-2"><i class="fa-solid fa-check-double text-primary me-1"></i> Reschedule Confirmation Summary:</div>
+                        <div class="row g-2 small">
+                            <div class="col-md-6">
+                                <div class="text-muted">Previous:</div>
+                                <div class="text-danger fw-bold text-decoration-line-through" id="summaryPrevSchedule">-</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-muted">New Confirmed:</div>
+                                <div class="text-success fw-bold fs-6" id="summaryNewSchedule">-</div>
+                            </div>
+                            <div class="col-12 mt-1">
+                                <span class="text-muted">Reason:</span> <span class="fw-bold text-dark" id="summaryReasonText">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer bg-light border-top px-4 py-3 d-flex justify-content-between">
+                    <button type="button" class="btn btn-light px-3 py-2 fw-semibold border" data-bs-dismiss="modal">
+                        <i class="fa-solid fa-xmark me-1"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary px-4 py-2 fw-bold shadow-sm" id="btnSubmitReschedule">
+                        <span class="btn-text"><i class="fa-solid fa-calendar-check me-1"></i> Confirm Reschedule</span>
+                        <span class="btn-spinner d-none"><i class="fa-solid fa-circle-notch fa-spin me-1"></i> Updating Schedule...</span>
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<!-- =========================================================================
+     WEBSITE POPUP: CUSTOM IN-PAGE CONFIRMATION MODAL (Replaces browser confirm)
+     ========================================================================= -->
+<div class="modal fade" id="websiteConfirmModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-sm" style="max-width: 380px;">
+        <div class="modal-content border-0 shadow-lg text-center p-3" style="border-radius: 20px;">
+            <div class="modal-body pt-3 pb-2">
+                <div class="mb-3">
+                    <div id="websiteConfirmIconBox" class="mx-auto d-flex align-items-center justify-content-center" style="width: 56px; height: 56px; border-radius: 50%; background: #fee2e2; color: #ef4444; font-size: 1.5rem;">
+                        <i class="fa-solid fa-triangle-exclamation" id="websiteConfirmIcon"></i>
+                    </div>
+                </div>
+                <h5 class="fw-bold text-dark mb-2" id="websiteConfirmTitle">Confirm Action</h5>
+                <p class="text-muted small mb-0" id="websiteConfirmMessage">Are you sure you want to perform this action?</p>
+            </div>
+            <div class="modal-footer border-0 d-flex justify-content-center gap-2 pt-2">
+                <button type="button" class="btn btn-light px-3 fw-semibold" data-bs-dismiss="modal" id="websiteConfirmCancelBtn" style="border-radius: 10px;">Keep</button>
+                <button type="button" class="btn btn-danger px-3 fw-bold" id="websiteConfirmOkBtn" style="border-radius: 10px;">Yes, Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =========================================================================
+     WEBSITE POPUP: CUSTOM IN-PAGE ALERT MODAL (Replaces browser alert)
+     ========================================================================= -->
+<div class="modal fade" id="websiteAlertModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm" style="max-width: 380px;">
+        <div class="modal-content border-0 shadow-lg text-center p-3" style="border-radius: 20px;">
+            <div class="modal-body pt-3 pb-2">
+                <div class="mb-3">
+                    <div id="websiteAlertIconBox" class="mx-auto d-flex align-items-center justify-content-center" style="width: 56px; height: 56px; border-radius: 50%; background: #eff6ff; color: #2563eb; font-size: 1.5rem;">
+                        <i class="fa-solid fa-circle-info" id="websiteAlertIcon"></i>
+                    </div>
+                </div>
+                <h5 class="fw-bold text-dark mb-2" id="websiteAlertTitle">Notice</h5>
+                <p class="text-muted small mb-0" id="websiteAlertMessage">Message details here.</p>
+            </div>
+            <div class="modal-footer border-0 d-flex justify-content-center pt-2">
+                <button type="button" class="btn btn-primary px-4 fw-bold" data-bs-dismiss="modal" style="border-radius: 10px;">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =========================================================================
+     WEBSITE POPUP: FLOATING TOAST NOTIFICATIONS CONTAINER
+     ========================================================================= -->
+<div class="toast-container-custom" id="websiteToastContainer"></div>
+
+{% endblock %}
+
+{% block js %}
+<script src="{{ url_for('static', filename='js/hr_interviews.js') }}"></script>
+{% endblock %}

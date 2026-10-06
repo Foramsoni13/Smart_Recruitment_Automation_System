@@ -1,0 +1,1053 @@
+{% extends "base.html" %}
+
+{% block title %}
+Candidates | Smart Recruitment
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/candidates.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="candidates-page">
+
+    <!-- =====================================================
+         BACKGROUND
+    ====================================================== -->
+
+    <div class="candidates-background">
+
+        <div class="candidate-orb orb-1"></div>
+        <div class="candidate-orb orb-2"></div>
+        <div class="candidate-orb orb-3"></div>
+
+        <div class="candidate-grid"></div>
+
+        <div class="candidate-particles">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header class="candidate-header">
+
+        <div class="candidate-header-left">
+
+            <a href="{{ url_for('home') }}"
+               class="back-dashboard"
+               title="Back to Dashboard">
+
+                <i class="fa-solid fa-arrow-left"></i>
+
+            </a>
+
+            <div class="candidate-title-icon">
+                <i class="fa-solid fa-users"></i>
+            </div>
+
+            <div>
+
+                <span class="candidate-eyebrow">
+                    RECRUITMENT MANAGEMENT
+                </span>
+
+                <h1>
+                    Candidates
+                </h1>
+
+                <p>
+                    Manage candidates, resumes and automated registration.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="candidate-header-right">
+
+            <div class="live-indicator">
+                <span class="live-dot"></span>
+                SYSTEM READY
+            </div>
+
+            <a href="{{ url_for('candidate_register') }}"
+               class="btn-add-candidate">
+                <i class="fa-solid fa-user-plus"></i>
+                + Add Candidate
+            </a>
+
+            <a href="{{ url_for('resume_scanner') }}"
+               class="candidate-logout">
+                <i class="fa-solid fa-file-arrow-up"></i>
+                Resume Scanner
+            </a>
+
+            <a href="{{ url_for('analytics') }}"
+               class="candidate-logout">
+                <i class="fa-solid fa-chart-line"></i>
+                Analytics
+            </a>
+
+            <a href="{{ url_for('home') }}"
+               class="candidate-logout">
+                <i class="fa-solid fa-house"></i>
+                Dashboard
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="candidate-main">
+
+
+        <!-- =================================================
+             STATISTICS
+        ================================================== -->
+
+        <section class="candidate-stats">
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        Total Candidates
+                    </span>
+
+                    <strong id="totalCandidates">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    <i class="fa-solid fa-file-excel"></i>
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        Excel Records
+                    </span>
+
+                    <strong id="excelCandidates">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    <i class="fa-solid fa-file-pdf"></i>
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        Resumes
+                    </span>
+
+                    <strong id="resumeCandidates">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    <i class="fa-solid fa-gears"></i>
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        Automation
+                    </span>
+
+                    <strong id="automationStatus">
+                        Ready
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             ROBOT FRAMEWORK AUTOMATION
+        ================================================== -->
+
+        <section class="automation-card" id="automationSection">
+
+
+            <!-- =================================================
+                 AUTOMATION FILES & SETTINGS
+            ================================================== -->
+
+            <div class="automation-files">
+
+
+                <!-- EXCEL -->
+
+                <div class="automation-file-box">
+
+                    <div class="file-box-icon">
+
+                        <i class="fa-solid fa-file-excel"></i>
+
+                    </div>
+
+                    <div class="file-box-content">
+
+                        <span>
+                            CANDIDATE DATA
+                        </span>
+
+                        <strong id="excelFileName">
+                            No Excel file selected
+                        </strong>
+
+                    </div>
+
+                    <label
+                        for="candidateFile"
+                        class="file-select-button">
+
+                        <i class="fa-solid fa-folder-open"></i>
+                        Choose Excel
+
+                    </label>
+
+                    <input
+                        type="file"
+                        id="candidateFile"
+                        name="candidate_file"
+                        accept=".csv,.xls,.xlsx"
+                        hidden
+                    >
+
+                </div>
+
+
+                <!-- RESUMES -->
+
+                <div class="automation-file-box">
+
+                    <div class="file-box-icon resume-icon">
+
+                        <i class="fa-solid fa-file-pdf"></i>
+
+                    </div>
+
+                    <div class="file-box-content">
+
+                        <span>
+                            CANDIDATE RESUMES
+                        </span>
+
+                        <strong id="resumeFileName">
+                            No resumes selected
+                        </strong>
+
+                    </div>
+
+                    <label
+                        for="resumeFiles"
+                        class="file-select-button">
+
+                        <i class="fa-solid fa-folder-open"></i>
+                        Choose Resumes
+
+                    </label>
+
+                    <input
+                        type="file"
+                        id="resumeFiles"
+                        name="resumes"
+                        accept=".pdf,.doc,.docx"
+                        multiple
+                        hidden
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 AUTOMATION CONTROLS & BROWSER MODE
+            ================================================== -->
+
+            <div class="automation-controls-bar">
+
+                <div class="browser-mode-container">
+                    <label class="mode-label">
+                        <i class="fa-solid fa-sliders"></i> Browser Mode:
+                    </label>
+
+                    <div class="mode-toggle-group">
+                        <label class="mode-option" title="Recommended: Run Selenium invisibly in the background without opening visible windows">
+                            <input type="radio" name="browserMode" value="headless" checked>
+                            <span class="mode-pill">
+                                <i class="fa-solid fa-ghost"></i>
+                                Headless (Silent RPA)
+                            </span>
+                        </label>
+
+                        <label class="mode-option" title="Open exactly ONE visible Chrome browser window controlled by Selenium">
+                            <input type="radio" name="browserMode" value="visible">
+                            <span class="mode-pill">
+                                <i class="fa-brands fa-chrome"></i>
+                                Visible Chrome Window
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="automation-action-buttons">
+                    <button
+                        type="button"
+                        id="cancelAutomationButton"
+                        class="cancel-automation-button hidden">
+                        <i class="fa-solid fa-stop"></i>
+                        <span>Cancel</span>
+                    </button>
+
+                    <button
+                        type="button"
+                        id="startAutomationButton"
+                        class="start-automation-button">
+                        <i class="fa-solid fa-play"></i>
+                        <span>Start Automation</span>
+                    </button>
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 AUTOMATION PROGRESS & LIVE METRICS
+            ================================================== -->
+
+            <div
+                id="automationProgress"
+                class="automation-progress hidden">
+
+                <div class="progress-header">
+
+                    <div class="progress-meta">
+                        <span class="progress-eyebrow" id="progressEyebrow">
+                            AUTOMATION ACTIVE
+                        </span>
+                        <strong id="automationMessage">
+                            Initializing Robot Framework & Selenium...
+                        </strong>
+                        <div class="progress-submeta">
+                            <span id="metaJobId">Job: -</span>
+                            <span class="meta-sep">•</span>
+                            <span id="metaStage">Stage: Initializing</span>
+                            <span class="meta-sep">•</span>
+                            <span id="metaCandidateCount">Candidates: 0 / 0</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-percent-box">
+                        <span id="automationPercent">0%</span>
+                    </div>
+
+                </div>
+
+
+                <div class="progress-track">
+                    <div
+                        id="automationProgressBar"
+                        class="progress-bar">
+                    </div>
+                </div>
+
+
+                <!-- TERMINAL LOG VIEWER -->
+                <div class="terminal-log-container">
+                    <div class="terminal-header">
+                        <div class="terminal-dots">
+                            <span class="dot red"></span>
+                            <span class="dot yellow"></span>
+                            <span class="dot green"></span>
+                        </div>
+                        <span class="terminal-title">
+                            <i class="fa-solid fa-terminal"></i> RPA Execution Terminal
+                        </span>
+                        <button type="button" class="terminal-clear" id="clearLogsBtn" title="Clear view">
+                            <i class="fa-solid fa-eraser"></i>
+                        </button>
+                    </div>
+
+                    <div class="automation-log" id="automationLog"></div>
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 STRUCTURED ERROR DIAGNOSTIC CARD
+            ================================================== -->
+
+            <div id="automationErrorCard" class="automation-error-card hidden">
+
+                <div class="error-card-header">
+                    <div class="error-icon-box">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <div>
+                        <h3>Automation Failed</h3>
+                        <p>The robotic automation encountered an issue. Review the diagnostic details below.</p>
+                    </div>
+                </div>
+
+                <div class="error-card-grid">
+                    <div class="error-grid-item">
+                        <span><i class="fa-solid fa-fingerprint"></i> Job ID</span>
+                        <strong id="errJobId">-</strong>
+                    </div>
+
+                    <div class="error-grid-item">
+                        <span><i class="fa-solid fa-layer-group"></i> Automation Stage</span>
+                        <strong id="errStage">-</strong>
+                    </div>
+
+                    <div class="error-grid-item">
+                        <span><i class="fa-solid fa-robot"></i> Robot Status</span>
+                        <strong id="errRobotStatus" class="status-badge failed">Failed</strong>
+                    </div>
+
+                    <div class="error-grid-item">
+                        <span><i class="fa-brands fa-chrome"></i> Selenium Status</span>
+                        <strong id="errSeleniumStatus" class="status-badge cleaned">Cleaned Up</strong>
+                    </div>
+
+                    <div class="error-grid-item full-width">
+                        <span><i class="fa-solid fa-circle-exclamation"></i> Failure Reason</span>
+                        <div class="error-reason-box" id="errReason">
+                            Element was not found or click was intercepted.
+                        </div>
+                    </div>
+
+                    <div class="error-grid-item full-width">
+                        <span><i class="fa-solid fa-circle-check"></i> Last Successful Step</span>
+                        <div class="error-step-box" id="errLastStep">
+                            Candidate information submitted.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="error-card-actions">
+                    <button type="button" id="retryAutomationBtn" class="btn-retry">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>Retry Automation</span>
+                    </button>
+                    <button type="button" id="viewErrorLogsBtn" class="btn-view-logs">
+                        <i class="fa-solid fa-terminal"></i>
+                        <span>View Execution Logs</span>
+                    </button>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- INLINE NOTIFICATION / STATUS BANNER -->
+        <div id="candidateNotificationBanner" class="candidate-notification-banner hidden mb-3" style="display: none;"></div>
+
+        <!-- =================================================
+             TOOLBAR
+        ================================================== -->
+
+        <section class="candidate-toolbar">
+
+
+            <!-- SEARCH -->
+
+            <div class="search-box">
+
+                <i class="fa-solid fa-search"></i>
+
+                <input
+                    type="text"
+                    id="candidateSearch"
+                    placeholder="Search candidate, email or position..."
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <!-- STATUS FILTER -->
+
+            <div class="filter-box">
+
+                <i class="fa-solid fa-filter"></i>
+
+                <select id="statusFilter">
+
+                    <option value="all">
+                        All Candidates
+                    </option>
+
+                    <option value="exam_assigned">
+                        Exam Assigned
+                    </option>
+
+                    <option value="not_started">
+                        Not Started
+                    </option>
+
+                    <option value="in_progress">
+                        In Progress
+                    </option>
+
+                    <option value="completed">
+                        Completed
+                    </option>
+
+                    <option value="passed">
+                        Passed
+                    </option>
+
+                    <option value="failed">
+                        Failed
+                    </option>
+
+                    <option value="Registered">
+                        Registered
+                    </option>
+
+                    <option value="Resume Uploaded">
+                        Resume Uploaded
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- REFRESH -->
+
+            <button
+                type="button"
+                id="refreshCandidates"
+                class="refresh-button">
+
+                <i class="fa-solid fa-rotate"></i>
+
+                Refresh
+
+            </button>
+
+        </section>
+
+
+        <!-- EXAM QUICK FILTERS PILLS -->
+        <div class="exam-filter-pills d-flex flex-wrap gap-2 mb-3 align-items-center">
+            <span class="fw-bold me-1" style="font-size: 0.85rem; color: #000000 !important;"><i class="fa-solid fa-sliders me-1" style="color: #2563eb !important;"></i> Quick Filters:</span>
+            <button type="button" class="btn btn-sm btn-filter active" data-filter="all">All</button>
+            <button type="button" class="btn btn-sm btn-filter" data-filter="exam_assigned">Exam Assigned</button>
+            <button type="button" class="btn btn-sm btn-filter" data-filter="not_started">Not Started</button>
+            <button type="button" class="btn btn-sm btn-filter" data-filter="in_progress">In Progress</button>
+            <button type="button" class="btn btn-sm btn-filter" data-filter="completed">Completed</button>
+            <button type="button" class="btn btn-sm btn-filter" data-filter="passed">Passed</button>
+            <button type="button" class="btn btn-sm btn-filter" data-filter="failed">Failed</button>
+        </div>
+
+
+        <!-- =================================================
+             CANDIDATE TABLE
+        ================================================== -->
+
+        <section class="candidate-table-card">
+
+            <div class="table-header">
+
+                <div>
+
+                    <span class="table-eyebrow">
+                        CANDIDATE DATABASE
+                    </span>
+
+                    <h2>
+                        Candidate List
+                    </h2>
+
+                </div>
+
+                <div class="d-flex align-items-center gap-3">
+                    <div id="bulkActionsContainer" class="bulk-actions-container hidden" style="display: none; align-items: center; gap: 0.75rem;">
+                        <span id="selectedCountBadge" class="badge" style="font-size: 0.85rem; padding: 0.4rem 0.8rem; background: #e2e8f0; color: #1e293b; border-radius: 20px; font-weight: 600;">
+                            0 selected
+                        </span>
+                        <button type="button" id="deleteSelectedBtn" class="btn btn-danger btn-sm" style="display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 600; padding: 0.4rem 0.9rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(225, 29, 72, 0.25);">
+                            <i class="fa-solid fa-trash-can"></i> Delete Selected
+                        </button>
+                    </div>
+
+                    <div class="result-count">
+                        <span id="candidateCount">
+                            0
+                        </span>
+                        Candidates
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="table-wrapper" style="overflow-x: auto;">
+
+                <table class="candidate-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th style="width: 40px; text-align: center;">
+                                <input type="checkbox" id="selectAllCandidates" title="Select All Candidates" style="width: 18px; height: 18px; cursor: pointer;">
+                            </th>
+                            <th>Candidate</th>
+                            <th>Email</th>
+                            <th>Job/Position</th>
+                            <th>Registration Status</th>
+                            <th>Resume Status</th>
+                            <th>Exam</th>
+                            <th>Exam Status</th>
+                            <th>Score</th>
+                            <th>Result</th>
+                            <th>Actions</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="candidateTableBody">
+
+                        <tr>
+
+                            <td colspan="10">
+
+                                <div class="candidate-state">
+
+                                    <div class="loading-spinner"></div>
+
+                                    <h3>
+                                        Loading candidates...
+                                    </h3>
+
+                                    <p>
+                                        Please wait.
+                                    </p>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- =====================================================
+     CANDIDATE DETAILS MODAL
+====================================================== -->
+
+<div
+    id="candidateModal"
+    class="candidate-modal hidden">
+
+    <div class="candidate-modal-overlay"></div>
+
+    <div class="candidate-modal-card">
+
+        <button
+            type="button"
+            class="modal-close"
+            id="closeCandidateModal"
+            aria-label="Close candidate details">
+
+            <i class="fa-solid fa-xmark"></i>
+
+        </button>
+
+
+        <div class="modal-profile-icon">
+
+            <i class="fa-solid fa-user"></i>
+
+        </div>
+
+
+        <div class="modal-heading">
+
+            <span>
+                CANDIDATE PROFILE
+            </span>
+
+            <h2 id="modalCandidateName">
+                Candidate
+            </h2>
+
+        </div>
+
+
+        <div class="candidate-details">
+
+
+            <!-- EMAIL -->
+
+            <div class="detail-item">
+
+                <span>
+
+                    <i class="fa-solid fa-envelope"></i>
+                    Email
+
+                </span>
+
+                <strong id="modalCandidateEmail">
+                    -
+                </strong>
+
+            </div>
+
+
+            <!-- PHONE -->
+
+            <div class="detail-item">
+
+                <span>
+
+                    <i class="fa-solid fa-phone"></i>
+                    Phone
+
+                </span>
+
+                <strong id="modalCandidatePhone">
+                    -
+                </strong>
+
+            </div>
+
+
+            <!-- POSITION -->
+
+            <div class="detail-item">
+
+                <span>
+
+                    <i class="fa-solid fa-briefcase"></i>
+                    Position
+
+                </span>
+
+                <strong id="modalCandidatePosition">
+                    -
+                </strong>
+
+            </div>
+
+
+            <!-- STATUS -->
+
+            <div class="detail-item">
+
+                <span>
+
+                    <i class="fa-solid fa-circle-check"></i>
+                    Registration Status
+
+                </span>
+
+                <strong id="modalCandidateStatus">
+                    -
+                </strong>
+
+            </div>
+
+
+            <!-- RESUME STATUS -->
+
+            <div class="detail-item">
+
+                <span>
+
+                    <i class="fa-solid fa-file-arrow-up"></i>
+                    Resume Status
+
+                </span>
+
+                <strong id="modalCandidateResumeStatus">
+                    -
+                </strong>
+
+            </div>
+
+
+            <!-- RESUME ATTACHMENT -->
+
+            <div class="detail-item">
+
+                <span>
+
+                    <i class="fa-solid fa-file-pdf"></i>
+                    Resume File
+
+                </span>
+
+                <div id="modalCandidateResumeLink">
+                    -
+                </div>
+
+            </div>
+
+
+            <!-- EMAIL STATUS -->
+
+            <div class="detail-item">
+
+                <span>
+
+                    <i class="fa-solid fa-paper-plane"></i>
+                    Email Status
+
+                </span>
+
+                <div class="d-flex align-items-center gap-2">
+                    <strong id="modalCandidateEmailStatus">
+                        Not Sent
+                    </strong>
+                    <button type="button" id="modalSendEmailBtn" class="btn-action-blue" style="font-size: 0.8rem; padding: 4px 10px; border-radius: 8px;">
+                        <i class="fa-solid fa-envelope me-1"></i> Send Email
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- EXAM RESULTS & SECURITY AUDIT SECTION -->
+        <div class="exam-results-section mt-4 pt-3 border-top" id="modalExamSection">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h3 class="h6 font-bold text-dark m-0" style="color: #000000 !important; font-weight: 800;">
+                    <i class="fa-solid fa-graduation-cap me-2" style="color: #2563eb !important;"></i> Exam Performance & Audit
+                </h3>
+                <span id="modalExamAttemptsCountBadge" class="badge" style="background: #eff6ff; color: #1d4ed8 !important; border: 1px solid #bfdbfe;">0 Attempts</span>
+            </div>
+
+            <div class="exam-details-grid grid-2-col gap-3">
+                <div class="detail-item">
+                    <span><i class="fa-solid fa-file-signature"></i> Exam Name</span>
+                    <strong id="modalExamName">No Exam Assigned</strong>
+                </div>
+
+                <div class="detail-item">
+                    <span><i class="fa-solid fa-spinner"></i> Attempt Status</span>
+                    <span id="modalExamAttemptStatus" class="badge bg-secondary-subtle text-secondary">—</span>
+                </div>
+
+                <div class="detail-item">
+                    <span><i class="fa-solid fa-trophy"></i> Pass / Fail Result</span>
+                    <span id="modalExamResultBadge" class="badge bg-secondary-subtle text-secondary">—</span>
+                </div>
+
+                <div class="detail-item">
+                    <span><i class="fa-solid fa-chart-simple"></i> Score / Percentage</span>
+                    <strong id="modalExamScore">—</strong>
+                </div>
+
+                <div class="detail-item">
+                    <span><i class="fa-solid fa-clock"></i> Started At</span>
+                    <strong id="modalExamStartedAt">—</strong>
+                </div>
+
+                <div class="detail-item">
+                    <span><i class="fa-solid fa-circle-check"></i> Submitted At</span>
+                    <strong id="modalExamSubmittedAt">—</strong>
+                </div>
+
+                <div class="detail-item">
+                    <span><i class="fa-solid fa-list-ol"></i> Total Questions</span>
+                    <strong id="modalExamTotalQuestions">0</strong>
+                </div>
+
+                <div class="detail-item">
+                    <span><i class="fa-solid fa-pen-to-square"></i> Questions Answered</span>
+                    <strong id="modalExamAnswered">0</strong>
+                </div>
+
+                <div class="detail-item">
+                    <span><i class="fa-solid fa-check text-success"></i> Correct Answers</span>
+                    <strong id="modalExamCorrect" class="text-success">0</strong>
+                </div>
+
+                <div class="detail-item">
+                    <span><i class="fa-solid fa-xmark text-danger"></i> Wrong Answers</span>
+                    <strong id="modalExamWrong" class="text-danger">0</strong>
+                </div>
+
+                <div class="detail-item">
+                    <span><i class="fa-solid fa-minus text-muted"></i> Unanswered</span>
+                    <strong id="modalExamUnanswered">0</strong>
+                </div>
+
+                <div class="detail-item">
+                    <span><i class="fa-solid fa-calculator"></i> Total Marks / Obtained</span>
+                    <strong id="modalExamMarks">0 / 0</strong>
+                </div>
+            </div>
+
+            <!-- SECURITY AUDIT METRICS CARD -->
+            <div class="security-audit-card mt-3 p-3 rounded border" style="background-color: #eff6ff; border-color: #bfdbfe !important;">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="fw-bold" style="font-size: 0.88rem; color: #000000 !important;">
+                        <i class="fa-solid fa-shield-halved me-1" style="color: #2563eb !important;"></i> Security Warnings & Proctoring
+                    </span>
+                    <a href="#" id="modalExamAuditLink" target="_blank" class="btn-action-blue py-1 px-3" style="font-size: 0.8rem; display: none;">
+                        View Audit Log <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+                <div class="d-flex flex-wrap gap-3 text-center">
+                    <div class="flex-fill bg-white p-2 rounded border">
+                        <small class="text-muted d-block" style="font-size: 0.72rem;">Tab Switches</small>
+                        <strong id="modalTabSwitchCount" class="text-dark">0</strong>
+                    </div>
+                    <div class="flex-fill bg-white p-2 rounded border">
+                        <small class="text-muted d-block" style="font-size: 0.72rem;">Fullscreen Exits</small>
+                        <strong id="modalFullscreenExitCount" class="text-dark">0</strong>
+                    </div>
+                    <div class="flex-fill bg-white p-2 rounded border">
+                        <small class="text-muted d-block" style="font-size: 0.72rem;">Total Warnings</small>
+                        <strong id="modalWarningCount" class="text-dark">0</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     DELETE MODAL
+====================================================== -->
+
+<div
+    id="deleteModal"
+    class="candidate-modal hidden">
+
+    <div class="candidate-modal-overlay"></div>
+
+    <div class="delete-modal-card">
+
+        <div class="delete-icon">
+
+            <i class="fa-solid fa-trash"></i>
+
+        </div>
+
+        <h2>
+            Delete Candidate?
+        </h2>
+
+        <p>
+            This candidate will be permanently removed.
+        </p>
+
+        <div class="delete-actions">
+
+            <button
+                type="button"
+                id="cancelDelete"
+                class="cancel-delete">
+
+                Cancel
+
+            </button>
+
+            <button
+                type="button"
+                id="confirmDelete"
+                class="confirm-delete">
+
+                Delete
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     CANDIDATES JAVASCRIPT
+====================================================== -->
+
+<script src="{{ url_for('static', filename='js/candidates.js') }}"></script>
+
+{% endblock %}

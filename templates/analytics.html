@@ -1,0 +1,330 @@
+{% extends "base.html" %}
+
+{% block title %}
+HR Analytics | Smart Recruitment
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/analytics.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="analytics-page">
+
+    <!-- =====================================================
+         BACKGROUND
+    ====================================================== -->
+    <div class="analytics-background">
+        <div class="analytics-orb orb-1"></div>
+        <div class="analytics-orb orb-2"></div>
+        <div class="analytics-orb orb-3"></div>
+        <div class="analytics-grid"></div>
+    </div>
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+    <header class="analytics-header">
+
+        <div class="analytics-header-left">
+
+            <a href="{{ url_for('home') }}"
+               class="back-btn"
+               title="Back to Dashboard">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+
+            <div class="analytics-header-icon">
+                <i class="fa-solid fa-chart-line"></i>
+            </div>
+
+            <div>
+                <span class="analytics-eyebrow">
+                    ANALYTICS MODULE
+                </span>
+                <h1>HR Analytics & Pipeline</h1>
+            </div>
+
+        </div>
+
+        <div class="analytics-header-right">
+
+            <div class="live-indicator">
+                <span class="live-dot"></span>
+                LIVE DATABASE
+            </div>
+
+            <button type="button" class="btn-refresh-analytics" id="refreshAnalyticsBtn">
+                <i class="fa-solid fa-rotate"></i>
+                <span>Refresh Data</span>
+            </button>
+
+            <a href="{{ url_for('candidates') }}" class="nav-shortcut-btn">
+                <i class="fa-solid fa-users"></i>
+                <span>Candidates</span>
+            </a>
+
+            <a href="{{ url_for('home') }}" class="nav-shortcut-btn">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         MAIN ANALYTICS
+    ====================================================== -->
+    <main class="analytics-main">
+
+        <!-- ERROR BANNER -->
+        <div class="analytics-alert alert-error hidden" id="analyticsErrorBanner">
+            <div class="alert-icon">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div class="alert-content">
+                <strong>Unable to load analytics data</strong>
+                <span>Could not connect to the recruitment database API.</span>
+            </div>
+            <button type="button" class="btn-retry" id="retryAnalyticsBtn">
+                <i class="fa-solid fa-rotate-right"></i> Retry
+            </button>
+        </div>
+
+
+        <!-- =================================================
+             1. KPI SUMMARY CARDS
+        ================================================== -->
+        <section class="kpi-grid">
+
+            <!-- TOTAL CANDIDATES -->
+            <div class="kpi-card">
+                <div class="kpi-icon icon-total">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <div class="kpi-details">
+                    <span class="kpi-label">TOTAL CANDIDATES</span>
+                    <strong class="kpi-value" id="kpiTotal">--</strong>
+                    <small class="kpi-meta">Database records</small>
+                </div>
+            </div>
+
+            <!-- REGISTERED CANDIDATES -->
+            <div class="kpi-card">
+                <div class="kpi-icon icon-registered">
+                    <i class="fa-solid fa-user-check"></i>
+                </div>
+                <div class="kpi-details">
+                    <span class="kpi-label">REGISTERED</span>
+                    <strong class="kpi-value" id="kpiRegistered">--</strong>
+                    <small class="kpi-meta" id="kpiRegisteredPct">--% of total</small>
+                </div>
+            </div>
+
+            <!-- RESUMES UPLOADED -->
+            <div class="kpi-card">
+                <div class="kpi-icon icon-uploaded">
+                    <i class="fa-solid fa-file-arrow-up"></i>
+                </div>
+                <div class="kpi-details">
+                    <span class="kpi-label">RESUMES UPLOADED</span>
+                    <strong class="kpi-value" id="kpiResumesUploaded">--</strong>
+                    <small class="kpi-meta" id="kpiUploadedPct">--% verified</small>
+                </div>
+            </div>
+
+            <!-- RESUMES PENDING -->
+            <div class="kpi-card">
+                <div class="kpi-icon icon-pending">
+                    <i class="fa-solid fa-file-excel"></i>
+                </div>
+                <div class="kpi-details">
+                    <span class="kpi-label">RESUMES PENDING</span>
+                    <strong class="kpi-value" id="kpiResumesPending">--</strong>
+                    <small class="kpi-meta">Awaiting file</small>
+                </div>
+            </div>
+
+            <!-- PROCESSED CANDIDATES -->
+            <div class="kpi-card">
+                <div class="kpi-icon icon-processed">
+                    <i class="fa-solid fa-gears"></i>
+                </div>
+                <div class="kpi-details">
+                    <span class="kpi-label">PROCESSED</span>
+                    <strong class="kpi-value" id="kpiProcessed">--</strong>
+                    <small class="kpi-meta">Automation completed</small>
+                </div>
+            </div>
+
+            <!-- FAILED CANDIDATES -->
+            <div class="kpi-card">
+                <div class="kpi-icon icon-failed">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </div>
+                <div class="kpi-details">
+                    <span class="kpi-label">FAILED / ERRORS</span>
+                    <strong class="kpi-value" id="kpiFailed">--</strong>
+                    <small class="kpi-meta">Needs attention</small>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             2. CANDIDATE PIPELINE FUNNEL
+        ================================================== -->
+        <section class="pipeline-section">
+
+            <div class="section-card-header">
+                <div class="section-title">
+                    <i class="fa-solid fa-diagram-project"></i>
+                    <div>
+                        <h2>Candidate Recruitment Pipeline</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pipeline-funnel" id="pipelineFunnel">
+                <!-- Injected dynamically by JS -->
+                <div class="pipeline-loading">
+                    <i class="fa-solid fa-circle-notch fa-spin"></i> Loading recruitment pipeline...
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             3. CHARTS GRID
+        ================================================== -->
+        <section class="charts-grid">
+
+            <!-- CANDIDATE STATUS CHART -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <div>
+                            <h3>Candidate Status Distribution</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="candidateStatusChart"></canvas>
+                </div>
+            </div>
+
+            <!-- RESUME STATUS CHART -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fa-solid fa-file-waveform"></i>
+                        <div>
+                            <h3>Resume Attachment Status</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="resumeStatusChart"></canvas>
+                </div>
+            </div>
+
+            <!-- POSITION BREAKDOWN CHART -->
+            <div class="chart-card full-width">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fa-solid fa-briefcase"></i>
+                        <div>
+                            <h3>Top Applied Positions</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-container-bar">
+                    <canvas id="positionsChart"></canvas>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             4. RECENT ACTIVITY & CANDIDATES TABLE
+        ================================================== -->
+        <section class="activity-section">
+
+            <!-- RECENT ACTIVITY TIMELINE -->
+            <div class="activity-card">
+                
+                <div class="section-card-header">
+                    <div class="section-title">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <div>
+                            <h3>Recent Recruitment Activity</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="activity-timeline" id="activityTimeline">
+                    <div class="timeline-loader">
+                        <i class="fa-solid fa-circle-notch fa-spin"></i> Loading activity...
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RECENT CANDIDATES SUMMARY -->
+            <div class="candidates-summary-card">
+
+                <div class="section-card-header">
+                    <div class="section-title">
+                        <i class="fa-solid fa-user-clock"></i>
+                        <div>
+                            <h3>Recently Added Candidates</h3>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('candidates') }}" class="btn-sm-view-all">
+                        View All <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="recent-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Position</th>
+                                <th>Registration</th>
+                                <th>Resume</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentCandidatesBody">
+                            <tr>
+                                <td colspan="4" class="text-center py-4">
+                                    <i class="fa-solid fa-circle-notch fa-spin"></i> Loading...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+{% endblock %}
+
+{% block js %}
+<!-- Chart.js CDN for responsive analytics visualization -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/analytics.js') }}"></script>
+{% endblock %}

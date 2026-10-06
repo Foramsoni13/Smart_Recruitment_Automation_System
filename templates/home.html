@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard | SmartRecruitment - AI Recruitment Platform
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div id="dashboard-page">
+
+    <!-- =====================================================
+         MAIN HOMEPAGE CONTENT CONTAINER (ONE CLEAR FLOW)
+    ====================================================== -->
+    <main class="dashboard-main-content">
+
+
+
+        <!-- =====================================================
+             2. ANIMATED RECRUITMENT MODULES (BENTO GRID - NO DUPLICATES)
+        ====================================================== -->
+        <section class="bento-section" id="modules">
+            <div class="bento-grid">
+
+                <!-- 1. RESUME SCANNER (FEATURED WIDE CARD) -->
+                <a href="{{ url_for('resume_scanner') }}" class="bento-card bento-wide" aria-label="Open Resume Scanner">
+                    <div>
+                        <div class="bento-card-top">
+                            <div class="bento-icon-box icon-blue">
+                                <i class="fa-solid fa-file-arrow-up"></i>
+                            </div>
+                            <span class="bento-tag tag-blue">AI AUTOMATION</span>
+                        </div>
+                        <div class="bento-card-body">
+                            <h3>Resume Scanner</h3>
+                        </div>
+                    </div>
+                    <div class="bento-card-footer">
+                        <span class="action-label">Scan Resumes Now</span>
+                        <div class="action-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                    </div>
+                </a>
+
+                <!-- 2. CANDIDATES PIPELINE -->
+                <a href="{{ url_for('candidates') }}" class="bento-card" aria-label="Open Candidates">
+                    <div>
+                        <div class="bento-card-top">
+                            <div class="bento-icon-box icon-blue">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                            <span class="bento-tag tag-blue">RECRUITMENT</span>
+                        </div>
+                        <div class="bento-card-body">
+                            <h3>Candidates Pipeline</h3>
+                        </div>
+                    </div>
+                    <div class="bento-card-footer">
+                        <span class="action-label">View Profiles</span>
+                        <div class="action-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                    </div>
+                </a>
+
+                <!-- INTERVIEWS & CALENDAR -->
+                <a href="{{ url_for('hr_interviews') }}" class="bento-card" aria-label="Open Interview Calendar">
+                    <div>
+                        <div class="bento-card-top">
+                            <div class="bento-icon-box icon-blue">
+                                <i class="fa-solid fa-calendar-days"></i>
+                            </div>
+                            <span class="bento-tag tag-blue">SCHEDULING</span>
+                        </div>
+                        <div class="bento-card-body">
+                            <h3>Interview Calendar</h3>
+                        </div>
+                    </div>
+                    <div class="bento-card-footer">
+                        <span class="action-label">Schedule & Manage</span>
+                        <div class="action-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                    </div>
+                </a>
+
+                <!-- 3. HR ANALYTICS -->
+                <a href="{{ url_for('analytics') }}" class="bento-card" aria-label="Open HR Analytics">
+                    <div>
+                        <div class="bento-card-top">
+                            <div class="bento-icon-box icon-blue">
+                                <i class="fa-solid fa-chart-line"></i>
+                            </div>
+                            <span class="bento-tag tag-blue">INSIGHTS</span>
+                        </div>
+                        <div class="bento-card-body">
+                            <h3>HR Analytics</h3>
+                        </div>
+                    </div>
+                    <div class="bento-card-footer">
+                        <span class="action-label">View Insights</span>
+                        <div class="action-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                    </div>
+                </a>
+
+                <!-- 4. EXAM MANAGEMENT -->
+                <a href="{{ url_for('hr_exams_list') }}" class="bento-card" aria-label="Open Exam Management">
+                    <div>
+                        <div class="bento-card-top">
+                            <div class="bento-icon-box icon-blue">
+                                <i class="fa-solid fa-file-signature"></i>
+                            </div>
+                            <span class="bento-tag tag-blue">EXAMS</span>
+                        </div>
+                        <div class="bento-card-body">
+                            <h3>Exam Management</h3>
+                        </div>
+                    </div>
+                    <div class="bento-card-footer">
+                        <span class="action-label">Manage Exams</span>
+                        <div class="action-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                    </div>
+                </a>
+
+                <!-- 5. CREATE CUSTOM EXAM -->
+                <a href="{{ url_for('hr_create_exam') }}" class="bento-card" aria-label="Create Custom Exam">
+                    <div>
+                        <div class="bento-card-top">
+                            <div class="bento-icon-box icon-blue">
+                                <i class="fa-solid fa-folder-plus"></i>
+                            </div>
+                            <span class="bento-tag tag-blue">EXAM CREATOR</span>
+                        </div>
+                        <div class="bento-card-body">
+                            <h3>Create Custom Exam</h3>
+                        </div>
+                    </div>
+                    <div class="bento-card-footer">
+                        <span class="action-label">Create Exam</span>
+                        <div class="action-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                    </div>
+                </a>
+
+                <!-- 6. AI PDF EXAM GENERATOR -->
+                <a href="{{ url_for('hr_upload_exam_pdf_page') }}" class="bento-card" aria-label="AI PDF Exam Generator">
+                    <div>
+                        <div class="bento-card-top">
+                            <div class="bento-icon-box icon-blue">
+                                <i class="fa-solid fa-file-pdf"></i>
+                            </div>
+                            <span class="bento-tag tag-blue">AI GENERATOR</span>
+                        </div>
+                        <div class="bento-card-body">
+                            <h3>AI PDF Exam Generator</h3>
+                        </div>
+                    </div>
+                    <div class="bento-card-footer">
+                        <span class="action-label">Generate From PDF</span>
+                        <div class="action-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                    </div>
+                </a>
+
+                <!-- 7. MCQ QUESTIONS BANK -->
+                <a href="{{ url_for('hr_question_bank') }}" class="bento-card" aria-label="MCQ Questions Bank">
+                    <div>
+                        <div class="bento-card-top">
+                            <div class="bento-icon-box icon-blue">
+                                <i class="fa-solid fa-list-check"></i>
+                            </div>
+                            <span class="bento-tag tag-blue">QUESTION BANK</span>
+                        </div>
+                        <div class="bento-card-body">
+                            <h3>MCQ Questions Bank</h3>
+                        </div>
+                    </div>
+                    <div class="bento-card-footer">
+                        <span class="action-label">Open Question Bank</span>
+                        <div class="action-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                    </div>
+                </a>
+
+            </div>
+        </section>
+
+    </main>
+
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script src="{{ url_for('static', filename='js/home.js') }}" defer></script>
+{% endblock %}

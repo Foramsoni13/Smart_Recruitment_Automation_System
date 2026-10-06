@@ -1,0 +1,713 @@
+{% extends "base.html" %}
+
+{% block title %}
+MCQ Questions for App - Question Bank | Smart Recruitment
+{% endblock %}
+
+{% block css %}
+<style>
+    .page-header-card, .form-section-card {
+        transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .page-header-card:hover, .form-section-card:hover, .form-section-card:focus-within {
+        border-color: #1d4ed8 !important;
+        box-shadow: 0 4px 16px rgba(29, 78, 216, 0.08) !important;
+    }
+
+    .question-card-item {
+        background: #ffffff;
+        border: 1.5px solid #cbd5e1 !important;
+        border-radius: var(--radius-xl);
+        padding: 1.5rem;
+        margin-bottom: 1.25rem;
+        transition: border-color 0.25s ease, box-shadow 0.25s ease;
+        position: relative;
+    }
+
+    .question-card-item:hover {
+        border-color: #1d4ed8 !important;
+        box-shadow: 0 4px 16px rgba(29, 78, 216, 0.08) !important;
+    }
+
+    .question-card-item.duplicate-highlight {
+        border-color: #cbd5e1 !important;
+        background-color: #f8fafc;
+    }
+
+    .option-item-box {
+        background: #f8fafc;
+        border: 1.5px solid #cbd5e1 !important;
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-size: 0.92rem;
+        color: #000000 !important;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: all 0.2s ease;
+    }
+
+    .option-item-box.correct-answer-badge {
+        background-color: #eff6ff !important;
+        border-color: #2563eb !important;
+        color: #1d4ed8 !important;
+        font-weight: 700 !important;
+    }
+
+    .option-letter-key {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background-color: #e2e8f0;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 0.85rem;
+        flex-shrink: 0;
+    }
+
+    .option-item-box.correct-answer-badge .option-letter-key {
+        background-color: #2563eb !important;
+        color: #ffffff !important;
+    }
+
+    .btn-form-action {
+        background-color: #2563eb !important;
+        color: #ffffff !important;
+        border: 1.5px solid #1d4ed8 !important;
+        border-radius: 12px !important;
+        padding: 0.5rem 0.9rem !important;
+        font-size: 0.85rem !important;
+        font-weight: 800 !important;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25) !important;
+        transition: all 0.2s ease !important;
+        text-decoration: none !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        cursor: pointer !important;
+        white-space: nowrap !important;
+    }
+
+    .btn-form-action *, .btn-form-action i {
+        color: #ffffff !important;
+    }
+
+    .btn-form-action:hover {
+        background-color: #1d4ed8 !important;
+        color: #ffffff !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 6px 16px rgba(29, 78, 216, 0.35) !important;
+    }
+
+    .btn-form-secondary {
+        background-color: #eff6ff !important;
+        color: #2563eb !important;
+        border: 1.5px solid #bfdbfe !important;
+        border-radius: 12px !important;
+        padding: 0.5rem 0.9rem !important;
+        font-size: 0.85rem !important;
+        font-weight: 800 !important;
+        transition: all 0.2s ease !important;
+        text-decoration: none !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        cursor: pointer !important;
+        white-space: nowrap !important;
+    }
+
+    .btn-form-secondary:hover {
+        background-color: #2563eb !important;
+        color: #ffffff !important;
+        border-color: #1d4ed8 !important;
+    }
+
+    .btn-form-secondary:hover * {
+        color: #ffffff !important;
+    }
+
+    .stat-pill-card {
+        background: #ffffff;
+        border: 1.5px solid #cbd5e1 !important;
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        text-align: center;
+    }
+
+    .stat-pill-card .val {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #000000;
+    }
+
+    .stat-pill-card .lbl {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #475569;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="app-container">
+
+    <!-- PAGE HEADER CARD -->
+    <header class="page-header-card d-flex align-items-center justify-content-between p-4 mb-4 bg-white border border-2 rounded-4 shadow-sm" style="border-color: #cbd5e1 !important;">
+        <div class="d-flex align-items-center gap-3">
+            <div class="header-icon-box d-flex align-items-center justify-content-center rounded-4" style="width: 50px; height: 50px; background-color: #eff6ff; color: #2563eb; border: 1.5px solid #bfdbfe; font-size: 1.4rem;">
+                <i class="fa-solid fa-list-check" style="color: #2563eb !important;"></i>
+            </div>
+            <div>
+                <span class="eyebrow-text fw-bold text-uppercase" style="font-size: 0.72rem; color: #2563eb; letter-spacing: 1.2px; display: block; margin-bottom: 2px;">QUESTION BANK MANAGEMENT</span>
+                <h1 class="h3 fw-extrabold m-0 text-dark" style="font-weight: 800; color: #000000 !important; letter-spacing: -0.5px;">
+                    MCQ Questions for App
+                </h1>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2 flex-wrap align-items-center justify-content-end">
+            <button type="button" class="btn-form-action" data-bs-toggle="modal" data-bs-target="#addQuestionModal" id="btnOpenAddQuestionModal">
+                <i class="fa-solid fa-plus"></i> Add Question
+            </button>
+
+            <!-- AUTOMATION DUPLICATE REMOVAL ACTION BUTTON -->
+            <button type="button" class="btn-form-action" style="background-color: #2563eb !important;" id="btnRemoveDuplicates" data-bs-toggle="modal" data-bs-target="#confirmDuplicateRemovalModal">
+                <i class="fa-solid fa-clone"></i> Find & Remove Duplicates
+            </button>
+
+            <button type="button" class="btn-form-secondary" data-bs-toggle="modal" data-bs-target="#uploadPdfModal">
+                <i class="fa-solid fa-file-pdf"></i> Upload Questions PDF
+            </button>
+            <button type="button" class="btn-form-secondary" data-bs-toggle="modal" data-bs-target="#importModal">
+                <i class="fa-solid fa-file-import"></i> Bulk Import CSV
+            </button>
+            <a href="{% if exam %}{{ url_for('hr_exams_list') }}{% else %}{{ url_for('home') }}{% endif %}" class="btn-form-secondary">
+                <i class="fa-solid fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </header>
+
+    <!-- AUTOMATION DUPLICATE SCANNER STATUS BANNER (HIDDEN BY DEFAULT, SHOWN WHEN SCANNING/COMPLETED) -->
+    <div id="duplicateStatusBanner" class="form-section-card bg-white p-4 mb-4 border border-2 rounded-4 shadow-sm d-none" style="border-color: #cbd5e1 !important;">
+        <div class="form-section-header mb-3">
+            <i class="fa-solid fa-robot text-primary"></i>
+            <h3 id="duplicateBannerTitle">Automated Duplicate Removal Task</h3>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-3">
+                <div class="stat-pill-card">
+                    <div class="val" id="statTotalScanned">0</div>
+                    <div class="lbl">Total Scanned</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-pill-card">
+                    <div class="val" id="statDuplicatesFound" style="color: #1d4ed8;">0</div>
+                    <div class="lbl">Duplicates Found</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-pill-card">
+                    <div class="val" id="statDuplicatesRemoved" style="color: #2563eb;">0</div>
+                    <div class="lbl">Duplicates Removed</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-pill-card">
+                    <div class="val" id="statRemainingQuestions">0</div>
+                    <div class="lbl">Remaining Questions</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="progress mb-2" style="height: 10px; border-radius: 6px; background-color: #f1f5f9;">
+            <div id="duplicateProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%; background-color: #2563eb;"></div>
+        </div>
+        <div id="duplicateLogOutput" class="small fw-semibold text-secondary" style="font-family: monospace;">Ready to process duplicate question cleanup...</div>
+    </div>
+
+    <!-- FILTER & SEARCH TOOLBAR CARD -->
+    <div class="form-section-card bg-white p-3.5 mb-4 border border-2 rounded-4 shadow-sm" style="border-color: #cbd5e1 !important;">
+        <div class="row g-3 align-items-center">
+            <div class="col-lg-4 col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0" style="border-color: #cbd5e1 !important;"><i class="fa-solid fa-magnifying-glass text-secondary"></i></span>
+                    <input type="text" id="questionSearchInput" class="form-control border-start-0 ps-0" placeholder="Search questions or options...">
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-3">
+                <select id="difficultyFilter" class="form-select">
+                    <option value="">All Difficulties</option>
+                    <option value="Easy">Easy</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard">Hard</option>
+                </select>
+            </div>
+            <div class="col-lg-2 col-md-3">
+                <select id="categoryFilter" class="form-select">
+                    <option value="">All Categories</option>
+                    <option value="Aptitude">Aptitude</option>
+                    <option value="Technical">Technical</option>
+                    <option value="Verbal">Verbal</option>
+                    <option value="Logical">Logical</option>
+                </select>
+            </div>
+            <div class="col-lg-4 col-md-2 text-end d-flex align-items-center justify-content-end gap-2">
+                <span class="badge py-2 px-3 fw-bold" id="duplicateBadge" style="background-color: #eff6ff; color: #2563eb; border: 1.5px solid #bfdbfe; font-size: 0.85rem; white-space: nowrap;">
+                    Duplicates: <span id="duplicateCountDisplay">0</span>
+                </span>
+                <span class="badge py-2 px-3 fw-bold" style="background-color: #eff6ff; color: #2563eb; border: 1.5px solid #bfdbfe; font-size: 0.85rem; white-space: nowrap;">
+                    Total: <span id="questionCountDisplay">{{ questions|length if questions else 0 }}</span>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- QUESTION BANK LIST CONTAINER -->
+    <div id="questionsContainer">
+        {% if questions and questions|length > 0 %}
+            {% for q in questions %}
+            <div class="question-card-item question-row-element" id="questionCard_{{ q.id }}" data-question-id="{{ q.id }}" data-question-text="{{ q.question_text }}" data-difficulty="{{ q.difficulty or 'Medium' }}" data-category="{{ q.category or 'Aptitude' }}">
+                <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge px-2.5 py-1 fw-bold" style="background-color: #2563eb; color: #ffffff !important; border: 1.5px solid #1d4ed8;">Q{{ loop.index }}</span>
+                        <span class="badge bg-white text-dark border px-2.5 py-1 fw-semibold" style="border-color: #cbd5e1 !important;">{{ q.category or 'Aptitude' }}</span>
+                        <span class="badge px-2.5 py-1 fw-semibold" style="background-color: #eff6ff; color: #2563eb; border: 1.5px solid #bfdbfe;">{{ q.difficulty or 'Medium' }}</span>
+                        <span class="badge px-2.5 py-1 fw-semibold" style="background-color: #f8fafc; color: #334155; border: 1.5px solid #cbd5e1;">Marks: +{{ "%.2f"|format(q.marks) }} | Neg: {{ "%.2f"|format(q.negative_marks or 0.0) }}</span>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <form action="{{ url_for('hr_delete_question', question_id=q.id) }}" method="POST" id="deleteForm_{{ q.id }}" data-confirm="Are you sure you want to delete this question? This cannot be undone." data-confirm-title="Delete Question" data-confirm-type="danger">
+                            <input type="hidden" name="exam_id" value="{{ exam.id if exam else '' }}">
+                            <button type="submit" class="btn btn-form-action btn-sm rounded-3 px-3 py-1 fw-bold" id="btnDelete_{{ q.id }}" title="Delete Question" style="background-color: #2563eb !important; border-color: #1d4ed8 !important; color: #ffffff !important;">
+                                <i class="fa-solid fa-trash me-1" style="color: #ffffff !important;"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <h5 class="fw-bold text-dark mb-3" style="line-height: 1.5; font-size: 1.05rem; color: #000000 !important;">{{ q.question_text }}</h5>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="option-item-box {% if q.correct_answer == 'A' %}correct-answer-badge{% endif %}">
+                            <div class="option-letter-key">A</div>
+                            <div>{{ q.option_a }}</div>
+                            {% if q.correct_answer == 'A' %}<span class="badge bg-primary ms-auto" style="font-size: 0.72rem; background-color: #2563eb !important;">HR Correct</span>{% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="option-item-box {% if q.correct_answer == 'B' %}correct-answer-badge{% endif %}">
+                            <div class="option-letter-key">B</div>
+                            <div>{{ q.option_b }}</div>
+                            {% if q.correct_answer == 'B' %}<span class="badge bg-primary ms-auto" style="font-size: 0.72rem; background-color: #2563eb !important;">HR Correct</span>{% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="option-item-box {% if q.correct_answer == 'C' %}correct-answer-badge{% endif %}">
+                            <div class="option-letter-key">C</div>
+                            <div>{{ q.option_c }}</div>
+                            {% if q.correct_answer == 'C' %}<span class="badge bg-primary ms-auto" style="font-size: 0.72rem; background-color: #2563eb !important;">HR Correct</span>{% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="option-item-box {% if q.correct_answer == 'D' %}correct-answer-badge{% endif %}">
+                            <div class="option-letter-key">D</div>
+                            <div>{{ q.option_d }}</div>
+                            {% if q.correct_answer == 'D' %}<span class="badge bg-primary ms-auto" style="font-size: 0.72rem; background-color: #2563eb !important;">HR Correct</span>{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state-card">
+                <div class="empty-state-icon">
+                    <i class="fa-solid fa-folder-open"></i>
+                </div>
+                <h4 class="empty-state-title">No MCQ Questions Found</h4>
+                <p class="empty-state-desc">There are currently no questions in your question bank. Click "+ Add Question" or "Upload Questions PDF" to get started.</p>
+                <div class="d-flex justify-content-center gap-2">
+                    <button type="button" class="btn-form-action" data-bs-toggle="modal" data-bs-target="#addQuestionModal">
+                        <i class="fa-solid fa-plus me-1"></i> Add Question
+                    </button>
+                    <button type="button" class="btn-form-secondary" data-bs-toggle="modal" data-bs-target="#uploadPdfModal">
+                        <i class="fa-solid fa-file-pdf me-1"></i> Upload Questions PDF
+                    </button>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- CONFIRM DUPLICATE REMOVAL MODAL -->
+<div class="modal fade" id="confirmDuplicateRemovalModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-bottom py-3">
+                <h5 class="modal-title fw-bold text-dark"><i class="fa-solid fa-clone text-primary me-2"></i>Remove Duplicate Questions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="text-dark fw-semibold mb-2">This automation will scan all questions, normalize question text, and safely remove only duplicate occurrences while preserving original questions.</p>
+                <div class="p-3 rounded-3 bg-light border mb-3" style="border-color: #cbd5e1 !important; font-size: 0.88rem;">
+                    <i class="fa-solid fa-shield-halved text-primary me-2"></i>
+                    <strong>Safety Rule:</strong> The first/original record of each question is kept intact. Subsequent duplicate entries are removed safely.
+                </div>
+                <div id="confirmModalScanResult" class="fw-bold text-primary">Scanning question bank for duplicates...</div>
+            </div>
+            <div class="modal-footer border-top bg-light py-3">
+                <button type="button" class="btn-form-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn-form-action" id="btnConfirmStartDuplicateRemoval" onclick="startAutomatedDuplicateRemoval()">
+                    <i class="fa-solid fa-play me-1"></i> Start Automated Removal
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ADD QUESTION MODAL -->
+<div class="modal fade" id="addQuestionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <form action="{{ url_for('hr_add_question') }}" method="POST">
+                <input type="hidden" name="exam_id" value="{{ exam.id if exam else '' }}">
+
+                <div class="modal-header border-bottom py-3">
+                    <h5 class="modal-title fw-bold text-dark"><i class="fa-solid fa-circle-plus text-primary me-2"></i>Add MCQ Question</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Question Text *</label>
+                        <textarea name="question_text" class="form-control" rows="3" placeholder="Enter question description..." required></textarea>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Option A *</label>
+                            <input type="text" name="option_a" class="form-control" placeholder="Enter Option A" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Option B *</label>
+                            <input type="text" name="option_b" class="form-control" placeholder="Enter Option B" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Option C *</label>
+                            <input type="text" name="option_c" class="form-control" placeholder="Enter Option C" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Option D *</label>
+                            <input type="text" name="option_d" class="form-control" placeholder="Enter Option D" required>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Correct Answer Key *</label>
+                            <select name="correct_answer" class="form-select" required>
+                                <option value="A">Option A</option>
+                                <option value="B">Option B</option>
+                                <option value="C">Option C</option>
+                                <option value="D">Option D</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Marks *</label>
+                            <input type="number" step="0.5" name="marks" class="form-control" value="1.0" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Negative Marks</label>
+                            <input type="number" step="0.25" name="negative_marks" class="form-control" value="0.0">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-top bg-light py-3">
+                    <button type="button" class="btn-form-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn-form-action">Save Question</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- BULK IMPORT MODAL -->
+<div class="modal fade" id="importModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <form action="{{ url_for('hr_import_questions') }}" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="exam_id" value="{{ exam.id if exam else '' }}">
+
+                <div class="modal-header border-bottom py-3">
+                    <h5 class="modal-title fw-bold text-dark"><i class="fa-solid fa-file-import me-2 text-primary"></i>Bulk Import MCQs (CSV/Excel)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body p-4">
+                    <p class="text-muted small mb-3">Upload a CSV or Excel file containing MCQ questions. Headers: <code>question, option_a, option_b, option_c, option_d, correct_answer, marks, negative_marks, category, difficulty</code>.</p>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Select File (.csv, .xlsx, .xls)</label>
+                        <input type="file" name="file" class="form-control" accept=".csv,.xlsx,.xls" required>
+                    </div>
+
+                    <a href="/api/hr/questions/template" class="btn btn-sm btn-link text-decoration-none p-0 fw-semibold" download>
+                        <i class="fa-solid fa-download me-1"></i> Download Sample CSV File
+                    </a>
+                </div>
+
+                <div class="modal-footer border-top bg-light py-3">
+                    <button type="button" class="btn-form-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn-form-action">
+                        <i class="fa-solid fa-upload"></i> Import Questions
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- UPLOAD QUESTIONS PDF MODAL -->
+<div class="modal fade" id="uploadPdfModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <form action="{{ url_for('hr_upload_questions_pdf') }}" method="POST" enctype="multipart/form-data" id="pdfUploadForm" onsubmit="return validateAndSubmitPdfForm(this)">
+                <input type="hidden" name="exam_id" value="{{ exam.id if exam else '' }}">
+
+                <div class="modal-header border-bottom py-3">
+                    <h5 class="modal-title fw-bold text-dark"><i class="fa-solid fa-file-pdf text-danger me-2"></i>Upload Questions PDF</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body p-4">
+                    <p class="text-muted small mb-3">Upload an Aptitude Exam PDF file containing MCQ questions, options, and answer keys. The backend will parse and extract questions into the Question Bank.</p>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Select PDF File (*.pdf, *.PDF)</label>
+                        <input type="file" name="pdf_file" id="pdfFileInput" class="form-control" accept=".pdf,.PDF" required onchange="handlePdfSelect(this)">
+
+                        <div id="pdfFileNameDisplay" class="alert alert-info py-2 px-3 mt-2 mb-0 border-0 d-none" style="border-radius: 8px; font-size: 0.88rem;">
+                            <i class="fa-solid fa-file-pdf me-2 text-danger"></i><strong id="pdfSelectedNameText"></strong> (<span id="pdfSelectedSizeText"></span>)
+                        </div>
+
+                        <div id="pdfClientError" class="alert alert-danger py-2 px-3 mt-2 mb-0 border-0 d-none" style="border-radius: 8px; font-size: 0.88rem;"></div>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-top bg-light py-3">
+                    <button type="button" class="btn-form-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn-form-action" id="btnProcessPdf">
+                        <i class="fa-solid fa-gear"></i> Process PDF
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+    // Normalize question text for accurate duplicate detection
+    function normalizeText(text) {
+        if (!text) return '';
+        return text.toLowerCase().trim().replace(/\s+/g, ' ');
+    }
+
+    // Scan questions and update duplicate count badges
+    function scanDuplicates() {
+        const rows = document.querySelectorAll('.question-row-element');
+        const seen = new Set();
+        let dupCount = 0;
+
+        rows.forEach(row => {
+            const rawText = row.getAttribute('data-question-text') || row.querySelector('h5')?.innerText || '';
+            const norm = normalizeText(rawText);
+            if (seen.has(norm)) {
+                dupCount++;
+                row.classList.add('duplicate-highlight');
+            } else {
+                seen.add(norm);
+                row.classList.remove('duplicate-highlight');
+            }
+        });
+
+        const countDisplay = document.getElementById('duplicateCountDisplay');
+        if (countDisplay) countDisplay.innerText = dupCount;
+
+        const confirmMsg = document.getElementById('confirmModalScanResult');
+        if (confirmMsg) {
+            confirmMsg.innerText = dupCount > 0
+                ? `Found ${dupCount} duplicate question(s) ready for safe removal.`
+                : 'No duplicate questions detected. Question Bank is clean!';
+        }
+
+        return dupCount;
+    }
+
+    // Filter questions by search keyword, difficulty, and category
+    function filterQuestions() {
+        const searchVal = document.getElementById('questionSearchInput')?.value.toLowerCase().trim() || '';
+        const diffVal = document.getElementById('difficultyFilter')?.value || '';
+        const catVal = document.getElementById('categoryFilter')?.value || '';
+
+        const items = document.querySelectorAll('.question-row-element');
+        let visibleCount = 0;
+
+        items.forEach(item => {
+            const text = item.textContent.toLowerCase();
+            const diff = item.getAttribute('data-difficulty') || '';
+            const cat = item.getAttribute('data-category') || '';
+
+            const matchesSearch = !searchVal || text.includes(searchVal);
+            const matchesDiff = !diffVal || diff.toLowerCase() === diffVal.toLowerCase();
+            const matchesCat = !catVal || cat.toLowerCase() === catVal.toLowerCase();
+
+            if (matchesSearch && matchesDiff && matchesCat) {
+                item.style.display = '';
+                visibleCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+
+        const countDisplay = document.getElementById('questionCountDisplay');
+        if (countDisplay) countDisplay.innerText = visibleCount;
+    }
+
+    document.getElementById('questionSearchInput')?.addEventListener('input', filterQuestions);
+    document.getElementById('difficultyFilter')?.addEventListener('change', filterQuestions);
+    document.getElementById('categoryFilter')?.addEventListener('change', filterQuestions);
+
+    // Run duplicate scan on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        scanDuplicates();
+    });
+
+    // Execute Automated Duplicate Removal
+    async function startAutomatedDuplicateRemoval() {
+        const modalEl = document.getElementById('confirmDuplicateRemovalModal');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) modal.hide();
+
+        const banner = document.getElementById('duplicateStatusBanner');
+        const pBar = document.getElementById('duplicateProgressBar');
+        const logOut = document.getElementById('duplicateLogOutput');
+
+        banner.classList.remove('d-none');
+        pBar.style.width = '20%';
+        logOut.innerText = 'Scanning question bank and initializing Robot Framework cleanup task...';
+
+        try {
+            const examId = "{{ exam.id if exam else '' }}";
+            const formData = new FormData();
+            if (examId) formData.append('exam_id', examId);
+
+            pBar.style.width = '50%';
+            logOut.innerText = 'Analyzing normalized question records and identifying duplicates...';
+
+            const resp = await fetch('/api/hr/questions/remove-duplicates', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await resp.json();
+
+            pBar.style.width = '100%';
+
+            if (data.success) {
+                document.getElementById('statTotalScanned').innerText = data.total_scanned;
+                document.getElementById('statDuplicatesFound').innerText = data.duplicates_found;
+                document.getElementById('statDuplicatesRemoved').innerText = data.duplicates_removed;
+                document.getElementById('statRemainingQuestions').innerText = data.remaining_questions;
+
+                logOut.innerText = `[SUCCESS] ${data.message} Scanned: ${data.total_scanned} | Duplicates Removed: ${data.duplicates_removed} | Remaining: ${data.remaining_questions}`;
+
+                // Remove deleted question cards from DOM live
+                if (data.deleted_ids && data.deleted_ids.length > 0) {
+                    data.deleted_ids.forEach(id => {
+                        const el = document.getElementById(`questionCard_${id}`);
+                        if (el) el.remove();
+                    });
+                }
+
+                scanDuplicates();
+                filterQuestions();
+            } else {
+                logOut.innerText = `[ERROR] Failed to execute duplicate removal: ${data.message || 'Unknown error'}`;
+            }
+        } catch (err) {
+            pBar.style.width = '100%';
+            pBar.classList.add('bg-danger');
+            logOut.innerText = `[ERROR] Exception encountered during duplicate removal: ${err.message}`;
+        }
+    }
+
+    function handlePdfSelect(input) {
+        const displayBox = document.getElementById('pdfFileNameDisplay');
+        const nameText = document.getElementById('pdfSelectedNameText');
+        const sizeText = document.getElementById('pdfSelectedSizeText');
+        const errBox = document.getElementById('pdfClientError');
+
+        errBox.classList.add('d-none');
+        errBox.innerText = '';
+
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            const fileName = file.name;
+            const ext = fileName.split('.').pop().toLowerCase();
+
+            if (ext !== 'pdf') {
+                errBox.innerText = 'Please select a valid PDF file.';
+                errBox.classList.remove('d-none');
+                displayBox.classList.add('d-none');
+                input.value = '';
+                return;
+            }
+
+            nameText.innerText = fileName;
+            const sizeKB = (file.size / 1024).toFixed(1);
+            sizeText.innerText = sizeKB > 1024 ? (sizeKB / 1024).toFixed(2) + ' MB' : sizeKB + ' KB';
+            displayBox.classList.remove('d-none');
+        } else {
+            displayBox.classList.add('d-none');
+        }
+    }
+
+    function validateAndSubmitPdfForm(form) {
+        const input = document.getElementById('pdfFileInput');
+        const errBox = document.getElementById('pdfClientError');
+        const btn = document.getElementById('btnProcessPdf');
+
+        if (!input.files || !input.files[0]) {
+            errBox.innerText = 'Please select a valid PDF file.';
+            errBox.classList.remove('d-none');
+            return false;
+        }
+
+        const fileName = input.files[0].name;
+        const ext = fileName.split('.').pop().toLowerCase();
+        if (ext !== 'pdf') {
+            errBox.innerText = 'Please select a valid PDF file.';
+            errBox.classList.remove('d-none');
+            return false;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Processing PDF...';
+        return true;
+    }
+</script>
+{% endblock %}
+

@@ -1,0 +1,241 @@
+/* ==========================================================================
+   SMART RECRUITMENT AUTOMATION SYSTEM - PREMIUM SAAS HOMEPAGE STYLESHEET
+   Spacious Layout + High-Contrast Black Text + Pure Blue Buttons & Badges
+   ========================================================================== */
+
+:root {
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --primary-light: #eff6ff;
+    --primary-border: #bfdbfe;
+    --bg-main: #ffffff;
+    --bg-card: #ffffff;
+    --text-main: #000000;
+    --text-dark: #000000;
+    --text-body: #000000;
+    --border-color: #e2e8f0;
+    --border-hover: #2563eb;
+    --radius-xl: 24px;
+    --radius-lg: 18px;
+    --radius-md: 12px;
+    --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.04);
+    --shadow-md: 0 10px 30px -5px rgba(15, 23, 42, 0.05), 0 4px 12px -2px rgba(15, 23, 42, 0.025);
+    --shadow-hover: 0 16px 36px -8px rgba(37, 99, 235, 0.16), 0 4px 12px rgba(15, 23, 42, 0.03);
+}
+
+body {
+    background-color: #ffffff !important;
+    background-image: none !important;
+    color: #000000 !important;
+    margin: 0;
+    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+#dashboard-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* =====================================================
+   MAIN DASHBOARD FRAMED CONTAINER WITH BLURRED GLOW BORDER
+   ===================================================== */
+.dashboard-main-content {
+    max-width: 1280px;
+    width: calc(100% - 3rem);
+    margin: 36px auto 50px auto;
+    padding: 36px 40px 48px 40px;
+    background: #ffffff;
+    border: 1.5px solid rgba(59, 130, 246, 0.35);
+    border-radius: var(--radius-xl);
+    position: relative;
+    box-shadow: 
+        0 0 0 1px rgba(147, 197, 253, 0.25),
+        0 0 24px -2px rgba(59, 130, 246, 0.2),
+        0 0 50px -6px rgba(56, 189, 248, 0.14),
+        0 20px 40px -10px rgba(15, 23, 42, 0.06);
+}
+
+/* Soft outer blurred glow effect behind container border */
+.dashboard-main-content::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(56, 189, 248, 0.2), rgba(255, 255, 255, 0.8), rgba(99, 102, 241, 0.2));
+    border-radius: 28px;
+    z-index: -1;
+    filter: blur(12px);
+    opacity: 0.85;
+    pointer-events: none;
+}
+
+.bento-section {
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* =====================================================
+   BENTO GRID MODULES SHOWCASE (PROPER SPACED LAYOUT)
+   ===================================================== */
+.bento-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.bento-card {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 1.85rem 2rem;
+    text-decoration: none;
+    color: var(--text-dark);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+    min-height: 170px;
+}
+
+.bento-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--border-hover);
+    box-shadow: var(--shadow-hover);
+}
+
+.bento-card.bento-wide {
+    grid-column: span 2;
+    background: linear-gradient(135deg, #ffffff 0%, #f4f8ff 100%);
+}
+
+.bento-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+}
+
+/* UNIFORM BLUE ICON BOXES (NO GREEN, NO RED) */
+.bento-icon-box,
+.icon-blue,
+.icon-sky,
+.icon-indigo,
+.icon-emerald,
+.icon-amber {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    background: #eff6ff !important;
+    color: #2563eb !important;
+    border: 1.5px solid #bfdbfe !important;
+    transition: transform 0.25s ease;
+}
+
+.bento-card:hover .bento-icon-box {
+    transform: scale(1.06);
+    background: #2563eb !important;
+    color: #ffffff !important;
+    border-color: #2563eb !important;
+}
+
+/* UNIFORM BLUE BADGE TAGS */
+.bento-tag,
+.tag-blue,
+.tag-sky,
+.tag-indigo,
+.tag-emerald {
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 5px 12px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: #eff6ff !important;
+    color: #1d4ed8 !important;
+    border: 1.5px solid #bfdbfe !important;
+}
+
+/* ALL TEXT BLACK & HIGH CONTRAST */
+.bento-card-body h3 {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #000000 !important;
+    margin: 0 0 0.45rem 0;
+    letter-spacing: -0.3px;
+}
+
+.bento-card-body p {
+    font-size: 0.92rem;
+    color: #1e293b !important;
+    font-weight: 500;
+    line-height: 1.55;
+    margin: 0 0 1.25rem 0;
+}
+
+.bento-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.action-label {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #0f172a;
+    transition: color 0.2s ease;
+}
+
+.bento-card:hover .action-label {
+    color: #2563eb;
+}
+
+/* BLUE ARROW BUTTONS */
+.action-arrow {
+    width: 32px;
+    height: 32px;
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1px solid #bfdbfe;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.bento-card:hover .action-arrow {
+    transform: translateX(4px);
+    background: #2563eb;
+    color: #ffffff;
+    border-color: #2563eb;
+}
+
+@media (max-width: 992px) {
+    .dashboard-main-content {
+        padding: 24px;
+        margin: 24px auto;
+        width: calc(100% - 2rem);
+    }
+    .bento-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    .bento-card.bento-wide {
+        grid-column: span 1;
+    }
+}

@@ -1,0 +1,613 @@
+{% extends "base.html" %}
+
+{% block title %}
+Candidate Registration | Smart Recruitment
+{% endblock %}
+
+{% block css %}
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/candidate_register.css') }}"
+>
+{% endblock %}
+
+{% block content %}
+
+<div class="candidate-register-page">
+
+    <div class="candidate-register-container">
+
+        <!-- HEADER -->
+        <div class="candidate-register-header">
+
+            <div class="header-icon">
+                <i class="fa-solid fa-user-plus"></i>
+            </div>
+
+            <div>
+                <h1>Candidate Registration</h1>
+
+                <p>
+                    Add a new candidate to the recruitment system
+                </p>
+            </div>
+
+        </div>
+
+
+        <!-- FORM CARD -->
+        {% if success %}
+        <div class="candidate-form-card success-card" id="registration-success" data-testid="registration-success">
+
+            <div class="logo-box">
+                <div class="logo">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <h2>Registration <span>Successful</span></h2>
+                <p>The candidate has been registered in the recruitment system.</p>
+                
+                <div class="security-text">
+                    <strong>Candidate ID:</strong> <span id="candidate-id" data-testid="candidate-id">{{ candidate_id }}</span>
+                </div>
+                <!-- {"candidate_id": {{ candidate_id }}} -->
+            </div>
+
+            <div class="form-actions" style="justify-content: center; margin-top: 25px;">
+                <a href="/candidate/register" class="btn-primary" style="text-decoration: none;">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <span>Register Another</span>
+                </a>
+            </div>
+
+        </div>
+        {% else %}
+        <div class="candidate-form-card">
+
+            <form
+                method="POST"
+                action="/candidate/register"
+                enctype="multipart/form-data"
+                id="candidateRegistrationForm"
+            >
+                <input
+                    type="hidden"
+                    name="job_id"
+                    id="job_id"
+                    value="{{ job_id or request.args.get('job_id', '') }}"
+                >
+
+                <!-- CANDIDATE INFORMATION -->
+                <div class="form-section">
+
+                    <div class="section-title">
+
+                        <div class="section-icon">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+
+                        <div>
+                            <h2>Candidate Information</h2>
+
+                            <p>
+                                Enter the candidate's basic details
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-grid">
+
+                        <!-- NAME -->
+                        <div class="form-group">
+
+                            <label for="name">
+                                Full Name
+                                <span>*</span>
+                            </label>
+
+                            <div class="input-wrapper">
+
+                                <i class="fa-solid fa-user"></i>
+
+                                <input
+                                    type="text"
+                                    id="name"
+                                    name="name"
+                                    data-testid="candidate-name"
+                                    placeholder="Enter candidate name"
+                                    autocomplete="name"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- EMAIL -->
+                        <div class="form-group">
+
+                            <label for="email">
+                                Email Address
+                                <span>*</span>
+                            </label>
+
+                            <div class="input-wrapper">
+
+                                <i class="fa-solid fa-envelope"></i>
+
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    data-testid="candidate-email"
+                                    placeholder="candidate@example.com"
+                                    autocomplete="email"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- PHONE -->
+                        <div class="form-group">
+
+                            <label for="phone">
+                                Phone Number
+                                <span>*</span>
+                            </label>
+
+                            <div class="input-wrapper">
+
+                                <i class="fa-solid fa-phone"></i>
+
+                                <input
+                                    type="tel"
+                                    id="phone"
+                                    name="phone"
+                                    data-testid="candidate-phone"
+                                    placeholder="Enter phone number"
+                                    autocomplete="tel"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- POSITION -->
+                        <div class="form-group">
+
+                            <label for="position">
+                                Applied Position
+                                <span>*</span>
+                            </label>
+
+                            <div class="input-wrapper">
+
+                                <i class="fa-solid fa-briefcase"></i>
+
+                                <input
+                                    type="text"
+                                    id="position"
+                                    name="position"
+                                    data-testid="candidate-position"
+                                    placeholder="e.g. Python Developer"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- RESUME SECTION -->
+                <div class="form-section">
+
+                    <div class="section-title">
+
+                        <div class="section-icon">
+                            <i class="fa-solid fa-file-pdf"></i>
+                        </div>
+
+                        <div>
+                            <h2>Resume</h2>
+
+                            <p>
+                                Upload the candidate's resume
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="resume-upload-area">
+
+                        <input
+                            type="file"
+                            id="resume"
+                            name="resume"
+                            data-testid="candidate-resume"
+                            class="candidate-file-input"
+                            accept=".pdf,.doc,.docx"
+                        >
+
+
+                        <label
+                            for="resume"
+                            class="resume-upload-box"
+                        >
+
+                            <div class="upload-icon">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                            </div>
+
+                            <div class="upload-content">
+
+                                <h3>
+                                    Upload Resume
+                                </h3>
+
+                                <p>
+                                    Click to browse or drag and drop
+                                </p>
+
+                                <span>
+                                    PDF, DOC or DOCX
+                                </span>
+
+                            </div>
+
+                        </label>
+
+
+                        <div
+                            id="selectedResume"
+                            class="selected-resume hidden"
+                        >
+
+                            <div class="selected-resume-icon">
+                                <i class="fa-solid fa-file"></i>
+                            </div>
+
+                            <div class="selected-resume-info">
+
+                                <strong id="resumeName">
+                                    Resume
+                                </strong>
+
+                                <small id="resumeSize">
+                                    0 KB
+                                </small>
+
+                            </div>
+
+                            <button
+                                type="button"
+                                id="removeResume"
+                                class="remove-resume"
+                                title="Remove resume"
+                            >
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- STATUS -->
+                <div class="form-section">
+
+                    <div class="section-title">
+
+                        <div class="section-icon">
+                            <i class="fa-solid fa-chart-simple"></i>
+                        </div>
+
+                        <div>
+                            <h2>Recruitment Status</h2>
+
+                            <p>
+                                Set the initial candidate status
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-group status-group">
+
+                        <label for="status">
+                            Status
+                        </label>
+
+                        <div class="input-wrapper">
+
+                            <i class="fa-solid fa-circle-check"></i>
+
+                            <select
+                                id="status"
+                                name="status"
+                                data-testid="candidate-status"
+                            >
+
+                                <option value="New">
+                                    New
+                                </option>
+
+                                <option value="Pending">
+                                    Pending
+                                </option>
+
+                                <option value="Processed">
+                                    Processed
+                                </option>
+
+                                <option value="Selected">
+                                    Selected
+                                </option>
+
+                                <option value="Rejected">
+                                    Rejected
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- FORM ACTIONS -->
+                <div class="form-actions">
+
+                    <a
+                        href="{{ url_for('candidates') }}"
+                        class="btn-secondary"
+                    >
+                        <i class="fa-solid fa-arrow-left"></i>
+
+                        <span>
+                            Cancel
+                        </span>
+                    </a>
+
+
+                    <button
+                        type="submit"
+                        class="btn-primary"
+                        id="submitCandidate"
+                        data-testid="submit-candidate"
+                    >
+
+                        <i class="fa-solid fa-user-plus"></i>
+
+                        <span>
+                            Register Candidate
+                        </span>
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+        {% endif %}
+
+
+    </div>
+
+</div>
+
+
+<!-- PAGE SCRIPT -->
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const resumeInput =
+            document.getElementById("resume");
+
+        const selectedResume =
+            document.getElementById("selectedResume");
+
+        const resumeName =
+            document.getElementById("resumeName");
+
+        const resumeSize =
+            document.getElementById("resumeSize");
+
+        const removeResume =
+            document.getElementById("removeResume");
+
+        const form =
+            document.getElementById(
+                "candidateRegistrationForm"
+            );
+
+        const submitButton =
+            document.getElementById(
+                "submitCandidate"
+            );
+
+
+        /* =========================================
+           RESUME SELECTED
+        ========================================= */
+
+        resumeInput.addEventListener(
+            "change",
+            function () {
+
+                if (!this.files.length) {
+
+                    selectedResume.classList.add(
+                        "hidden"
+                    );
+
+                    return;
+                }
+
+
+                const file =
+                    this.files[0];
+
+
+                resumeName.textContent =
+                    file.name;
+
+
+                const size =
+                    file.size / 1024;
+
+
+                if (size >= 1024) {
+
+                    resumeSize.textContent =
+                        `${(size / 1024).toFixed(2)} MB`;
+
+                } else {
+
+                    resumeSize.textContent =
+                        `${size.toFixed(1)} KB`;
+
+                }
+
+
+                selectedResume.classList.remove(
+                    "hidden"
+                );
+
+            }
+        );
+
+
+        /* =========================================
+           REMOVE RESUME
+        ========================================= */
+
+        removeResume.addEventListener(
+            "click",
+            function () {
+
+                resumeInput.value = "";
+
+                selectedResume.classList.add(
+                    "hidden"
+                );
+
+            }
+        );
+
+
+        /* =========================================
+           DRAG & DROP
+        ========================================= */
+
+        const uploadBox =
+            document.querySelector(
+                ".resume-upload-box"
+            );
+
+
+        uploadBox.addEventListener(
+            "dragover",
+            function (event) {
+
+                event.preventDefault();
+
+                uploadBox.classList.add(
+                    "dragging"
+                );
+
+            }
+        );
+
+
+        uploadBox.addEventListener(
+            "dragleave",
+            function () {
+
+                uploadBox.classList.remove(
+                    "dragging"
+                );
+
+            }
+        );
+
+
+        uploadBox.addEventListener(
+            "drop",
+            function (event) {
+
+                event.preventDefault();
+
+                uploadBox.classList.remove(
+                    "dragging"
+                );
+
+
+                const files =
+                    event.dataTransfer.files;
+
+
+                if (!files.length) {
+                    return;
+                }
+
+
+                resumeInput.files =
+                    files;
+
+
+                resumeInput.dispatchEvent(
+                    new Event("change")
+                );
+
+            }
+        );
+
+
+        /* =========================================
+           FORM SUBMIT
+        ========================================= */
+
+        if (form && submitButton) {
+            form.addEventListener(
+                "submit",
+                function () {
+                    submitButton.classList.add("submitting");
+                    submitButton.innerHTML =
+                        `
+                        <i class="fa-solid fa-spinner fa-spin"></i>
+                        <span>Registering Candidate...</span>
+                        `;
+                }
+            );
+        }
+
+    }
+);
+
+</script>
+
+{% endblock %}

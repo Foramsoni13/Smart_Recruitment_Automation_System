@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ exam.title }} - Examination Portal | Smart Recruitment</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Google Fonts Plus Jakarta Sans & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-dark: #000000;
+            --text-muted: #475569;
+            --border-color: #cbd5e1;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            background-color: var(--bg-main);
+            color: #000000 !important;
+            min-height: 100vh;
+            margin: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            overflow-x: hidden;
+        }
+
+        /* Top Examination Navbar */
+        .exam-nav {
+            background: #ffffff;
+            border-bottom: 1.5px solid var(--border-color);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+        }
+
+        .exam-brand-info h4 {
+            font-size: 1.15rem;
+            font-weight: 800;
+            margin: 0;
+            color: #000000;
+        }
+
+        .exam-brand-info span {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .exam-timer-box {
+            background: #eff6ff;
+            border: 1.5px solid #bfdbfe;
+            color: #1d4ed8;
+            padding: 6px 16px;
+            border-radius: var(--radius-lg);
+            font-size: 1.05rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: monospace;
+        }
+
+        .exam-timer-box.normal {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+            color: #1d4ed8;
+        }
+
+        .camera-widget {
+            width: 110px;
+            height: 70px;
+            background: #0f172a;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .camera-widget video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+
+        .camera-status-dot {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 8px;
+            height: 8px;
+            background: #2563eb;
+            border-radius: 50%;
+            box-shadow: 0 0 6px #2563eb;
+        }
+
+        /* Main Portal Layout */
+        .portal-layout {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 20px;
+            padding: 24px;
+            max-width: 1440px;
+            margin: 0 auto;
+            min-height: calc(100vh - 75px);
+        }
+
+        @media (max-width: 991.98px) {
+            .portal-layout {
+                grid-template-columns: 1fr;
+                padding: 14px;
+            }
+        }
+
+        /* Question Box Card */
+        .question-card {
+            background: #ffffff;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 14px;
+            border-bottom: 1.5px solid #e2e8f0;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .question-number-badge {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1.5px solid #bfdbfe;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 0.9rem;
+        }
+
+        .question-marks-badge {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 700;
+            line-height: 1.6;
+            margin-bottom: 24px;
+            color: #000000;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .option-item {
+            background: #ffffff;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-item:hover {
+            background: #eff6ff;
+            border-color: #1d4ed8;
+        }
+
+        .option-item.selected {
+            background: #eff6ff;
+            border-color: #2563eb;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);
+        }
+
+        .option-key-badge {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            color: #475569;
+            border: 1.5px solid #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .option-item.selected .option-key-badge {
+            background: #2563eb;
+            color: #ffffff;
+            border-color: #1d4ed8;
+        }
+
+        .option-label-text {
+            font-size: 0.98rem;
+            color: #000000;
+            font-weight: 600;
+        }
+
+        /* Footer Controls */
+        .question-actions-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding-top: 20px;
+            border-top: 1.5px solid #e2e8f0;
+        }
+
+        .btn-custom-action {
+            background: #2563eb !important;
+            color: #ffffff !important;
+            border: 1.5px solid #1d4ed8 !important;
+            padding: 9px 20px !important;
+            border-radius: var(--radius-lg) !important;
+            font-weight: 700 !important;
+            font-size: 0.9rem !important;
+            transition: all 0.2s ease !important;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2) !important;
+        }
+
+        .btn-custom-action:hover:not(:disabled) {
+            background: #1d4ed8 !important;
+            border-color: #1d4ed8 !important;
+            color: #ffffff !important;
+        }
+
+        .btn-custom-action:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .btn-review-action {
+            background: #eff6ff !important;
+            color: #1d4ed8 !important;
+            border: 1.5px solid #bfdbfe !important;
+            box-shadow: none !important;
+        }
+
+        .btn-review-action.active {
+            background: #2563eb !important;
+            color: #ffffff !important;
+            border-color: #1d4ed8 !important;
+        }
+
+        .btn-submit-exam {
+            background: #2563eb !important;
+            color: #ffffff !important;
+            border: 1.5px solid #1d4ed8 !important;
+            font-weight: 800 !important;
+            padding: 9px 22px !important;
+            border-radius: var(--radius-lg) !important;
+        }
+
+        /* Question Navigator Drawer */
+        .navigator-card {
+            background: #ffffff;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            height: fit-content;
+        }
+
+        .nav-title {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #000000;
+            border-bottom: 1.5px solid #e2e8f0;
+            padding-bottom: 12px;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .questions-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            max-height: 340px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .nav-q-btn {
+            width: 100%;
+            height: 42px;
+            border-radius: var(--radius-lg);
+            border: 1.5px solid var(--border-color);
+            background: #ffffff;
+            color: #475569;
+            font-weight: 800;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-q-btn.answered {
+            background: #2563eb;
+            border-color: #1d4ed8;
+            color: #ffffff;
+        }
+
+        .nav-q-btn.review {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+            color: #1d4ed8;
+        }
+
+        .nav-q-btn.current {
+            border: 2.5px solid #000000 !important;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .legend-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            padding-top: 12px;
+            border-top: 1.5px solid #e2e8f0;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-box {
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+        }
+
+        .modal-content-custom {
+            background: #ffffff;
+            border: 1.5px solid var(--border-color);
+            color: #000000;
+            border-radius: var(--radius-xl);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOP EXAMINATION HEADER -->
+    <header class="exam-nav">
+        <div class="exam-brand-info">
+            <h4>{{ exam.title }}</h4>
+            <span>Candidate Attempt ID: #{{ attempt.id }}</span>
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+            <div id="examTimerBox" class="exam-timer-box normal">
+                <i class="fa-solid fa-clock"></i>
+                <span id="timerText">--:--</span>
+            </div>
+
+            <!-- LIVE CAMERA THUMBNAIL WIDGET -->
+            <div class="camera-widget">
+                <video id="examWebcam" autoplay playsinline muted></video>
+                <div class="camera-status-dot" title="Live Proctoring Active"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN PORTAL BODY -->
+    <div class="portal-layout">
+
+        <!-- LEFT QUESTION AREA -->
+        <div class="question-card">
+            <div>
+                <div class="question-header">
+                    <span class="question-number-badge" id="qNumberBadge">Question 1 of {{ questions|length }}</span>
+                    <span class="question-marks-badge">Marks: <span id="qMarksText">+1.00</span> | Neg: <span id="qNegMarksText">0.00</span></span>
+                </div>
+
+                <div class="question-text" id="qTextDisplay">
+                    Loading question...
+                </div>
+
+                <!-- MCQ OPTIONS -->
+                <div class="options-list" id="optionsContainer">
+                    <!-- Dynamic rendering -->
+                </div>
+            </div>
+
+            <!-- ACTION BAR -->
+            <div class="question-actions-bar">
+                <div class="d-flex gap-2 flex-wrap">
+                    <button type="button" class="btn btn-custom-action" id="btnPrev" onclick="navigateQuestion(-1)">
+                        <i class="fa-solid fa-chevron-left me-1"></i> Previous
+                    </button>
+
+                    <button type="button" class="btn btn-custom-action btn-review-action" id="btnMarkReview" onclick="toggleMarkForReview()">
+                        <i class="fa-solid fa-bookmark me-1"></i> Mark for Review
+                    </button>
+
+                    <button type="button" class="btn btn-custom-action" style="background: #f1f5f9 !important; color: #475569 !important; border-color: #cbd5e1 !important; box-shadow: none !important;" onclick="clearAnswer()">
+                        <i class="fa-solid fa-eraser me-1"></i> Clear
+                    </button>
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap">
+                    <button type="button" class="btn btn-custom-action" id="btnNext" onclick="navigateQuestion(1)">
+                        Save & Next <i class="fa-solid fa-chevron-right ms-1"></i>
+                    </button>
+
+                    <button type="button" class="btn btn-submit-exam ms-2" onclick="openSubmitModal()">
+                        <i class="fa-solid fa-paper-plane me-1"></i> Submit Exam
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT QUESTION NAVIGATOR -->
+        <div class="navigator-card">
+            <div class="nav-title">
+                <span>Question Palette</span>
+                <small class="badge bg-primary px-2 py-1" id="answeredCountBadge">0 / {{ questions|length }} Answered</small>
+            </div>
+
+            <div class="questions-grid" id="questionPalette">
+                {% for q in questions %}
+                    <button type="button" class="nav-q-btn" id="navBtn_{{ loop.index0 }}" onclick="goToQuestion({{ loop.index0 }})">
+                        {{ loop.index }}
+                    </button>
+                {% endfor %}
+            </div>
+
+            <div class="legend-grid">
+                <div class="legend-item"><div class="legend-box" style="background: #2563eb; border: 1.5px solid #1d4ed8;"></div> Answered</div>
+                <div class="legend-item"><div class="legend-box" style="background: #ffffff; border: 1.5px solid #cbd5e1;"></div> Unanswered</div>
+                <div class="legend-item"><div class="legend-box" style="background: #eff6ff; border: 1.5px solid #bfdbfe;"></div> Marked Review</div>
+                <div class="legend-item"><div class="legend-box" style="background: #ffffff; border: 2.5px solid #000000;"></div> Current</div>
+            </div>
+
+            <div class="text-center pt-2">
+                <button type="button" class="btn btn-sm btn-primary w-100" onclick="requestFullScreenMode()">
+                    <i class="fa-solid fa-expand me-1"></i> Re-enable Full Screen
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SECURITY WARNING MODAL -->
+    <div class="modal fade" id="securityWarningModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-custom p-3">
+                <div class="modal-header border-bottom pb-2">
+                    <h5 class="modal-title text-dark fw-bold">
+                        <i class="fa-solid fa-triangle-exclamation text-primary me-2"></i>Security Violation Warning
+                    </h5>
+                </div>
+                <div class="modal-body">
+                    <p id="securityWarningMsg" class="fw-semibold text-dark">You have violated examination security protocols.</p>
+                    <div class="alert alert-primary border-0 small text-dark fw-bold" style="background: #eff6ff; color: #1d4ed8;">
+                        <i class="fa-solid fa-circle-exclamation me-1"></i> Warnings used: <span id="warningCountText" class="text-dark">0</span> / {{ exam.allowed_warnings }}
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-primary w-100 fw-bold" onclick="dismissWarningModal()">
+                        I Understand & Continue Exam
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUBMIT CONFIRMATION MODAL -->
+    <div class="modal fade" id="submitConfirmModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-custom p-3">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-dark">
+                        <i class="fa-solid fa-paper-plane text-primary me-2"></i>Confirm Final Submission
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-dark fw-semibold mb-3">Are you sure you want to submit your examination now?</p>
+                    <div class="p-3 bg-light rounded-3 border border-secondary-subtle mb-3">
+                        <div class="d-flex justify-content-between mb-1"><span class="text-muted fw-bold">Total Questions:</span> <strong class="text-dark">{{ questions|length }}</strong></div>
+                        <div class="d-flex justify-content-between mb-1"><span class="text-muted fw-bold">Answered:</span> <strong class="text-primary" id="modalAnsweredCount">0</strong></div>
+                        <div class="d-flex justify-content-between"><span class="text-muted fw-bold">Unanswered:</span> <strong class="text-muted" id="modalUnansweredCount">{{ questions|length }}</strong></div>
+                    </div>
+                    <small class="text-muted d-block"><i class="fa-solid fa-circle-info me-1"></i> Once submitted, you cannot change your answers.</small>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary-custom" data-bs-dismiss="modal">Continue Exam</button>
+                    <button type="button" class="btn btn-submit-exam" onclick="executeExamSubmission('MANUAL_SUBMIT')">Yes, Submit Exam</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HIDDEN FORM FOR EXAM SUBMISSION -->
+    <form id="examSubmitForm" action="{{ url_for('submit_candidate_exam', exam_id=exam.id) }}" method="POST" style="display:none;">
+        <input type="hidden" name="answers_json" id="formAnswersJson">
+        <input type="hidden" name="time_taken_seconds" id="formTimeTaken">
+        <input type="hidden" name="warnings_triggered" id="formWarnings">
+        <input type="hidden" name="submission_reason" id="formSubReason" value="MANUAL_SUBMIT">
+    </form>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- EXAMINATION ENGINE LOGIC -->
+    <script>
+        const EXAM_ID = {{ exam.id }};
+        const TOTAL_DURATION_SEC = {{ exam.duration_minutes * 60 }};
+        const ALLOWED_WARNINGS = {{ exam.allowed_warnings }};
+        const QUESTIONS_DATA = {{ questions | tojson }};
+        let remainingSeconds = {{ remaining_seconds }};
+        let currentQuestionIndex = 0;
+        let candidateAnswers = {}; // { question_id: selected_option_key }
+        let markedForReview = new Set();
+        let warningsCount = {{ attempt.warnings_triggered or 0 }};
+        let isExamSubmitted = false;
+
+        // WebRTC Camera stream
+        async function initExamWebcam() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                const videoElem = document.getElementById('examWebcam');
+                videoElem.srcObject = stream;
+            } catch (err) {
+                console.error("Camera access stream error:", err);
+            }
+        }
+
+        // Fullscreen Enforcement
+        function requestFullScreenMode() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen().catch(err => console.log(err));
+            } else if (elem.mozRequestFullScreen) {
+                elem.mozRequestFullScreen();
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            }
+        }
+
+        // Timer Display & Countdown
+        function startExamTimer() {
+            const timerElem = document.getElementById('timerText');
+            const timerBox = document.getElementById('examTimerBox');
+
+            const interval = setInterval(() => {
+                if (remainingSeconds <= 0) {
+                    clearInterval(interval);
+                    timerElem.innerText = "00:00";
+                    executeExamSubmission('TIME_EXPIRED');
+                    return;
+                }
+
+                remainingSeconds--;
+                const mins = Math.floor(remainingSeconds / 60);
+                const secs = remainingSeconds % 60;
+                timerElem.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        // Render Current Question
+        function renderCurrentQuestion() {
+            if (!QUESTIONS_DATA || QUESTIONS_DATA.length === 0) return;
+
+            const q = QUESTIONS_DATA[currentQuestionIndex];
+
+            document.getElementById('qNumberBadge').innerText = `Question ${currentQuestionIndex + 1} of ${QUESTIONS_DATA.length}`;
+            document.getElementById('qMarksText').innerText = `+${parseFloat(q.marks || 1).toFixed(2)}`;
+            document.getElementById('qNegMarksText').innerText = parseFloat(q.negative_marks || 0).toFixed(2);
+            document.getElementById('qTextDisplay').innerText = q.question_text;
+
+            // Render Options
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = '';
+
+            const selectedOpt = candidateAnswers[q.id];
+            const opts = (q.options && Array.isArray(q.options) && q.options.length > 0) ? q.options : [
+                { key: 'A', text: q.option_a },
+                { key: 'B', text: q.option_b },
+                { key: 'C', text: q.option_c },
+                { key: 'D', text: q.option_d }
+            ];
+
+            opts.forEach(opt => {
+                if (!opt || opt.text === undefined || opt.text === null || String(opt.text).trim() === '') return;
+                const optItem = document.createElement('div');
+                optItem.className = `option-item ${selectedOpt === opt.key ? 'selected' : ''}`;
+                optItem.onclick = () => selectOption(q.id, opt.key);
+
+                const badge = document.createElement('div');
+                badge.className = 'option-key-badge';
+                badge.textContent = opt.key;
+
+                const labelText = document.createElement('div');
+                labelText.className = 'option-label-text';
+                labelText.textContent = opt.text;
+
+                optItem.appendChild(badge);
+                optItem.appendChild(labelText);
+                container.appendChild(optItem);
+            });
+
+            // Update Review Button State
+            const btnReview = document.getElementById('btnMarkReview');
+            if (markedForReview.has(q.id)) {
+                btnReview.classList.add('active');
+            } else {
+                btnReview.classList.remove('active');
+            }
+
+            // Update Prev/Next buttons
+            document.getElementById('btnPrev').disabled = (currentQuestionIndex === 0);
+            document.getElementById('btnNext').innerText = (currentQuestionIndex === QUESTIONS_DATA.length - 1) ? 'Save & Review' : 'Save & Next';
+
+            updateQuestionPalette();
+        }
+
+        function selectOption(qId, key) {
+            candidateAnswers[qId] = key;
+            renderCurrentQuestion();
+        }
+
+        function clearAnswer() {
+            const q = QUESTIONS_DATA[currentQuestionIndex];
+            delete candidateAnswers[q.id];
+            renderCurrentQuestion();
+        }
+
+        function toggleMarkForReview() {
+            const q = QUESTIONS_DATA[currentQuestionIndex];
+            if (markedForReview.has(q.id)) {
+                markedForReview.delete(q.id);
+            } else {
+                markedForReview.add(q.id);
+            }
+            renderCurrentQuestion();
+        }
+
+        function navigateQuestion(delta) {
+            const newIndex = currentQuestionIndex + delta;
+            if (newIndex >= 0 && newIndex < QUESTIONS_DATA.length) {
+                currentQuestionIndex = newIndex;
+                renderCurrentQuestion();
+            }
+        }
+
+        function goToQuestion(index) {
+            if (index >= 0 && index < QUESTIONS_DATA.length) {
+                currentQuestionIndex = index;
+                renderCurrentQuestion();
+            }
+        }
+
+        function updateQuestionPalette() {
+            let answeredCount = 0;
+
+            QUESTIONS_DATA.forEach((q, idx) => {
+                const btn = document.getElementById(`navBtn_${idx}`);
+                if (!btn) return;
+
+                btn.className = 'nav-q-btn';
+
+                if (candidateAnswers[q.id]) {
+                    btn.classList.add('answered');
+                    answeredCount++;
+                }
+
+                if (markedForReview.has(q.id)) {
+                    btn.classList.add('review');
+                }
+
+                if (idx === currentQuestionIndex) {
+                    btn.classList.add('current');
+                }
+            });
+
+            document.getElementById('answeredCountBadge').innerText = `${answeredCount} / ${QUESTIONS_DATA.length} Answered`;
+        }
+
+        // Submit Modal & Submission Handler
+        function openSubmitModal() {
+            const answeredCount = Object.keys(candidateAnswers).length;
+            const unansweredCount = QUESTIONS_DATA.length - answeredCount;
+
+            document.getElementById('modalAnsweredCount').innerText = answeredCount;
+            document.getElementById('modalUnansweredCount').innerText = unansweredCount;
+
+            const modal = new bootstrap.Modal(document.getElementById('submitConfirmModal'));
+            modal.show();
+        }
+
+        function executeExamSubmission(reason = 'MANUAL_SUBMIT') {
+            if (isExamSubmitted) return;
+            isExamSubmitted = true;
+
+            const timeTaken = TOTAL_DURATION_SEC - remainingSeconds;
+            document.getElementById('formAnswersJson').value = JSON.stringify(candidateAnswers);
+            document.getElementById('formTimeTaken').value = timeTaken;
+            document.getElementById('formWarnings').value = warningsCount;
+            document.getElementById('formSubReason').value = reason;
+
+            document.getElementById('examSubmitForm').submit();
+        }
+
+        // Security Monitoring (Visibility & Blur Events)
+        function triggerSecurityViolation(msg) {
+            if (isExamSubmitted) return;
+
+            warningsCount++;
+            document.getElementById('securityWarningMsg').innerText = msg;
+            document.getElementById('warningCountText').innerText = warningsCount;
+
+            const modalElem = document.getElementById('securityWarningModal');
+            const modal = new bootstrap.Modal(modalElem);
+            modal.show();
+
+            if (warningsCount > ALLOWED_WARNINGS) {
+                setTimeout(() => {
+                    executeExamSubmission('DISQUALIFIED');
+                }, 2000);
+            }
+        }
+
+        function dismissWarningModal() {
+            const modalElem = document.getElementById('securityWarningModal');
+            const modal = bootstrap.Modal.getInstance(modalElem);
+            if (modal) modal.hide();
+            requestFullScreenMode();
+        }
+
+        // Event Listeners
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                triggerSecurityViolation("Tab switch or browser minimization detected!");
+            }
+        });
+
+        window.addEventListener('blur', () => {
+            triggerSecurityViolation("Window focus lost!");
+        });
+
+        // Initialize Exam Portal
+        document.addEventListener('DOMContentLoaded', () => {
+            initExamWebcam();
+            startExamTimer();
+            renderCurrentQuestion();
+        });
+    </script>
+</body>
+</html>
