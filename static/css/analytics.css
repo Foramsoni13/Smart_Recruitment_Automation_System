@@ -204,20 +204,38 @@ p, span, h1, h2, h3, h4, h5, h6, label, td, th, small, strong, b, input, select 
 /* KPI GRID CARDS */
 .kpi-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1.25rem;
     margin-bottom: 2rem;
+}
+
+@media (max-width: 1200px) {
+    .kpi-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .kpi-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .kpi-card {
     background-color: #ffffff;
     border-radius: var(--radius-lg);
-    padding: 1.5rem;
+    padding: 1.25rem 1.15rem;
     border: 1.5px solid #cbd5e1 !important;
     box-shadow: var(--shadow-sm);
     display: flex;
     align-items: center;
-    gap: 1.25rem;
+    gap: 1rem;
     transition: all 0.25s ease;
     cursor: pointer;
 }
@@ -367,9 +385,10 @@ p, span, h1, h2, h3, h4, h5, h6, label, td, th, small, strong, b, input, select 
 /* CHARTS GRID */
 .charts-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 1.75rem;
     margin-bottom: 2rem;
+    width: 100%;
 }
 
 .chart-card {
@@ -379,6 +398,8 @@ p, span, h1, h2, h3, h4, h5, h6, label, td, th, small, strong, b, input, select 
     border: 1.5px solid #cbd5e1 !important;
     box-shadow: var(--shadow-sm);
     transition: all 0.25s ease;
+    display: flex;
+    flex-direction: column;
 }
 
 .chart-card:hover, .chart-card:focus-within {
@@ -393,7 +414,7 @@ p, span, h1, h2, h3, h4, h5, h6, label, td, th, small, strong, b, input, select 
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.25rem;
 }
 
 .chart-title {
@@ -423,13 +444,16 @@ p, span, h1, h2, h3, h4, h5, h6, label, td, th, small, strong, b, input, select 
 
 .chart-container {
     position: relative;
-    height: 280px;
+    height: 310px;
     width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .chart-container-bar {
     position: relative;
-    height: 320px;
+    height: 300px;
     width: 100%;
 }
 
@@ -531,11 +555,11 @@ p, span, h1, h2, h3, h4, h5, h6, label, td, th, small, strong, b, input, select 
     .analytics-page {
         padding: 1.25rem 1rem !important;
     }
-    .charts-grid-two-col {
+    .charts-grid {
         grid-template-columns: 1fr !important;
     }
-    .kpi-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
+    .activity-section {
+        grid-template-columns: 1fr !important;
     }
 }
 
@@ -543,15 +567,12 @@ p, span, h1, h2, h3, h4, h5, h6, label, td, th, small, strong, b, input, select 
     .analytics-page {
         padding: 0.85rem 0.65rem !important;
     }
-    .kpi-grid {
-        grid-template-columns: 1fr !important;
-    }
-    .analytics-header-box {
+    .analytics-header {
         flex-direction: column !important;
         align-items: flex-start !important;
         gap: 1rem !important;
     }
-    .analytics-header-actions {
+    .analytics-header-right {
         width: 100% !important;
         flex-wrap: wrap !important;
     }

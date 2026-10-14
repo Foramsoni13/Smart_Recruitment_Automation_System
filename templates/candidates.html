@@ -6,7 +6,44 @@ Candidates | Smart Recruitment
 
 {% block css %}
 <link rel="stylesheet"
-      href="{{ url_for('static', filename='css/candidates.css') }}">
+      href="{{ url_for('static', filename='css/candidates.css') }}?v={{ range(1000, 99999) | random }}">
+<style>
+    /* Guaranteed Blue Delete Modal Styles (Bypasses any browser cache) */
+    .delete-icon,
+    #deleteModal .delete-icon {
+        background-color: #eff6ff !important;
+        color: #2563eb !important;
+        border: 1.5px solid #bfdbfe !important;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12) !important;
+    }
+    .delete-icon i,
+    #deleteModal .delete-icon i,
+    .delete-icon .fa-trash,
+    #deleteModal .delete-icon .fa-trash {
+        color: #2563eb !important;
+    }
+    .confirm-delete,
+    #confirmDelete,
+    #deleteModal .confirm-delete {
+        background-color: #2563eb !important;
+        border: 1.5px solid #1d4ed8 !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25) !important;
+    }
+    .confirm-delete:hover,
+    #confirmDelete:hover,
+    #deleteModal .confirm-delete:hover {
+        background-color: #1d4ed8 !important;
+        border-color: #1e40af !important;
+        color: #ffffff !important;
+        box-shadow: 0 6px 16px rgba(29, 78, 216, 0.35) !important;
+    }
+    .confirm-delete *,
+    #confirmDelete *,
+    #deleteModal .confirm-delete * {
+        color: #ffffff !important;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -93,25 +130,19 @@ Candidates | Smart Recruitment
             <a href="{{ url_for('candidate_register') }}"
                class="btn-add-candidate">
                 <i class="fa-solid fa-user-plus"></i>
-                + Add Candidate
-            </a>
-
-            <a href="{{ url_for('resume_scanner') }}"
-               class="candidate-logout">
-                <i class="fa-solid fa-file-arrow-up"></i>
-                Resume Scanner
+                <span>+ Add Candidate</span>
             </a>
 
             <a href="{{ url_for('analytics') }}"
-               class="candidate-logout">
+               class="candidate-logout candidate-nav-btn">
                 <i class="fa-solid fa-chart-line"></i>
-                Analytics
+                <span>Analytics</span>
             </a>
 
             <a href="{{ url_for('home') }}"
-               class="candidate-logout">
+               class="candidate-logout candidate-nav-btn">
                 <i class="fa-solid fa-house"></i>
-                Dashboard
+                <span>Dashboard</span>
             </a>
 
         </div>
@@ -325,29 +356,8 @@ Candidates | Smart Recruitment
 
             <div class="automation-controls-bar">
 
-                <div class="browser-mode-container">
-                    <label class="mode-label">
-                        <i class="fa-solid fa-sliders"></i> Browser Mode:
-                    </label>
-
-                    <div class="mode-toggle-group">
-                        <label class="mode-option" title="Recommended: Run Selenium invisibly in the background without opening visible windows">
-                            <input type="radio" name="browserMode" value="headless" checked>
-                            <span class="mode-pill">
-                                <i class="fa-solid fa-ghost"></i>
-                                Headless (Silent RPA)
-                            </span>
-                        </label>
-
-                        <label class="mode-option" title="Open exactly ONE visible Chrome browser window controlled by Selenium">
-                            <input type="radio" name="browserMode" value="visible">
-                            <span class="mode-pill">
-                                <i class="fa-brands fa-chrome"></i>
-                                Visible Chrome Window
-                            </span>
-                        </label>
-                    </div>
-                </div>
+                <!-- Hidden default headless mode input for automation engine -->
+                <input type="hidden" name="browserMode" value="headless">
 
                 <div class="automation-action-buttons">
                     <button
@@ -630,7 +640,7 @@ Candidates | Smart Recruitment
                         <span id="selectedCountBadge" class="badge" style="font-size: 0.85rem; padding: 0.4rem 0.8rem; background: #e2e8f0; color: #1e293b; border-radius: 20px; font-weight: 600;">
                             0 selected
                         </span>
-                        <button type="button" id="deleteSelectedBtn" class="btn btn-danger btn-sm" style="display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 600; padding: 0.4rem 0.9rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(225, 29, 72, 0.25);">
+                        <button type="button" id="deleteSelectedBtn" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 600; padding: 0.4rem 0.9rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);">
                             <i class="fa-solid fa-trash-can"></i> Delete Selected
                         </button>
                     </div>
@@ -1003,9 +1013,9 @@ Candidates | Smart Recruitment
 
     <div class="delete-modal-card">
 
-        <div class="delete-icon">
+        <div class="delete-icon" style="background-color: #eff6ff !important; color: #2563eb !important; border: 1.5px solid #bfdbfe !important; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12) !important;">
 
-            <i class="fa-solid fa-trash"></i>
+            <i class="fa-solid fa-trash" style="color: #2563eb !important;"></i>
 
         </div>
 
@@ -1031,7 +1041,8 @@ Candidates | Smart Recruitment
             <button
                 type="button"
                 id="confirmDelete"
-                class="confirm-delete">
+                class="confirm-delete"
+                style="background-color: #2563eb !important; border: 1.5px solid #1d4ed8 !important; color: #ffffff !important; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25) !important;">
 
                 Delete
 
@@ -1048,6 +1059,6 @@ Candidates | Smart Recruitment
      CANDIDATES JAVASCRIPT
 ====================================================== -->
 
-<script src="{{ url_for('static', filename='js/candidates.js') }}"></script>
+<script src="{{ url_for('static', filename='js/candidates.js') }}?v={{ range(1000, 99999) | random }}"></script>
 
 {% endblock %}

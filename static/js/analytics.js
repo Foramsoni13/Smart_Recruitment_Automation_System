@@ -66,28 +66,49 @@ document.addEventListener("DOMContentLoaded", function () {
         let processed = 0;
         let failed = 0;
 
+        let statusRegistered = 0;
+        let statusPending = 0;
+        let statusProcessed = 0;
+        let statusFailed = 0;
+
         const positionsMap = {};
 
         candidates.forEach(c => {
-            const regSt = (c.registration_status || c.status || "").toLowerCase();
+            const regSt = (c.registration_status || "").toLowerCase();
+            const st = (c.status || "").toLowerCase();
+            const autoSt = (c.automation_status || "").toLowerCase();
             const resSt = (c.resume_status || "").toLowerCase();
 
-            if (regSt.includes("registered") || regSt.includes("processed") || regSt.includes("new")) {
-                registered++;
-            }
+            // Resume metric
             if (resSt.includes("uploaded") || (c.resume && c.resume.length > 0)) {
                 resumesUploaded++;
             } else {
                 resumesPending++;
             }
-            if (regSt.includes("processed") || resSt.includes("uploaded")) {
+
+            // High-level KPI counts
+            if (regSt.includes("registered") || st.includes("registered") || regSt.includes("processed") || st.includes("processed") || regSt.includes("new") || st.includes("new") || !regSt) {
+                registered++;
+            }
+            if (st.includes("process") || autoSt.includes("process") || regSt.includes("process")) {
                 processed++;
             }
-            if (regSt.includes("fail") || resSt.includes("fail")) {
+            if (st.includes("fail") || regSt.includes("fail") || autoSt.includes("fail") || resSt.includes("fail")) {
                 failed++;
             }
 
-            const pos = c.position || "Unspecified";
+            // Mutually exclusive distribution for Status Chart:
+            if (st.includes("fail") || regSt.includes("fail") || autoSt.includes("fail")) {
+                statusFailed++;
+            } else if (st.includes("process") || autoSt.includes("process") || regSt.includes("process")) {
+                statusProcessed++;
+            } else if (st.includes("pend") || regSt.includes("pend") || autoSt.includes("pend") || st.includes("new")) {
+                statusPending++;
+            } else {
+                statusRegistered++;
+            }
+
+            const pos = (c.position && c.position.trim()) ? c.position.trim() : "Software Engineer";
             positionsMap[pos] = (positionsMap[pos] || 0) + 1;
         });
 
@@ -104,8 +125,8 @@ document.addEventListener("DOMContentLoaded", function () {
         // Render Pipeline Funnel
         renderPipeline(total, registered, resumesUploaded, processed);
 
-        // Render Charts
-        renderStatusChart(registered, resumesPending, processed, failed);
+        // Render Charts with balanced data
+        renderStatusChart(statusRegistered, statusPending, statusProcessed, statusFailed);
         renderResumeChart(resumesUploaded, resumesPending, failed);
         renderPositionChart(positionsMap);
 
@@ -147,21 +168,65 @@ document.addEventListener("DOMContentLoaded", function () {
         const ctx = document.getElementById("candidateStatusChart");
         if (!ctx || typeof Chart === "undefined") return;
 
+        const total = (registered || 0) + (pending || 0) + (processed || 0) + (failed || 0);
+        const labels = ["Registered", "Pending", "Processed", "Failed"];
+        const dataVals = total > 0
+            ? [registered, pending, processed, failed]
+            : [1, 0, 0, 0];
+        const bgColors = ["#2563eb", "#60a5fa", "#1e40af", "#94a3b8"];
+
         if (statusChart) statusChart.destroy();
         statusChart = new Chart(ctx, {
-            type: "pie",
+            type: "doughnut",
             data: {
-                labels: ["Registered", "Resume Pending", "Processed", "Failed"],
+                labels: labels,
                 datasets: [{
-                    data: [registered || 1, pending, processed, failed],
-                    backgroundColor: ["#1d4ed8", "#2563eb", "#3b82f6", "#60a5fa"],
-                    borderWidth: 2,
-                    borderColor: "#ffffff"
+                    data: dataVals,
+                    backgroundColor: bgColors,
+                    borderWidth: 3,
+                    borderColor: "#ffffff",
+                    hoverOffset: 6
                 }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false
+                maintainAspectRatio: false,
+                cutout: "62%",
+                layout: {
+                    padding: { top: 10, bottom: 10, left: 10, right: 10 }
+                },
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                        labels: {
+                            padding: 16,
+                            usePointStyle: true,
+                            pointStyle: "circle",
+                            boxWidth: 10,
+                            font: {
+                                family: "'Plus Jakarta Sans', sans-serif",
+                                size: 12,
+                                weight: "600"
+                            },
+                            color: "#334155"
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: "#0f172a",
+                        titleFont: { family: "'Plus Jakarta Sans', sans-serif", size: 13, weight: "700" },
+                        bodyFont: { family: "'Plus Jakarta Sans', sans-serif", size: 12 },
+                        padding: 12,
+                        cornerRadius: 10,
+                        callbacks: {
+                            label: function(context) {
+                                const sum = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const val = context.parsed;
+                                const pct = sum > 0 ? Math.round((val / sum) * 100) : 0;
+                                return ` ${context.label}: ${val} (${pct}%)`;
+                            }
+                        }
+                    }
+                }
             }
         });
     }
@@ -170,21 +235,65 @@ document.addEventListener("DOMContentLoaded", function () {
         const ctx = document.getElementById("resumeStatusChart");
         if (!ctx || typeof Chart === "undefined") return;
 
+        const total = (uploaded || 0) + (pending || 0) + (failed || 0);
+        const labels = ["Uploaded", "Pending", "Failed"];
+        const dataVals = total > 0
+            ? [uploaded, pending, failed]
+            : [1, 0, 0];
+        const bgColors = ["#2563eb", "#60a5fa", "#94a3b8"];
+
         if (resumeChart) resumeChart.destroy();
         resumeChart = new Chart(ctx, {
             type: "doughnut",
             data: {
-                labels: ["Uploaded", "Pending", "Failed"],
+                labels: labels,
                 datasets: [{
-                    data: [uploaded || 1, pending, failed],
-                    backgroundColor: ["#1d4ed8", "#2563eb", "#60a5fa"],
-                    borderWidth: 2,
-                    borderColor: "#ffffff"
+                    data: dataVals,
+                    backgroundColor: bgColors,
+                    borderWidth: 3,
+                    borderColor: "#ffffff",
+                    hoverOffset: 6
                 }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false
+                maintainAspectRatio: false,
+                cutout: "62%",
+                layout: {
+                    padding: { top: 10, bottom: 10, left: 10, right: 10 }
+                },
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                        labels: {
+                            padding: 16,
+                            usePointStyle: true,
+                            pointStyle: "circle",
+                            boxWidth: 10,
+                            font: {
+                                family: "'Plus Jakarta Sans', sans-serif",
+                                size: 12,
+                                weight: "600"
+                            },
+                            color: "#334155"
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: "#0f172a",
+                        titleFont: { family: "'Plus Jakarta Sans', sans-serif", size: 13, weight: "700" },
+                        bodyFont: { family: "'Plus Jakarta Sans', sans-serif", size: 12 },
+                        padding: 12,
+                        cornerRadius: 10,
+                        callbacks: {
+                            label: function(context) {
+                                const sum = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const val = context.parsed;
+                                const pct = sum > 0 ? Math.round((val / sum) * 100) : 0;
+                                return ` ${context.label}: ${val} (${pct}%)`;
+                            }
+                        }
+                    }
+                }
             }
         });
     }
@@ -193,8 +302,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const ctx = document.getElementById("positionsChart");
         if (!ctx || typeof Chart === "undefined") return;
 
-        const labels = Object.keys(positionsMap).length ? Object.keys(positionsMap) : ["Python Developer", "Data Analyst", "DevOps Engineer"];
-        const dataVals = Object.keys(positionsMap).length ? Object.values(positionsMap) : [5, 3, 2];
+        const rawLabels = Object.keys(positionsMap).filter(k => k && k.trim());
+        const labels = rawLabels.length ? rawLabels : ["Software Engineer"];
+        const dataVals = rawLabels.length ? rawLabels.map(k => positionsMap[k]) : [1];
+
+        const maxVal = Math.max(...dataVals, 1);
+        const yMax = maxVal < 5 ? maxVal + 1 : Math.ceil(maxVal * 1.25);
 
         if (positionChart) positionChart.destroy();
         positionChart = new Chart(ctx, {
@@ -205,14 +318,71 @@ document.addEventListener("DOMContentLoaded", function () {
                     label: "Candidates",
                     data: dataVals,
                     backgroundColor: "#2563eb",
-                    borderRadius: 8
+                    hoverBackgroundColor: "#1d4ed8",
+                    borderRadius: 8,
+                    borderSkipped: false,
+                    maxBarThickness: 52,
+                    barPercentage: 0.6,
+                    categoryPercentage: labels.length === 1 ? 0.35 : 0.7
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                layout: {
+                    padding: { top: 20, bottom: 8, left: 15, right: 15 }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: "#0f172a",
+                        titleFont: { family: "'Plus Jakarta Sans', sans-serif", size: 13, weight: "700" },
+                        bodyFont: { family: "'Plus Jakarta Sans', sans-serif", size: 12 },
+                        padding: 12,
+                        cornerRadius: 10,
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                const val = context.parsed.y;
+                                return `${val} Candidate${val === 1 ? '' : 's'}`;
+                            }
+                        }
+                    }
+                },
                 scales: {
-                    y: { beginAtZero: true, ticks: { precision: 0 } }
+                    x: {
+                        grid: { display: false, drawBorder: false },
+                        ticks: {
+                            color: "#0f172a",
+                            font: {
+                                family: "'Plus Jakarta Sans', sans-serif",
+                                size: 12,
+                                weight: "700"
+                            },
+                            padding: 8
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        suggestedMax: yMax,
+                        grid: {
+                            color: "#f1f5f9",
+                            drawBorder: false
+                        },
+                        ticks: {
+                            precision: 0,
+                            stepSize: 1,
+                            color: "#64748b",
+                            font: {
+                                family: "'Plus Jakarta Sans', sans-serif",
+                                size: 11,
+                                weight: "600"
+                            },
+                            padding: 8
+                        }
+                    }
                 }
             }
         });

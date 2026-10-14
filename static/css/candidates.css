@@ -182,11 +182,12 @@ p, span, h1, h2, h3, h4, h5, h6, label, td, th, small, strong, b, input, select 
 
 /* ALL HEADER BUTTONS IN SOLID BLUE WITH WHITE TEXT */
 
-.btn-add-candidate, .candidate-logout {
-    display: flex;
+.btn-add-candidate, .candidate-nav-btn, .candidate-logout {
+    display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
-    padding: 0.6rem 1.1rem;
+    padding: 0.62rem 1.15rem;
     border-radius: 12px;
     background-color: #2563eb !important;
     color: #ffffff !important;
@@ -196,14 +197,15 @@ p, span, h1, h2, h3, h4, h5, h6, label, td, th, small, strong, b, input, select 
     border: 1.5px solid #1d4ed8 !important;
     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
     transition: all 0.2s ease;
+    white-space: nowrap;
 }
 
-.btn-add-candidate *, .candidate-logout *,
-.btn-add-candidate i, .candidate-logout i {
+.btn-add-candidate *, .candidate-nav-btn *, .candidate-logout *,
+.btn-add-candidate i, .candidate-nav-btn i, .candidate-logout i {
     color: #ffffff !important;
 }
 
-.btn-add-candidate:hover, .candidate-logout:hover {
+.btn-add-candidate:hover, .candidate-nav-btn:hover, .candidate-logout:hover {
     background-color: #1d4ed8 !important;
     color: #ffffff !important;
     transform: translateY(-2px);
@@ -398,7 +400,7 @@ p, span, h1, h2, h3, h4, h5, h6, label, td, th, small, strong, b, input, select 
 .automation-controls-bar {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     flex-wrap: wrap;
     gap: 1.25rem;
 }
@@ -985,19 +987,20 @@ p, span, h1, h2, h3, h4, h5, h6, label, td, th, small, strong, b, input, select 
 .delete-icon {
     width: 64px;
     height: 64px;
-    background-color: #ffffff;
-    color: #ef4444 !important;
+    background-color: #eff6ff;
+    color: #2563eb !important;
     border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.8rem;
     margin: 0 auto 1.25rem auto;
-    border: 1.5px solid #fca5a5;
+    border: 1.5px solid #bfdbfe;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
 }
 
 .delete-icon i {
-    color: #ef4444 !important;
+    color: #2563eb !important;
 }
 
 .delete-modal-card h2 {
@@ -1028,18 +1031,35 @@ p, span, h1, h2, h3, h4, h5, h6, label, td, th, small, strong, b, input, select 
     font-weight: 700 !important;
     color: #0f172a !important;
     cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cancel-delete:hover {
+    background-color: #f8fafc !important;
+    border-color: #94a3b8 !important;
+    color: #0f172a !important;
+    transform: translateY(-1px);
 }
 
 .confirm-delete {
     flex: 1;
     padding: 0.8rem;
-    background-color: #dc2626 !important;
-    border: 1.5px solid #b91c1c !important;
+    background-color: #2563eb !important;
+    border: 1.5px solid #1d4ed8 !important;
     border-radius: 12px;
     font-weight: 700 !important;
     color: #ffffff !important;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    transition: all 0.2s ease;
+}
+
+.confirm-delete:hover {
+    background-color: #1d4ed8 !important;
+    border-color: #1e40af !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(29, 78, 216, 0.35);
 }
 
 .confirm-delete *, .confirm-delete i {

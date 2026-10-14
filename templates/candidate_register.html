@@ -7,7 +7,7 @@ Candidate Registration | Smart Recruitment
 {% block css %}
 <link
     rel="stylesheet"
-    href="{{ url_for('static', filename='css/candidate_register.css') }}"
+    href="{{ url_for('static', filename='css/candidate_register.css') }}?v={{ range(1000, 99999) | random }}"
 >
 {% endblock %}
 
@@ -20,16 +20,29 @@ Candidate Registration | Smart Recruitment
         <!-- HEADER -->
         <div class="candidate-register-header">
 
-            <div class="header-icon">
-                <i class="fa-solid fa-user-plus"></i>
+            <div class="header-left-content">
+                <a href="{{ url_for('candidates') }}"
+                   class="btn-back-candidates"
+                   title="Back to Candidates">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+
+                <div class="header-icon">
+                    <i class="fa-solid fa-user-plus"></i>
+                </div>
+
+                <div>
+                    <span class="header-eyebrow">RECRUITMENT MANAGEMENT</span>
+                    <h1>Candidate Registration</h1>
+                    <p>Add a new candidate with profile details, resume, and initial recruitment status</p>
+                </div>
             </div>
 
-            <div>
-                <h1>Candidate Registration</h1>
-
-                <p>
-                    Add a new candidate to the recruitment system
-                </p>
+            <div class="header-right-content">
+                <a href="{{ url_for('candidates') }}" class="btn-return-link">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Candidates List</span>
+                </a>
             </div>
 
         </div>

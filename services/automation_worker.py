@@ -195,23 +195,10 @@ def process_candidate_batch():
         print("FAILED: Candidate upload file contains no records.")
         sys.exit(1)
 
-    # Initialize Selenium WebDriver if available
+    # Silent background processing: Candidate registration and resume matching are handled directly
+    # via the REST API and MySQL database without launching a Chrome browser window.
     driver = None
-    try:
-        from selenium import webdriver
-        from selenium.webdriver.chrome.options import Options
-        from selenium.webdriver.common.by import By
-        options = Options()
-        if browser_mode == "headless":
-            options.add_argument("--headless=new")
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
-        options.add_argument("--disable-gpu")
-
-        driver = webdriver.Chrome(options=options)
-        print(f"WebDriver session active ({browser_mode.capitalize()} mode)")
-    except Exception as drv_err:
-        print(f"Notice launching Selenium Chrome WebDriver: {drv_err}. Using direct API automation pipeline.")
+    print("Silent background pipeline active: Candidate registration handled directly via API & Database without launching Chrome.")
 
     successful_count = 0
     failed_count = 0
@@ -379,20 +366,8 @@ def process_candidate_batch():
             abs_resume_path = resolved_resume_path
             print(f"Resume: FOUND for {name}")
 
-            # Selenium File Upload via send_keys()
-            if driver:
-                try:
-                    driver.get(f"{base_url}/candidate/register")
-                    file_inputs = driver.find_elements(By.CSS_SELECTOR, "input[type='file']")
-                    for fi in file_inputs:
-                        try:
-                            fi.send_keys(abs_resume_path)
-                            print(f"Selenium send_keys() executed for {name}")
-                            break
-                        except Exception:
-                            pass
-                except Exception as sel_err:
-                    print(f"Notice during Selenium upload interaction: {sel_err}")
+            # Direct resume processing (No Chrome browser navigation to /candidate/register)
+            print(f"Direct resume verified and linked for {name}: {abs_resume_path}")
 
             # Update database record: Uploaded & Processed
             res_filename = resume_file_obj.name

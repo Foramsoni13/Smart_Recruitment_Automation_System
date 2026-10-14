@@ -1,107 +1,294 @@
 {% extends "base.html" %}
 
 {% block title %}
-Live Exam Proctoring Monitor - {{ exam.title }} | Smart Recruitment
+Live Exam Proctoring Monitor - {{ exam.title|title }} | Smart Recruitment
 {% endblock %}
 
 {% block css %}
 <style>
-    :root {
-        --dark-bg: #0f172a;
-        --card-bg: #ffffff;
-        --border: #e2e8f0;
+    .page-header-card {
+        transition: border-color 0.25s ease;
     }
-    body { background-color: #f8fafc; }
+    .page-header-card:hover {
+        border-color: #1d4ed8 !important;
+    }
+
+    .app-card {
+        transition: border-color 0.25s ease;
+    }
+    .app-card:hover {
+        border-color: #1d4ed8 !important;
+    }
+
+    .exam-action-btn {
+        background-color: #2563eb !important;
+        color: #ffffff !important;
+        border: 1.5px solid #1d4ed8 !important;
+        border-radius: 10px !important;
+        padding: 0.55rem 1rem !important;
+        font-size: 0.85rem !important;
+        font-weight: 700 !important;
+        text-decoration: none !important;
+        box-shadow: 0 3px 8px rgba(37, 99, 235, 0.25) !important;
+        transition: all 0.2s ease !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        cursor: pointer !important;
+    }
+
+    .exam-action-btn *, .exam-action-btn i {
+        color: #ffffff !important;
+    }
+
+    .exam-action-btn:hover {
+        background-color: #1d4ed8 !important;
+        border-color: #1d4ed8 !important;
+        color: #ffffff !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 5px 14px rgba(29, 78, 216, 0.35) !important;
+    }
+
+    .exam-action-btn-icon {
+        padding: 0.55rem 0.85rem !important;
+    }
+
+    /* 5-COLUMN BALANCED MONITOR STATS GRID */
+    .monitor-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 1.25rem;
+        margin-bottom: 1.75rem;
+    }
+
     .monitor-stat-card {
         background: #ffffff;
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 1.25rem;
-        text-align: center;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        border: 1.5px solid #cbd5e1 !important;
+        border-radius: 14px;
+        padding: 1.25rem 1.35rem;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.25s ease;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
-    .stat-num {
-        font-size: 1.8rem;
-        font-weight: 700;
+
+    .monitor-stat-card:hover {
+        border-color: #1d4ed8 !important;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
     }
-    .table-custom th {
-        background: #f1f5f9;
-        font-size: 0.85rem;
+
+    .stat-header-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.75rem;
+    }
+
+    .stat-lbl {
+        font-size: 0.74rem;
+        font-weight: 800;
+        color: #475569;
+        letter-spacing: 0.6px;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
-        padding: 0.85rem;
     }
-    .table-custom td {
-        padding: 0.85rem;
-        vertical-align: middle;
+
+    .stat-icon-pill {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: #eff6ff;
+        color: #2563eb;
+        border: 1.5px solid #bfdbfe;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.95rem;
+        flex-shrink: 0;
     }
-    .badge-in-progress { background: #eff6ff; color: #1d4ed8; font-weight: 700; border: 1.5px solid #bfdbfe; }
-    .badge-submitted { background: #eff6ff; color: #1d4ed8; font-weight: 700; border: 1.5px solid #bfdbfe; }
-    .badge-not-started { background: #f1f5f9; color: #475569; font-weight: 700; border: 1.5px solid #cbd5e1; }
-    .badge-disqualified { background: #fef2f2; color: #b91c1c; font-weight: 700; border: 1.5px solid #fecaca; }
+
+    .stat-val {
+        font-size: 1.95rem;
+        font-weight: 800;
+        color: #000000 !important;
+        line-height: 1.1;
+    }
+
+    /* PULSING TELEMETRY DOT */
+    @keyframes livePulse {
+        0% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.35; transform: scale(0.85); }
+        100% { opacity: 1; transform: scale(1); }
+    }
+    .live-pulse-dot {
+        display: inline-block;
+        animation: livePulse 2s infinite ease-in-out;
+        color: #2563eb;
+        font-size: 0.75rem;
+    }
+
+    /* TABLE STYLES */
+    .table-container-bordered {
+        border: 1.5px solid #cbd5e1;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .table-app th {
+        background-color: #f8fafc !important;
+        font-size: 0.76rem !important;
+        font-weight: 800 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.6px !important;
+        color: #475569 !important;
+        padding: 12px 16px !important;
+        border-bottom: 1.5px solid #cbd5e1 !important;
+    }
+
+    .table-app td {
+        padding: 14px 16px !important;
+        vertical-align: middle !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+    }
+
+    .table-app tbody tr:last-child td {
+        border-bottom: none !important;
+    }
+
+    .table-app tbody tr:hover td {
+        background-color: #f8fafc !important;
+    }
+
+    @media (max-width: 1100px) {
+        .monitor-stats-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .monitor-stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .monitor-stats-grid {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container py-4">
+<div class="app-container">
 
-    <!-- HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <div class="d-flex align-items-center gap-2">
-                <span class="badge bg-danger px-2 py-1"><i class="fa-solid fa-signal me-1"></i> LIVE MONITOR</span>
-                <h3 class="fw-bold mb-0">{{ exam.title }}</h3>
+    <!-- PAGE HEADER CARD -->
+    <header class="page-header-card d-flex align-items-center justify-content-between p-4 mb-4 bg-white border border-2 rounded-4 shadow-sm" style="border-color: #cbd5e1 !important;">
+        <div class="d-flex align-items-center gap-3">
+            <a href="{{ url_for('hr_exams_list') }}" class="exam-action-btn exam-action-btn-icon" title="Back to Exams" aria-label="Back to Exams">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <div class="header-icon-box d-flex align-items-center justify-content-center rounded-4" style="width: 52px; height: 52px; background-color: #eff6ff; color: #2563eb; border: 1.5px solid #bfdbfe; font-size: 1.5rem; flex-shrink: 0;">
+                <i class="fa-solid fa-desktop" style="color: #2563eb !important;"></i>
             </div>
-            <p class="text-muted mb-0">Real-time candidate tracking, camera connection telemetry, and proctoring security events.</p>
+            <div>
+                <span class="eyebrow-text fw-bold text-uppercase" style="font-size: 0.72rem; color: #2563eb; letter-spacing: 1.2px; display: block; margin-bottom: 3px;">LIVE PROCTORING MONITOR</span>
+                <h1 class="h3 fw-bold m-0 text-dark" style="font-weight: 800; color: #000000 !important; letter-spacing: -0.4px; line-height: 1.2;">
+                    Live Monitor <span style="color: #94a3b8; font-weight: 400; margin: 0 4px;">•</span> {{ exam.title|title }}
+                </h1>
+            </div>
         </div>
-        <div class="d-flex gap-2">
-            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="fetchLiveStatus()">
-                <i class="fa-solid fa-rotate me-1"></i> Refresh Grid
+
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <button type="button" class="exam-action-btn" onclick="fetchLiveStatus()" title="Refresh Telemetry Grid">
+                <i class="fa-solid fa-arrows-rotate"></i> Refresh Grid
             </button>
-            <a href="{{ url_for('hr_exams_list') }}" class="btn btn-secondary btn-sm">
-                <i class="fa-solid fa-arrow-left me-1"></i> Back to Exams
+            <a href="{{ url_for('hr_assign_exam', exam_id=exam.id) }}" class="exam-action-btn" title="Assign Candidates">
+                <i class="fa-solid fa-user-plus"></i> Assign Candidates
+            </a>
+            <a href="{{ url_for('hr_exams_list') }}" class="exam-action-btn">
+                <i class="fa-solid fa-arrow-left"></i> Back to Exams
+            </a>
+            <a href="{{ url_for('home') }}" class="exam-action-btn">
+                <i class="fa-solid fa-house"></i> Dashboard
             </a>
         </div>
+    </header>
+
+    <!-- BALANCED 5-COLUMN METRICS GRID -->
+    <div class="monitor-stats-grid">
+        <!-- 1. TOTAL CANDIDATES -->
+        <div class="monitor-stat-card">
+            <div class="stat-header-row">
+                <span class="stat-lbl">Total Candidates</span>
+                <div class="stat-icon-pill"><i class="fa-solid fa-users"></i></div>
+            </div>
+            <div class="stat-val" id="statTotal">0</div>
+        </div>
+
+        <!-- 2. NOT STARTED -->
+        <div class="monitor-stat-card">
+            <div class="stat-header-row">
+                <span class="stat-lbl">Not Started</span>
+                <div class="stat-icon-pill"><i class="fa-regular fa-clock"></i></div>
+            </div>
+            <div class="stat-val" id="statNotStarted">0</div>
+        </div>
+
+        <!-- 3. IN PROGRESS -->
+        <div class="monitor-stat-card">
+            <div class="stat-header-row">
+                <span class="stat-lbl">In Progress</span>
+                <div class="stat-icon-pill"><i class="fa-solid fa-hourglass-half"></i></div>
+            </div>
+            <div class="stat-val" id="statInProgress">0</div>
+        </div>
+
+        <!-- 4. SUBMITTED -->
+        <div class="monitor-stat-card">
+            <div class="stat-header-row">
+                <span class="stat-lbl">Submitted</span>
+                <div class="stat-icon-pill"><i class="fa-solid fa-circle-check"></i></div>
+            </div>
+            <div class="stat-val" id="statSubmitted">0</div>
+        </div>
+
+        <!-- 5. SECURITY ALERTS -->
+        <div class="monitor-stat-card">
+            <div class="stat-header-row">
+                <span class="stat-lbl">Security Alerts</span>
+                <div class="stat-icon-pill"><i class="fa-solid fa-shield-halved"></i></div>
+            </div>
+            <div class="stat-val" id="statViolations">0</div>
+        </div>
     </div>
 
-    <!-- METRICS CARDS -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-2.4 col-6">
-            <div class="monitor-stat-card">
-                <small class="text-muted">Total Candidates</small>
-                <div class="stat-num text-dark" id="statTotal">0</div>
+    <!-- LIVE MONITOR TABLE CARD -->
+    <div class="app-card bg-white p-4 border border-2 rounded-4 shadow-sm" style="border-color: #cbd5e1 !important;">
+        <!-- Card Header Toolbar -->
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 pb-3 mb-3 border-bottom" style="border-color: #e2e8f0;">
+            <div class="d-flex align-items-center gap-2">
+                <i class="fa-solid fa-satellite-dish text-primary fs-5"></i>
+                <h2 class="h5 fw-bold m-0 text-dark" style="font-weight: 800; color: #000000 !important;">Real-Time Candidate Telemetry</h2>
+                <span class="badge px-3 py-1.5 rounded-pill fw-bold d-inline-flex align-items-center gap-1.5" style="background-color: #eff6ff; color: #2563eb; border: 1.5px solid #bfdbfe; font-size: 0.8rem;">
+                    <span class="live-pulse-dot">●</span> Live Polling Active
+                </span>
             </div>
-        </div>
-        <div class="col-md-2.4 col-6">
-            <div class="monitor-stat-card">
-                <small class="text-muted">Not Started</small>
-                <div class="stat-num text-secondary" id="statNotStarted">0</div>
-            </div>
-        </div>
-        <div class="col-md-2.4 col-6">
-            <div class="monitor-stat-card">
-                <small class="text-muted">In Progress</small>
-                <div class="stat-num text-info" id="statInProgress">0</div>
-            </div>
-        </div>
-        <div class="col-md-2.4 col-6">
-            <div class="monitor-stat-card">
-                <small class="text-muted">Submitted</small>
-                <div class="stat-num text-success" id="statSubmitted">0</div>
-            </div>
-        </div>
-        <div class="col-md-2.4 col-6">
-            <div class="monitor-stat-card">
-                <small class="text-muted">Security Violations</small>
-                <div class="stat-num text-danger" id="statViolations">0</div>
-            </div>
-        </div>
-    </div>
 
-    <!-- LIVE MONITOR TABLE -->
-    <div class="card border-0 shadow-sm rounded-4 p-3">
-        <div class="table-responsive">
-            <table class="table table-custom align-middle">
+            <div class="d-flex align-items-center gap-2">
+                <div class="input-group input-group-sm" style="width: 250px;">
+                    <span class="input-group-text bg-white" style="border: 1.5px solid #cbd5e1; border-right: none; color: #64748b;">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+                    <input type="text" id="monitorSearchInput" class="form-control form-control-sm" placeholder="Filter candidates..." onkeyup="filterMonitorTable()" style="border: 1.5px solid #cbd5e1; border-left: none; font-size: 0.85rem;">
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Container (Shown only when candidates are present) -->
+        <div class="table-responsive table-container-bordered" id="monitorTableWrapper" style="display: none;">
+            <table class="table-app align-middle m-0" id="monitorTable" style="width: 100%;">
                 <thead>
                     <tr>
                         <th>Candidate</th>
@@ -116,13 +303,23 @@ Live Exam Proctoring Monitor - {{ exam.title }} | Smart Recruitment
                     </tr>
                 </thead>
                 <tbody id="monitorTableBody">
-                    <tr>
-                        <td colspan="9" class="text-center py-4 text-muted">
-                            <i class="fa-solid fa-spinner fa-spin me-2"></i> Loading live candidate telemetry...
-                        </td>
-                    </tr>
+                    <!-- Populated via JS -->
                 </tbody>
             </table>
+        </div>
+
+        <!-- Dedicated Clean Empty State (Shown when no candidates are assigned) -->
+        <div id="monitorEmptyState" class="text-center py-5">
+            <div class="d-flex flex-column align-items-center justify-content-center">
+                <div class="mb-3" style="width: 60px; height: 60px; border-radius: 50%; background-color: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; border: 1.5px solid #bfdbfe;">
+                    <i class="fa-solid fa-users-slash"></i>
+                </div>
+                <h5 class="fw-bold mb-1" style="font-weight: 800; color: #000000 !important; font-size: 1.15rem;">No candidates assigned to this exam</h5>
+                <p class="text-muted small mb-3" style="max-width: 440px; font-size: 0.88rem;">Assign candidates to enable real-time telemetry and proctoring monitoring.</p>
+                <a href="{{ url_for('hr_assign_exam', exam_id=exam.id) }}" class="exam-action-btn" style="padding: 0.6rem 1.35rem !important; font-size: 0.9rem !important;">
+                    <i class="fa-solid fa-user-plus"></i> Assign Candidates Now
+                </a>
+            </div>
         </div>
     </div>
 
@@ -140,52 +337,74 @@ Live Exam Proctoring Monitor - {{ exam.title }} | Smart Recruitment
 
             if (data.success) {
                 // Update stats
-                document.getElementById('statTotal').innerText = data.stats.total;
-                document.getElementById('statNotStarted').innerText = data.stats.not_started;
-                document.getElementById('statInProgress').innerText = data.stats.in_progress;
-                document.getElementById('statSubmitted').innerText = data.stats.submitted;
-                document.getElementById('statViolations').innerText = data.stats.violations;
+                document.getElementById('statTotal').innerText = data.stats.total || 0;
+                document.getElementById('statNotStarted').innerText = data.stats.not_started || 0;
+                document.getElementById('statInProgress').innerText = data.stats.in_progress || 0;
+                document.getElementById('statSubmitted').innerText = data.stats.submitted || 0;
+                document.getElementById('statViolations').innerText = data.stats.violations || 0;
 
-                // Update Table
+                const tableWrapper = document.getElementById('monitorTableWrapper');
+                const emptyState = document.getElementById('monitorEmptyState');
                 const tbody = document.getElementById('monitorTableBody');
-                if (data.candidates.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-muted">No candidates assigned to this exam.</td></tr>`;
+
+                if (!data.candidates || data.candidates.length === 0) {
+                    if (tableWrapper) tableWrapper.style.display = 'none';
+                    if (emptyState) emptyState.style.display = 'block';
                     return;
                 }
 
+                if (emptyState) emptyState.style.display = 'none';
+                if (tableWrapper) tableWrapper.style.display = 'block';
+
                 tbody.innerHTML = data.candidates.map(c => {
-                    let statusBadge = `<span class="badge badge-not-started">Not Started</span>`;
-                    if (c.status === 'IN_PROGRESS') statusBadge = `<span class="badge badge-in-progress"><i class="fa-solid fa-spinner fa-spin me-1"></i> In Progress</span>`;
-                    else if (c.status === 'SUBMITTED' || c.status === 'AUTO_SUBMITTED' || c.status === 'TIME_EXPIRED') statusBadge = `<span class="badge badge-submitted"><i class="fa-solid fa-check me-1"></i> Submitted</span>`;
-                    else if (c.status === 'DISQUALIFIED') statusBadge = `<span class="badge badge-disqualified"><i class="fa-solid fa-xmark me-1"></i> Disqualified</span>`;
+                    let statusBadge = `<span class="badge" style="background-color: #f8fafc; color: #475569; border: 1.5px solid #cbd5e1; font-weight: 700; padding: 6px 12px; border-radius: 20px;">Not Started</span>`;
+                    if (c.status === 'IN_PROGRESS') {
+                        statusBadge = `<span class="badge" style="background-color: #eff6ff; color: #1d4ed8; border: 1.5px solid #bfdbfe; font-weight: 800; padding: 6px 12px; border-radius: 20px;"><i class="fa-solid fa-spinner fa-spin me-1"></i> In Progress</span>`;
+                    } else if (c.status === 'SUBMITTED' || c.status === 'AUTO_SUBMITTED' || c.status === 'TIME_EXPIRED') {
+                        statusBadge = `<span class="badge" style="background-color: #eff6ff; color: #2563eb; border: 1.5px solid #bfdbfe; font-weight: 800; padding: 6px 12px; border-radius: 20px;"><i class="fa-solid fa-circle-check me-1"></i> Submitted</span>`;
+                    } else if (c.status === 'DISQUALIFIED') {
+                        statusBadge = `<span class="badge" style="background-color: #f8fafc; color: #64748b; border: 1.5px solid #cbd5e1; font-weight: 700; padding: 6px 12px; border-radius: 20px;"><i class="fa-solid fa-ban me-1"></i> Disqualified</span>`;
+                    }
 
                     const cameraBadge = (c.camera_status === 'Connected')
-                        ? `<span class="badge bg-success-subtle text-success border border-success"><i class="fa-solid fa-video me-1"></i> Connected</span>`
-                        : `<span class="badge bg-secondary-subtle text-secondary"><i class="fa-solid fa-video-slash me-1"></i> Disconnected</span>`;
+                        ? `<span class="badge" style="background-color: #eff6ff; color: #2563eb; border: 1.5px solid #bfdbfe; font-weight: 700; padding: 5px 10px; border-radius: 16px;"><i class="fa-solid fa-video me-1"></i> Connected</span>`
+                        : `<span class="badge" style="background-color: #f8fafc; color: #64748b; border: 1.5px solid #cbd5e1; font-weight: 700; padding: 5px 10px; border-radius: 16px;"><i class="fa-solid fa-video-slash me-1"></i> Disconnected</span>`;
 
                     const fsBadge = (c.fullscreen_status === 'Active')
-                        ? `<span class="badge bg-info-subtle text-info border border-info">Active</span>`
-                        : `<span class="badge bg-danger-subtle text-danger">Exited</span>`;
+                        ? `<span class="badge" style="background-color: #eff6ff; color: #1d4ed8; border: 1.5px solid #bfdbfe; font-weight: 700; padding: 5px 10px; border-radius: 16px;"><i class="fa-solid fa-expand me-1"></i> Active</span>`
+                        : `<span class="badge" style="background-color: #f8fafc; color: #64748b; border: 1.5px solid #cbd5e1; font-weight: 700; padding: 5px 10px; border-radius: 16px;"><i class="fa-solid fa-compress me-1"></i> Exited</span>`;
 
                     const warningBadge = (c.warnings > 0)
-                        ? `<span class="badge bg-danger text-white fw-bold">${c.warnings} Warning(s)</span>`
-                        : `<span class="badge bg-light text-dark border">0</span>`;
+                        ? `<span class="badge" style="background-color: #eff6ff; color: #2563eb; border: 1.5px solid #bfdbfe; font-weight: 800; padding: 5px 10px; border-radius: 16px;"><i class="fa-solid fa-shield-halved me-1"></i> ${c.warnings} Warning${c.warnings === 1 ? '' : 's'}</span>`
+                        : `<span class="badge" style="background-color: #f8fafc; color: #64748b; border: 1.5px solid #cbd5e1; font-weight: 600; padding: 5px 10px; border-radius: 16px;">0</span>`;
+
+                    const answered = c.answered_count || 0;
+                    const totalQ = c.total_questions || 1;
+                    const progressPct = Math.min(100, Math.round((answered / totalQ) * 100));
 
                     return `
-                        <tr>
+                        <tr class="candidate-monitor-row" data-name="${(c.name || '').toLowerCase()}" data-email="${(c.email || '').toLowerCase()}">
                             <td>
-                                <strong>${c.name}</strong><br>
-                                <small class="text-muted">${c.email}</small>
+                                <strong class="text-dark d-block" style="font-weight: 800; color: #000000 !important; font-size: 0.92rem;">${c.name}</strong>
+                                <small class="text-muted" style="font-size: 0.8rem;">${c.email}</small>
                             </td>
                             <td>${statusBadge}</td>
-                            <td><strong class="font-monospace text-primary">${c.remaining_time || '--:--'}</strong></td>
-                            <td>${c.answered_count} / ${c.total_questions} answered</td>
+                            <td><strong class="font-monospace text-dark" style="font-weight: 800; color: #000000 !important; font-size: 0.92rem;">${c.remaining_time || '--:--'}</strong></td>
+                            <td style="min-width: 140px;">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span style="font-weight: 700; font-size: 0.82rem; color: #000000;">${answered} / ${c.total_questions}</span>
+                                    <small class="text-muted fw-bold" style="font-size: 0.75rem;">${progressPct}%</small>
+                                </div>
+                                <div class="progress" style="height: 5px; border-radius: 4px; background-color: #e2e8f0;">
+                                    <div class="progress-bar" role="progressbar" style="width: ${progressPct}%; background-color: #2563eb; border-radius: 4px;"></div>
+                                </div>
+                            </td>
                             <td>${cameraBadge}</td>
                             <td>${fsBadge}</td>
                             <td>${warningBadge}</td>
-                            <td><small class="text-muted">${c.last_activity || 'N/A'}</small></td>
+                            <td><small class="text-muted" style="font-weight: 600; font-size: 0.82rem;">${c.last_activity || 'N/A'}</small></td>
                             <td class="text-end">
-                                ${c.attempt_id ? `<a href="/hr/exams/attempt/${c.attempt_id}" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-shield-halved me-1"></i> Audit</a>` : '<span class="text-muted small">--</span>'}
+                                ${c.attempt_id ? `<a href="/hr/exams/attempt/${c.attempt_id}" class="exam-action-btn" style="padding: 0.4rem 0.85rem !important; font-size: 0.8rem !important;"><i class="fa-solid fa-shield-halved"></i> Audit</a>` : '<span class="text-muted small">--</span>'}
                             </td>
                         </tr>
                     `;
@@ -194,6 +413,20 @@ Live Exam Proctoring Monitor - {{ exam.title }} | Smart Recruitment
         } catch (err) {
             console.error("Fetch live status error:", err);
         }
+    }
+
+    function filterMonitorTable() {
+        const query = (document.getElementById('monitorSearchInput')?.value || '').toLowerCase().trim();
+        const rows = document.querySelectorAll('.candidate-monitor-row');
+        rows.forEach(row => {
+            const name = row.getAttribute('data-name') || '';
+            const email = row.getAttribute('data-email') || '';
+            if (!query || name.includes(query) || email.includes(query)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
     }
 
     // Auto-poll every 5 seconds

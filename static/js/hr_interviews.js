@@ -1503,19 +1503,17 @@ function showWebsiteConfirm(titleOrOptions, message, onConfirm, okText = 'Confir
 
     if (okBtn) {
         okBtn.textContent = okText;
-        okBtn.className = `btn btn-${type} px-3 fw-bold`;
+        okBtn.className = `btn btn-primary px-3 fw-bold`;
+        okBtn.style.backgroundColor = '#2563eb';
+        okBtn.style.borderColor = '#1d4ed8';
+        okBtn.style.color = '#ffffff';
     }
 
     if (iconBox && iconEl) {
-        if (type === 'danger') {
-            iconBox.style.background = '#fee2e2';
-            iconBox.style.color = '#ef4444';
-            iconEl.className = 'fa-solid fa-triangle-exclamation';
-        } else {
-            iconBox.style.background = '#eff6ff';
-            iconBox.style.color = '#2563eb';
-            iconEl.className = 'fa-solid fa-circle-question';
-        }
+        iconBox.style.background = '#eff6ff';
+        iconBox.style.color = '#2563eb';
+        iconBox.style.border = '1.5px solid #bfdbfe';
+        iconEl.className = 'fa-solid fa-circle-question';
     }
 
     const modalEl = document.getElementById('websiteConfirmModal');

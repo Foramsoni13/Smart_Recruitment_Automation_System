@@ -143,6 +143,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (confirmDeleteBtn) {
         confirmDeleteBtn.addEventListener("click", executeDeleteCandidate);
     }
+    enforceBlueDeleteModal();
 
     // Initial load
     fetchCandidates();
@@ -512,9 +513,29 @@ document.addEventListener("DOMContentLoaded", function () {
         deleteSelectedBtn.addEventListener("click", promptBatchDeleteCandidates);
     }
 
+    function enforceBlueDeleteModal() {
+        if (!deleteModal) return;
+        const iconBox = deleteModal.querySelector(".delete-icon");
+        if (iconBox) {
+            iconBox.style.setProperty("background-color", "#eff6ff", "important");
+            iconBox.style.setProperty("border-color", "#bfdbfe", "important");
+            iconBox.style.setProperty("color", "#2563eb", "important");
+            const iconI = iconBox.querySelector("i");
+            if (iconI) iconI.style.setProperty("color", "#2563eb", "important");
+        }
+        const confirmBtn = document.getElementById("confirmDelete");
+        if (confirmBtn) {
+            confirmBtn.style.setProperty("background-color", "#2563eb", "important");
+            confirmBtn.style.setProperty("border-color", "#1d4ed8", "important");
+            confirmBtn.style.setProperty("color", "#ffffff", "important");
+            confirmBtn.style.setProperty("box-shadow", "0 4px 12px rgba(37, 99, 235, 0.25)", "important");
+        }
+    }
+
     function promptDeleteCandidate(id) {
         selectedCandidateId = id;
         isBatchDeleteTarget = false;
+        enforceBlueDeleteModal();
         const title = deleteModal ? deleteModal.querySelector("h2") : null;
         const msg = deleteModal ? deleteModal.querySelector("p") : null;
         if (title) title.textContent = "Delete Candidate?";
@@ -528,6 +549,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (count === 0) return;
 
         isBatchDeleteTarget = true;
+        enforceBlueDeleteModal();
         const title = deleteModal ? deleteModal.querySelector("h2") : null;
         const msg = deleteModal ? deleteModal.querySelector("p") : null;
         if (title) title.textContent = "Delete Selected Candidates?";

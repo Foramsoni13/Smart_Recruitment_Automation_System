@@ -6,95 +6,234 @@ Assign Candidates - {{ exam.title }} | Smart Recruitment
 
 {% block css %}
 <style>
-    body { background-color: #f8fafc; }
-    .card-custom {
-        background: #ffffff;
-        border-radius: 16px;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
+    .page-header-card {
+        transition: border-color 0.25s ease;
+    }
+    .page-header-card:hover {
+        border-color: #1d4ed8 !important;
+    }
+
+    .app-card {
+        transition: border-color 0.25s ease;
+    }
+    .app-card:hover {
+        border-color: #1d4ed8 !important;
+    }
+
+    .exam-action-btn {
+        background-color: #2563eb !important;
+        color: #ffffff !important;
+        border: 1.5px solid #1d4ed8 !important;
+        border-radius: 10px !important;
+        padding: 0.55rem 1rem !important;
+        font-size: 0.85rem !important;
+        font-weight: 700 !important;
+        text-decoration: none !important;
+        box-shadow: 0 3px 8px rgba(37, 99, 235, 0.25) !important;
+        transition: all 0.2s ease !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        cursor: pointer !important;
+    }
+
+    .exam-action-btn *, .exam-action-btn i {
+        color: #ffffff !important;
+    }
+
+    .exam-action-btn:hover {
+        background-color: #1d4ed8 !important;
+        border-color: #1d4ed8 !important;
+        color: #ffffff !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 5px 14px rgba(29, 78, 216, 0.35) !important;
+    }
+
+    .exam-action-btn-icon {
+        padding: 0.55rem 0.85rem !important;
+    }
+
+    .candidate-row {
+        background-color: #ffffff !important;
+        transition: background-color 0.15s ease;
+    }
+
+    .candidate-row:hover {
+        background-color: #f8fafc !important;
+    }
+
+    .candidate-row.row-assigned {
+        background-color: #ffffff !important;
+    }
+
+    .form-check-input {
+        cursor: pointer;
+        width: 1.15rem !important;
+        height: 1.15rem !important;
+        border: 1.5px solid #cbd5e1 !important;
+        border-radius: 5px !important;
+    }
+
+    .form-check-input:checked {
+        background-color: #2563eb !important;
+        border-color: #1d4ed8 !important;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container py-4">
+<div class="app-container">
 
-    <!-- HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h3 class="fw-bold mb-1">Assign Candidates to "{{ exam.title }}"</h3>
-            <p class="text-muted mb-0">Select individual candidates or assign by Job / Upload batch.</p>
+    <!-- PAGE HEADER CARD -->
+    <header class="page-header-card d-flex align-items-center justify-content-between p-4 mb-4 bg-white border border-2 rounded-4 shadow-sm" style="border-color: #cbd5e1 !important;">
+        <div class="d-flex align-items-center gap-3">
+            <a href="{{ url_for('hr_exams_list') }}" class="exam-action-btn exam-action-btn-icon" title="Back to Exams" aria-label="Back to Exams">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <div class="header-icon-box d-flex align-items-center justify-content-center rounded-4" style="width: 52px; height: 52px; background-color: #eff6ff; color: #2563eb; border: 1.5px solid #bfdbfe; font-size: 1.5rem; flex-shrink: 0;">
+                <i class="fa-solid fa-user-check" style="color: #2563eb !important;"></i>
+            </div>
+            <div>
+                <span class="eyebrow-text fw-bold text-uppercase" style="font-size: 0.72rem; color: #2563eb; letter-spacing: 1.2px; display: block; margin-bottom: 3px;">CANDIDATE ASSIGNMENT</span>
+                <h1 class="h3 fw-bold m-0 text-dark" style="font-weight: 800; color: #000000 !important; letter-spacing: -0.4px; line-height: 1.2;">
+                    Assign Candidates to {{ exam.title|title }}
+                </h1>
+            </div>
         </div>
-        <a href="{{ url_for('hr_exams_list') }}" class="btn btn-secondary btn-sm">
-            <i class="fa-solid fa-arrow-left me-1"></i> Back to Exams
-        </a>
-    </div>
 
-    <!-- BULK ASSIGN BY JOB / UPLOAD CARD -->
-    <div class="card-custom mb-4">
-        <h5 class="fw-bold text-primary mb-3"><i class="fa-solid fa-layer-group me-2"></i>Bulk Assign by Job / Upload Batch</h5>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <a href="{{ url_for('hr_exams_list') }}" class="exam-action-btn">
+                <i class="fa-solid fa-arrow-left"></i> Back to Exams
+            </a>
+            <a href="{{ url_for('home') }}" class="exam-action-btn">
+                <i class="fa-solid fa-house"></i> Dashboard
+            </a>
+        </div>
+    </header>
+
+    <!-- BULK ASSIGN BY JOB / UPLOAD BATCH CARD -->
+    <div class="app-card bg-white p-4 mb-4 border border-2 rounded-4 shadow-sm" style="border-color: #cbd5e1 !important;">
+        <div class="d-flex align-items-center justify-content-between pb-3 mb-3 border-bottom" style="border-color: #e2e8f0;">
+            <div class="d-flex align-items-center gap-2">
+                <i class="fa-solid fa-layer-group text-primary fs-5"></i>
+                <h2 class="h5 fw-bold m-0 text-dark" style="font-weight: 800; color: #000000 !important;">Bulk Assign by Job / Upload Batch</h2>
+            </div>
+            <span class="badge px-3 py-1.5 rounded-pill fw-bold" style="background-color: #eff6ff; color: #2563eb; border: 1.5px solid #bfdbfe; font-size: 0.8rem;">
+                Fast Batch Processing
+            </span>
+        </div>
 
         <form action="{{ url_for('hr_assign_exam_batch', exam_id=exam.id) }}" method="POST" class="row g-3 align-items-end">
-            <div class="col-md-5">
-                <label class="form-label fw-semibold">Select Job / Upload Batch</label>
-                <select name="job_upload_key" class="form-select" required>
-                    <option value="">-- Choose Job / Batch --</option>
-                    {% for job in automation_jobs %}
-                        <option value="job_{{ job.job_code }}">Job: {{ job.job_name }} ({{ job.job_code }}) - {{ job.total_candidates }} candidates</option>
-                    {% endfor %}
-                    {% for uf in uploaded_files %}
-                        <option value="upload_{{ uf.upload_id }}">Upload Batch: {{ uf.filename }} (ID: {{ uf.upload_id }})</option>
-                    {% endfor %}
-                </select>
+            <div class="col-md-7 col-lg-8">
+                <label class="form-label fw-bold text-dark small mb-1.5">Select Job / Upload Batch</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0" style="border-color: #cbd5e1;"><i class="fa-solid fa-briefcase text-muted"></i></span>
+                    <select name="job_upload_key" class="form-select border-start-0" required style="border-color: #cbd5e1;">
+                        <option value="">-- Choose Job / Batch --</option>
+                        {% for job in automation_jobs %}
+                            <option value="job_{{ job.job_code }}">Job: {{ job.job_name }} ({{ job.job_code }}) - {{ job.total_candidates }} candidates</option>
+                        {% endfor %}
+                        {% for uf in uploaded_files %}
+                            <option value="upload_{{ uf.upload_id }}">Upload Batch: {{ uf.filename }} (ID: {{ uf.upload_id }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
-            <div class="col-md-4">
-                <button type="submit" class="btn btn-primary fw-bold">
-                    <i class="fa-solid fa-users-gear me-1"></i> Assign Whole Batch
+            <div class="col-md-5 col-lg-4">
+                <button type="submit" class="btn btn-primary w-100 fw-bold d-inline-flex align-items-center justify-content-center gap-2" style="background-color: #2563eb !important; border-color: #1d4ed8 !important; padding: 10px 20px; border-radius: 10px;">
+                    <i class="fa-solid fa-users-gear"></i>
+                    <span>Assign Whole Batch</span>
                 </button>
             </div>
         </form>
     </div>
 
-    <!-- INDIVIDUAL CANDIDATES TABLE -->
-    <div class="card-custom">
-        <form action="{{ url_for('hr_assign_exam', exam_id=exam.id) }}" method="POST">
-            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-                <h5 class="fw-bold mb-0">Candidate Selection ({{ candidates|length if candidates else 0 }})</h5>
-                <button type="submit" class="btn btn-primary fw-bold">
-                    <i class="fa-solid fa-floppy-disk me-1"></i> Save Selected Assignments
-                </button>
+    <!-- INDIVIDUAL CANDIDATES SELECTION CARD -->
+    <div class="app-card bg-white p-4 border border-2 rounded-4 shadow-sm" style="border-color: #cbd5e1 !important;">
+        <form action="{{ url_for('hr_assign_exam', exam_id=exam.id) }}" method="POST" id="assignForm">
+            <!-- HEADER & ACTION TOOLBAR -->
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 pb-3 mb-3 border-bottom" style="border-color: #e2e8f0;">
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <h2 class="h5 fw-bold m-0 text-dark" style="font-weight: 800; color: #000000 !important;">Candidate Selection</h2>
+                    <span class="badge px-3 py-1.5 rounded-pill fw-bold" style="background-color: #eff6ff; color: #2563eb; border: 1.5px solid #bfdbfe; font-size: 0.82rem;">
+                        Total: <span id="totalCandidatesCount">{{ candidates|length if candidates else 0 }}</span>
+                    </span>
+                    <span class="badge px-3 py-1.5 rounded-pill fw-bold" style="background-color: #eff6ff; color: #1d4ed8; border: 1.5px solid #bfdbfe; font-size: 0.82rem;">
+                        Selected: <span id="selectedCount">{{ assigned_cand_ids|length }}</span>
+                    </span>
+                </div>
+
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <!-- Live Search Filter -->
+                    <div class="input-group input-group-sm" style="width: 220px;">
+                        <span class="input-group-text bg-light" style="border-color: #cbd5e1;"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                        <input type="text" id="candidateSearchInput" class="form-control form-control-sm" placeholder="Filter candidates..." onkeyup="filterCandidateRows()" style="border-color: #cbd5e1;">
+                    </div>
+
+                    <!-- Quick Selection Buttons -->
+                    <button type="button" class="btn btn-sm btn-outline-primary fw-semibold" onclick="setSelectAll(true)" style="border-radius: 8px;">
+                        Select All
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary fw-semibold" onclick="setSelectAll(false)" style="border-radius: 8px;">
+                        Clear All
+                    </button>
+
+                    <!-- Save Selected Assignments Button -->
+                    <button type="submit" class="btn btn-primary fw-bold d-inline-flex align-items-center gap-2" style="background-color: #2563eb !important; border-color: #1d4ed8 !important; padding: 7px 18px; border-radius: 10px;">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        <span>Save Selected Assignments</span>
+                    </button>
+                </div>
             </div>
 
             {% if candidates and candidates|length > 0 %}
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
+                <div class="table-responsive-wrapper" style="overflow-x: auto;">
+                    <table class="table-app align-middle m-0" id="candidatesTable" style="width: 100%;">
+                        <thead>
                             <tr>
-                                <th style="width: 40px;">
-                                    <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)" style="cursor: pointer;">
+                                <th style="width: 50px; text-align: center;">
+                                    <input type="checkbox" id="selectAll" class="form-check-input" onchange="toggleSelectAll(this)" title="Toggle Select All">
                                 </th>
                                 <th>Candidate Name</th>
                                 <th>Email Address</th>
                                 <th>Position / Job ID</th>
-                                <th>Assignment Status</th>
+                                <th style="text-align: center;">Assignment Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for c in candidates %}
-                            <tr>
-                                <td>
-                                    <input type="checkbox" name="candidate_ids" value="{{ c.id }}" class="cand-checkbox" {% if c.id in assigned_cand_ids %}checked{% endif %} style="cursor: pointer;">
+                            <tr class="candidate-row" data-name="{{ c.name|lower }}" data-email="{{ c.email|lower }}" data-pos="{{ (c.position or '')|lower }}">
+                                <td style="text-align: center;">
+                                    <input type="checkbox" name="candidate_ids" value="{{ c.id }}" class="cand-checkbox form-check-input" {% if c.id in assigned_cand_ids %}checked{% endif %} onchange="updateSelectedCounter()">
                                 </td>
-                                <td><strong>{{ c.name }}</strong></td>
-                                <td>{{ c.email }}</td>
-                                <td>{{ c.position }} <small class="text-muted">({{ c.job_id or 'General' }})</small></td>
                                 <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="candidate-avatar d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; border-radius: 10px; background-color: #eff6ff; color: #2563eb; border: 1.5px solid #bfdbfe; font-size: 0.85rem; flex-shrink: 0;">
+                                            {{ c.name[:2]|upper if c.name else 'CA' }}
+                                        </div>
+                                        <div>
+                                            <strong class="text-dark d-block" style="font-weight: 700; color: #000000 !important; font-size: 0.95rem;">{{ c.name }}</strong>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="text-dark" style="font-weight: 600;"><i class="fa-solid fa-envelope text-muted me-1.5 small"></i>{{ c.email }}</span>
+                                </td>
+                                <td>
+                                    <strong class="text-dark" style="font-weight: 700;">{{ c.position }}</strong>
+                                    {% if c.job_id %}
+                                        <span class="badge ms-1" style="background-color: #f8fafc; color: #475569; border: 1px solid #cbd5e1; font-size: 0.75rem;">{{ c.job_id }}</span>
+                                    {% endif %}
+                                </td>
+                                <td style="text-align: center;">
                                     {% if c.id in assigned_cand_ids %}
-                                        <span class="badge bg-success"><i class="fa-solid fa-check me-1"></i> Assigned</span>
+                                        <span class="badge px-3 py-1.5 rounded-pill fw-bold" style="background-color: #eff6ff; color: #1d4ed8; border: 1.5px solid #bfdbfe; font-size: 0.82rem;">
+                                            <i class="fa-solid fa-circle-check me-1"></i> Assigned
+                                        </span>
                                     {% else %}
-                                        <span class="badge bg-secondary">Not Assigned</span>
+                                        <span class="badge px-3 py-1.5 rounded-pill fw-bold" style="background-color: #f8fafc; color: #64748b; border: 1.5px solid #cbd5e1; font-size: 0.82rem;">
+                                            <i class="fa-solid fa-circle-minus me-1"></i> Not Assigned
+                                        </span>
                                     {% endif %}
                                 </td>
                             </tr>
@@ -103,8 +242,15 @@ Assign Candidates - {{ exam.title }} | Smart Recruitment
                     </table>
                 </div>
             {% else %}
-                <div class="text-center py-4 text-muted">
-                    No candidates found in the database.
+                <div class="empty-state-card text-center py-5">
+                    <div class="empty-state-icon mx-auto mb-3" style="width: 60px; height: 60px; border-radius: 50%; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; border: 1.5px solid #bfdbfe;">
+                        <i class="fa-solid fa-users-slash"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-1">No Candidates Available</h5>
+                    <p class="text-muted small mb-3">No candidate records were found in the database to assign to this examination.</p>
+                    <a href="{{ url_for('candidate_register') }}" class="btn btn-primary fw-bold px-3 py-2" style="border-radius: 10px;">
+                        <i class="fa-solid fa-user-plus me-1"></i> Add Candidate
+                    </a>
                 </div>
             {% endif %}
 
@@ -118,7 +264,52 @@ Assign Candidates - {{ exam.title }} | Smart Recruitment
 <script>
     function toggleSelectAll(master) {
         const checkboxes = document.querySelectorAll('.cand-checkbox');
-        checkboxes.forEach(cb => cb.checked = master.checked);
+        checkboxes.forEach(cb => {
+            const row = cb.closest('tr');
+            if (row && row.style.display !== 'none') {
+                cb.checked = master.checked;
+            }
+        });
+        updateSelectedCounter();
     }
+
+    function setSelectAll(selectAll) {
+        const master = document.getElementById('selectAll');
+        if (master) master.checked = selectAll;
+        const checkboxes = document.querySelectorAll('.cand-checkbox');
+        checkboxes.forEach(cb => {
+            const row = cb.closest('tr');
+            if (row && row.style.display !== 'none') {
+                cb.checked = selectAll;
+            }
+        });
+        updateSelectedCounter();
+    }
+
+    function updateSelectedCounter() {
+        const checked = document.querySelectorAll('.cand-checkbox:checked').length;
+        const counter = document.getElementById('selectedCount');
+        if (counter) {
+            counter.textContent = checked;
+        }
+    }
+
+    function filterCandidateRows() {
+        const query = (document.getElementById('candidateSearchInput')?.value || '').toLowerCase().trim();
+        const rows = document.querySelectorAll('.candidate-row');
+        rows.forEach(row => {
+            const name = row.getAttribute('data-name') || '';
+            const email = row.getAttribute('data-email') || '';
+            const pos = row.getAttribute('data-pos') || '';
+            if (!query || name.includes(query) || email.includes(query) || pos.includes(query)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    // Initialize counter on load
+    document.addEventListener('DOMContentLoaded', updateSelectedCounter);
 </script>
 {% endblock %}

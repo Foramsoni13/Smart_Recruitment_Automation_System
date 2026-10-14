@@ -277,6 +277,62 @@ Interview Management & Calendar | Smart Recruitment
         to { opacity: 0; transform: translateX(50px) scale(0.95); }
     }
 
+    /* Header Navigation & Dashboard Buttons */
+    .btn-back-dashboard {
+        background-color: #2563eb !important;
+        color: #ffffff !important;
+        border: 1.5px solid #1d4ed8 !important;
+        border-radius: var(--radius-md) !important;
+        font-weight: 700 !important;
+        padding: 8px 18px !important;
+        font-size: 0.9rem !important;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25) !important;
+        transition: all 0.2s ease !important;
+        cursor: pointer;
+        text-decoration: none !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        white-space: nowrap !important;
+    }
+    .btn-back-dashboard *, .btn-back-dashboard i, .btn-back-dashboard span {
+        color: #ffffff !important;
+    }
+    .btn-back-dashboard:hover {
+        background-color: #1d4ed8 !important;
+        color: #ffffff !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 6px 16px rgba(29, 78, 216, 0.35) !important;
+    }
+
+    .btn-back-icon {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+        border-radius: 12px;
+        background-color: #2563eb !important;
+        color: #ffffff !important;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none !important;
+        font-size: 1.1rem;
+        transition: all 0.2s ease;
+        border: 1.5px solid #1d4ed8 !important;
+        box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+        flex-shrink: 0;
+    }
+    .btn-back-icon *, .btn-back-icon i {
+        color: #ffffff !important;
+    }
+    .btn-back-icon:hover {
+        background-color: #1d4ed8 !important;
+        color: #ffffff !important;
+        transform: translateX(-3px);
+        box-shadow: 0 6px 16px rgba(29, 78, 216, 0.35);
+    }
+
     @media (max-width: 768px) {
         .calendar-month-grid {
             gap: 4px;
@@ -298,6 +354,10 @@ Interview Management & Calendar | Smart Recruitment
             min-width: unset;
             max-width: 100%;
         }
+        .btn-back-dashboard {
+            width: 100% !important;
+            justify-content: center !important;
+        }
     }
 </style>
 {% endblock %}
@@ -307,11 +367,20 @@ Interview Management & Calendar | Smart Recruitment
 
     <!-- PAGE HEADER -->
     <div class="page-header-box mb-4">
-        <div>
-            <h2><i class="fa-solid fa-calendar-days text-primary me-2"></i>Interview Management & Calendar</h2>
-            <p class="text-muted">Schedule, reschedule, track candidate interviews, and manage interviewer schedules without conflict.</p>
+        <div class="d-flex align-items-center gap-3">
+            <a href="{{ url_for('home') }}" class="btn-back-icon" title="Back to Dashboard" aria-label="Back to Dashboard">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <div>
+                <h2 class="mb-1"><i class="fa-solid fa-calendar-days text-primary me-2"></i>Interview Management & Calendar</h2>
+                <p class="text-muted mb-0">Schedule, reschedule, track candidate interviews, and manage interviewer schedules without conflict.</p>
+            </div>
         </div>
-        <div class="d-flex gap-2 flex-wrap">
+        <div class="d-flex gap-2 flex-wrap align-items-center">
+            <a href="{{ url_for('home') }}" class="btn-back-dashboard" id="btnBackToDashboard">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Back to Dashboard</span>
+            </a>
             <button class="btn btn-primary btn-form-action" data-bs-toggle="modal" data-bs-target="#scheduleModal" onclick="openScheduleModal()">
                 <i class="fa-solid fa-calendar-plus me-1"></i> Schedule Interview
             </button>
@@ -991,16 +1060,16 @@ Interview Management & Calendar | Smart Recruitment
         <div class="modal-content border-0 shadow-lg text-center p-3" style="border-radius: 20px;">
             <div class="modal-body pt-3 pb-2">
                 <div class="mb-3">
-                    <div id="websiteConfirmIconBox" class="mx-auto d-flex align-items-center justify-content-center" style="width: 56px; height: 56px; border-radius: 50%; background: #fee2e2; color: #ef4444; font-size: 1.5rem;">
-                        <i class="fa-solid fa-triangle-exclamation" id="websiteConfirmIcon"></i>
+                    <div id="websiteConfirmIconBox" class="mx-auto d-flex align-items-center justify-content-center" style="width: 56px; height: 56px; border-radius: 50%; background: #eff6ff; color: #2563eb; border: 1.5px solid #bfdbfe; font-size: 1.5rem;">
+                        <i class="fa-solid fa-circle-question" id="websiteConfirmIcon"></i>
                     </div>
                 </div>
                 <h5 class="fw-bold text-dark mb-2" id="websiteConfirmTitle">Confirm Action</h5>
                 <p class="text-muted small mb-0" id="websiteConfirmMessage">Are you sure you want to perform this action?</p>
             </div>
             <div class="modal-footer border-0 d-flex justify-content-center gap-2 pt-2">
-                <button type="button" class="btn btn-light px-3 fw-semibold" data-bs-dismiss="modal" id="websiteConfirmCancelBtn" style="border-radius: 10px;">Keep</button>
-                <button type="button" class="btn btn-danger px-3 fw-bold" id="websiteConfirmOkBtn" style="border-radius: 10px;">Yes, Confirm</button>
+                <button type="button" class="btn btn-light px-3 fw-semibold border" data-bs-dismiss="modal" id="websiteConfirmCancelBtn" style="border-radius: 10px;">Keep</button>
+                <button type="button" class="btn btn-primary px-3 fw-bold" id="websiteConfirmOkBtn" style="border-radius: 10px; background-color: #2563eb !important; border-color: #1d4ed8 !important; color: #ffffff !important;">Yes, Confirm</button>
             </div>
         </div>
     </div>

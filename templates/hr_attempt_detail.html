@@ -47,23 +47,32 @@ Attempt Audit & Security Detail #{{ attempt.id }} | Smart Recruitment
 {% endblock %}
 
 {% block content %}
-<div class="container py-4">
+<div class="app-container">
 
-    <!-- HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h3 class="fw-bold mb-1">Candidate Attempt Audit #{{ attempt.id }}</h3>
-            <p class="text-muted mb-0">Detailed proctoring security timeline and question response analysis.</p>
-        </div>
-        <div class="d-flex gap-2">
-            <a href="/api/hr/exam/{{ exam.id }}/export" class="btn btn-outline-success btn-sm">
-                <i class="fa-solid fa-file-excel me-1"></i> Export Results CSV
+    <!-- PAGE HEADER CARD -->
+    <header class="page-header-card d-flex align-items-center justify-content-between p-4 mb-4 bg-white border border-2 rounded-4 shadow-sm" style="border-color: #cbd5e1 !important;">
+        <div class="d-flex align-items-center gap-3">
+            <a href="{{ url_for('hr_exam_monitor', exam_id=exam.id) }}" class="btn btn-primary d-inline-flex align-items-center justify-content-center" style="width: 44px; height: 44px; border-radius: 12px; background-color: #2563eb !important; border-color: #1d4ed8 !important; color: #ffffff !important;" title="Back to Monitor">
+                <i class="fa-solid fa-arrow-left"></i>
             </a>
-            <a href="{{ url_for('hr_exam_monitor', exam_id=exam.id) }}" class="btn btn-secondary btn-sm">
-                <i class="fa-solid fa-arrow-left me-1"></i> Back to Monitor
+            <div>
+                <span class="eyebrow-text fw-bold text-uppercase" style="font-size: 0.75rem; color: #2563eb; letter-spacing: 1.2px; display: block; margin-bottom: 2px;">AUDIT TRAIL</span>
+                <h1 class="h3 fw-bold mb-0 text-dark" style="font-weight: 800; color: #000000 !important;">Candidate Attempt Audit #{{ attempt.id }}</h1>
+                <p class="text-muted mb-0 small" style="font-weight: 600; margin-top: 2px;">Detailed proctoring security timeline and question response analysis.</p>
+            </div>
+        </div>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <a href="/api/hr/exam/{{ exam.id }}/export" class="btn btn-primary d-inline-flex align-items-center gap-2" style="background-color: #2563eb !important; border-color: #1d4ed8 !important; padding: 8px 16px; border-radius: 10px; font-weight: 700;">
+                <i class="fa-solid fa-file-excel"></i> Export Results CSV
+            </a>
+            <a href="{{ url_for('hr_exam_monitor', exam_id=exam.id) }}" class="btn btn-primary d-inline-flex align-items-center gap-2" style="background-color: #2563eb !important; border-color: #1d4ed8 !important; padding: 8px 16px; border-radius: 10px; font-weight: 700;">
+                <i class="fa-solid fa-arrow-left"></i> Back to Monitor
+            </a>
+            <a href="{{ url_for('home') }}" class="btn btn-primary d-inline-flex align-items-center gap-2" style="background-color: #2563eb !important; border-color: #1d4ed8 !important; padding: 8px 16px; border-radius: 10px; font-weight: 700;">
+                <i class="fa-solid fa-house"></i> Dashboard
             </a>
         </div>
-    </div>
+    </header>
 
     <!-- SUMMARY ROW -->
     <div class="row g-3 mb-4">
