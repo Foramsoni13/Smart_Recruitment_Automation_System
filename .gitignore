@@ -1,36 +1,90 @@
+# ==============================
 # Python
+# ==============================
 __pycache__/
 *.py[cod]
-*.pyo
+*$py.class
+*.so
+.Python
+build/
+dist/
+wheels/
+*.egg-info/
 
+# ==============================
 # Virtual environments
+# ==============================
 venv/
 .venv/
 env/
+ENV/
 
-# Environment variables and secrets
+# ==============================
+# Environment variables / secrets
+# ==============================
 .env
 .env.*
 !.env.example
+*.pem
+*.key
 
-# Editors and OS
+# ==============================
+# IDE and operating system
+# ==============================
 .DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
 .vscode/
+.idea/
+*.swp
+*.swo
 
-# Temporary files
+# ==============================
+# Logs and caches
+# ==============================
 *.log
 .cache/
-
-# Generated files (uncomment if these should not be versioned)
-# uploads/
-# resumes/
-# scratch/
-# Application logs
+cache/
 automation/logs/
+logs/
 
-# Uploaded candidate data and resumes
-uploads/candidates/
-uploads/resumes/
+# ==============================
+# Testing and coverage
+# ==============================
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
 
-# Other generated uploads
+# ==============================
+# Uploaded files and private candidate data
+# ==============================
 uploads/
+resumes/
+
+# ==============================
+# Generated reports and temporary files
+# ==============================
+*.tmp
+*.temp
+*.bak
+*.orig
+
+# ==============================
+# Local databases
+# Uncomment if your database is local-only
+# ==============================
+# *.db
+# *.sqlite
+# *.sqlite3
+
+# ==============================
+# Generated artifacts
+# Uncomment if these should not be versioned
+# ==============================
+# reports/
+# scratch/
+# eval_results.json
