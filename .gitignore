@@ -1,19 +1,36 @@
-# Environment variables
-.env
-
 # Python
 __pycache__/
 *.py[cod]
-*$py.class
+*.pyo
+
+# Virtual environments
 venv/
 .venv/
+env/
 
-# Logs and temporary files
-*.log
-automation/logs/*
-!automation/logs/.gitkeep
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
 
-# macOS
+# Editors and OS
 .DS_Store
+.vscode/
 
+# Temporary files
+*.log
+.cache/
+
+# Generated files (uncomment if these should not be versioned)
+# uploads/
+# resumes/
+# scratch/
+# Application logs
+automation/logs/
+
+# Uploaded candidate data and resumes
+uploads/candidates/
+uploads/resumes/
+
+# Other generated uploads
 uploads/
